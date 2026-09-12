@@ -73,12 +73,32 @@ def test_sigla_ambigua_nao_e_adivinhada():
     assert len(nos) == 3
 
 
-def test_sigla_nao_funde_entre_tipos_diferentes():
+def test_tipo_sai_por_voto_entre_as_mencoes():
+    """O tipo e a parte menos confiavel da saida do LLM.
+
+    O mesmo corpus rendeu "Cemig" como Organizacao em varios trechos e como
+    Evento em um. Votar corrige o erro pontual; usar a primeira (ou a ultima)
+    ocorrencia deixava o acaso decidir.
+    """
     entidades = [
-        ent("CSN", EntityType.ORGANIZACAO),
-        ent("Companhia Siderúrgica Nacional", EntityType.LUGAR),
+        ent("Cemig", EntityType.ORGANIZACAO),
+        ent("Cemig", EntityType.ORGANIZACAO),
+        ent("Cemig", EntityType.EVENTO),
     ]
-    assert len(EntityResolver().resolve(entidades)) == 2
+    nos = EntityResolver().resolve(entidades)
+    assert len(nos) == 1
+    assert nos[0].type is EntityType.ORGANIZACAO
+    assert nos[0].mentions == 3
+
+
+def test_mesma_entidade_com_tipos_diferentes_nao_fragmenta():
+    """Fragmentar por tipo criava nos duplicados que o MERGE por chave depois
+    sobrescrevia, perdendo as mencoes no caminho."""
+    entidades = [
+        ent("Suzano", EntityType.ORGANIZACAO),
+        ent("Suzano", EntityType.SETOR),
+    ]
+    assert len(EntityResolver().resolve(entidades)) == 1
 
 
 # --- os casos perigosos -----------------------------------------------------

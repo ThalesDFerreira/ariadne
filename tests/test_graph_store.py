@@ -19,8 +19,8 @@ CHUNK = uuid4()
 
 
 @pytest.fixture
-def store(db):
-    s = AgeGraphStore()
+def store(db, test_graph):
+    s = AgeGraphStore(test_graph)
     s.clear(db)
     s.upsert_nodes(
         db,
@@ -123,9 +123,6 @@ def test_profundidade_maior_alcanca_o_vizinho_do_vizinho(store, db):
 
 def test_caminho_multi_hop_traz_a_justificativa_de_cada_passo(store, db):
     """O caso que motiva o projeto: ligacao que nenhum trecho contem sozinho."""
-    caminho = store.shortest_path(db, "paragominas", "gama")
-    assert caminho == []  # nao ha caminho nessa direcao
-
     caminho = store.shortest_path(db, "alfa", "gama")
     assert len(caminho) == 2
     assert caminho[0].source == "Mineradora Alfa"
@@ -145,8 +142,30 @@ def test_entidade_inexistente_nao_quebra(store, db):
     assert store.shortest_path(db, "nao-existe", "alfa") == []
 
 
-def test_find_key_localiza_pela_forma_normalizada(db):
-    s = AgeGraphStore()
+def test_busca_nao_dirigida_acha_ligacao_pela_ponta_oposta(store, db):
+    """Quem pergunta "qual a ligacao entre X e Y" nao quer uma direcao so.
+
+    Nao existe aresta saindo de paragominas, mas ela se liga a gama atraves
+    da alfa. Exigir direcao unica devolvia "nenhum caminho" para pares
+    claramente conectados.
+    """
+    assert store.shortest_path(db, "paragominas", "gama", directed=True) == []
+    assert store.shortest_path(db, "paragominas", "gama", directed=False)
+
+
+def test_hub_de_lugar_nao_vira_atalho(store, db):
+    """ "As duas ficam no mesmo lugar" e caminho valido e informativamente vazio."""
+    from ariadne.domain.graph import EntityType
+
+    caminho = store.shortest_path(db, "beta", "paragominas", avoid_hub_types=())
+    assert caminho
+    sem_lugar = store.shortest_path(db, "beta", "paragominas", avoid_hub_types=(EntityType.LUGAR,))
+    # O destino ainda pode ser um Lugar; o filtro vale para os INTERMEDIARIOS.
+    assert all(p.target != "Paragominas" for p in sem_lugar[:-1])
+
+
+def test_find_key_localiza_pela_forma_normalizada(db, test_graph):
+    s = AgeGraphStore(test_graph)
     s.clear(db)
     s.upsert_nodes(
         db,
@@ -157,9 +176,9 @@ def test_find_key_localiza_pela_forma_normalizada(db):
     assert s.find_key(db, "Empresa Inexistente") is None
 
 
-def test_nome_malicioso_nao_vira_comando(db):
+def test_nome_malicioso_nao_vira_comando(db, test_graph):
     """Nomes vem de documentos: input nao confiavel."""
-    s = AgeGraphStore()
+    s = AgeGraphStore(test_graph)
     s.clear(db)
     veneno = "x'}) DETACH DELETE (n) //"
     s.upsert_nodes(db, [GraphNode(key="veneno", name=veneno, type=EntityType.ORGANIZACAO)])

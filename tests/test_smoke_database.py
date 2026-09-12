@@ -3,6 +3,10 @@
 Prova a afirmacao que sustenta a escolha de stack do projeto: pgvector e
 Apache AGE conversam no mesmo Postgres, na mesma conexao e dentro da mesma
 transacao. Se este arquivo passa, a fundacao esta de pe.
+
+Os testes de Cypher usam um GRAFO SEPARADO. Sem isso eles escreviam no grafo
+real e passaram a quebrar quando o corpus ganhou uma Petrobras de verdade --
+teste de infraestrutura nao pode depender do conteudo ingerido.
 """
 
 import pytest
@@ -27,15 +31,21 @@ def test_search_path_da_conexao_do_pool_enxerga_o_age(db):
 
 
 def test_tabelas_do_projeto_ficam_em_public(db):
-    """ag_catalog NAO pode vir primeiro no search_path.
+    """ag_catalog NAO pode vir primeiro, e "$user" nao pode entrar.
 
-    Se vier, todo CREATE TABLE sem qualificacao cria a tabela dentro do schema
-    interno da extensao -- e um DROP EXTENSION age levaria os dados do projeto
-    junto. Ja aconteceu neste repo; este teste impede a reincidencia.
+    Com ag_catalog na frente, todo CREATE TABLE sem qualificacao cria a tabela
+    dentro do schema interno da extensao -- e um DROP EXTENSION age levaria os
+    dados do projeto junto.
+
+    Com "$user" no caminho e pior: o AGE cria um schema com o NOME DO GRAFO, e
+    aqui o grafo se chama "ariadne" igual ao usuario do banco, entao as tabelas
+    iam parar dentro do proprio grafo. Os dois casos ja aconteceram neste repo.
     """
     (search_path,) = db.execute("SHOW search_path").fetchone()
     posicoes = [s.strip().strip('"') for s in search_path.split(",")]
-    assert posicoes[-1] == "ag_catalog", f"ag_catalog deve ser o ultimo: {search_path}"
+    assert posicoes[0] == "public", f"public deve vir primeiro: {search_path}"
+    assert "ag_catalog" in posicoes, f"ag_catalog precisa estar no caminho: {search_path}"
+    assert "$user" not in search_path, f'"$user" nao pode estar no caminho: {search_path}'
 
     rows = db.execute(
         """
@@ -65,14 +75,24 @@ def test_busca_vetorial_funciona(db):
     assert rows[0][1] == pytest.approx(0.0, abs=1e-6)
 
 
-def test_cypher_cria_e_le_no_a_mesma_transacao(db):
-    run_cypher(db, "CREATE (n:Entity {name: 'Teseu'}) RETURN n")
-    rows = run_cypher(db, "MATCH (n:Entity {name: 'Teseu'}) RETURN n.name")
+def test_vetor_sobrevive_a_ida_e_volta_ao_banco(db):
+    from ariadne.storage.vector_store import to_pgvector
+
+    original = [1e-07, -0.5, 2.0]
+    (devolvido,) = db.execute("SELECT %s::vector(3)", (to_pgvector(original),)).fetchone()
+    numeros = [float(x) for x in devolvido.strip("[]").split(",")]
+    assert numeros == pytest.approx(original, rel=1e-6)
+
+
+def test_cypher_cria_e_le_no_a_mesma_transacao(db, test_graph):
+    run_cypher(db, "CREATE (n:Smoke {name: 'Teseu'}) RETURN n", graph_name=test_graph)
+    rows = run_cypher(db, "MATCH (n:Smoke {name: 'Teseu'}) RETURN n.name", graph_name=test_graph)
     assert len(rows) == 1
     assert "Teseu" in str(rows[0]["c0"])
+    db.rollback()
 
 
-def test_vetor_e_grafo_commitam_juntos(db):
+def test_vetor_e_grafo_commitam_juntos(db, test_graph):
     """O ponto central: uma transacao so cobrindo os dois mundos.
 
     Com Neo4j e Qdrant separados nao existe transacao comum -- uma falha no
@@ -80,49 +100,67 @@ def test_vetor_e_grafo_commitam_juntos(db):
     """
     db.execute("CREATE TEMP TABLE smoke_chunk (id int, embedding vector(3)) ON COMMIT DROP")
     db.execute("INSERT INTO smoke_chunk VALUES (1, '[0.1,0.2,0.3]')")
-    run_cypher(db, "CREATE (n:Entity {name: 'Ariadne', chunk_id: 1}) RETURN n")
+    run_cypher(
+        db,
+        "CREATE (n:Smoke {name: 'Ariadne', chunk_id: 1}) RETURN n",
+        graph_name=test_graph,
+    )
 
     (chunks,) = db.execute("SELECT count(*) FROM smoke_chunk").fetchone()
-    nodes = run_cypher(db, "MATCH (n:Entity {name: 'Ariadne'}) RETURN n")
+    nodes = run_cypher(db, "MATCH (n:Smoke {name: 'Ariadne'}) RETURN n", graph_name=test_graph)
     assert chunks == 1
     assert len(nodes) == 1
 
     # E o rollback desfaz os dois lados de uma vez.
     db.rollback()
-    remaining = run_cypher(db, "MATCH (n:Entity {name: 'Ariadne'}) RETURN n")
+    remaining = run_cypher(db, "MATCH (n:Smoke {name: 'Ariadne'}) RETURN n", graph_name=test_graph)
     assert remaining == []
 
 
-def test_cypher_aceita_parametros(db):
+def test_cypher_aceita_parametros(db, test_graph):
     """Valores vao por params, nunca concatenados na query."""
     run_cypher(
         db,
-        "CREATE (n:Entity {name: $nome, tipo: $tipo}) RETURN n",
+        "CREATE (n:Smoke {name: $nome, tipo: $tipo}) RETURN n",
         params={"nome": "Petrobras", "tipo": "Empresa"},
+        graph_name=test_graph,
     )
     rows = run_cypher(
         db,
-        "MATCH (n:Entity {name: $nome}) RETURN n.tipo",
+        "MATCH (n:Smoke {name: $nome}) RETURN n.tipo",
         params={"nome": "Petrobras"},
+        graph_name=test_graph,
     )
     assert len(rows) == 1
     assert "Empresa" in str(rows[0]["c0"])
+    db.rollback()
 
 
-def test_valor_malicioso_nao_vira_cypher(db):
+def test_valor_malicioso_nao_vira_cypher(db, test_graph):
     """Uma entidade extraida de documento e input nao confiavel.
 
     Se o valor fosse concatenado na query, o trecho abaixo viraria comando.
     Indo por params, ele continua sendo apenas um nome esquisito.
     """
     veneno = "x$ariadne$}) DETACH DELETE (n) //"
-    run_cypher(db, "CREATE (n:Entity {name: $nome}) RETURN n", params={"nome": veneno})
-    rows = run_cypher(db, "MATCH (n:Entity {name: $nome}) RETURN n.name", params={"nome": veneno})
+    run_cypher(
+        db,
+        "CREATE (n:Smoke {name: $nome}) RETURN n",
+        params={"nome": veneno},
+        graph_name=test_graph,
+    )
+    rows = run_cypher(
+        db,
+        "MATCH (n:Smoke {name: $nome}) RETURN n.name",
+        params={"nome": veneno},
+        graph_name=test_graph,
+    )
     assert len(rows) == 1
     assert veneno in str(rows[0]["c0"])
+    db.rollback()
 
 
-def test_query_com_o_delimitador_e_rejeitada(db):
+def test_query_com_o_delimitador_e_rejeitada(db, test_graph):
     """O dollar-quoting so e seguro se o delimitador nao aparecer na query."""
     with pytest.raises(ValueError, match="delimitador"):
-        run_cypher(db, "MATCH (n) RETURN $ariadne$ n")
+        run_cypher(db, "MATCH (n) RETURN $ariadne$ n", graph_name=test_graph)

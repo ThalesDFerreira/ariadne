@@ -210,7 +210,9 @@ def explore_entity(name: str, depth: int = 1) -> ExploreResponse:
     description=(
         "Encontra o caminho mais curto entre duas entidades no grafo, com o "
         "trecho de origem que justifica cada passo. Responde perguntas cuja "
-        "resposta nao esta escrita em nenhum documento isolado."
+        "resposta nao esta escrita em nenhum documento isolado. A busca nao e "
+        "dirigida: a ordem dos passos e a de leitura do caminho, e quem diz "
+        "quem faz o que e o campo `evidence`."
     ),
 )
 def find_connection(entity_a: str, entity_b: str, max_hops: int = 4) -> ConnectionResponse:

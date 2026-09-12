@@ -85,7 +85,10 @@ class OllamaExtractor:
         self.model = model or cfg.extraction_model
         self._client = client or httpx.Client(
             base_url=cfg.ollama_base_url,
-            timeout=httpx.Timeout(300.0),
+            # 120s, nao 300s: um punhado de chunks longos estoura o tempo de
+            # qualquer forma, e esperar 5 minutos por cada um deles antes de
+            # desistir custa mais que o pouco que eles renderiam.
+            timeout=httpx.Timeout(120.0),
         )
 
     @property
@@ -101,7 +104,12 @@ class OllamaExtractor:
             "format": Extraction.model_json_schema(),
             # Temperatura zero: extracao e tarefa determinista. Criatividade
             # aqui significa inventar relacao que o texto nao afirma.
-            "options": {"temperature": 0},
+            "options": {
+                "temperature": 0,
+                # Teto de saida: sem ele, um chunk com dezenas de entidades
+                # gera uma resposta interminavel e estoura o timeout.
+                "num_predict": 1536,
+            },
         }
         response = self._client.post("/api/chat", json=payload)
         response.raise_for_status()

@@ -100,8 +100,11 @@ def cmd_connect(args: argparse.Namespace) -> int:
     if not caminho:
         print(f"nenhum caminho de {args.source!r} ate {args.target!r}")
         return 1
+    # "~" e nao "->": a busca e nao dirigida, entao a ordem do caminho nem
+    # sempre e a direcao da aresta. Desenhar uma seta aqui afirmaria quem faz o
+    # que, e quem responde isso e a evidencia.
     for passo in caminho:
-        print(f"  {passo.source} -[{passo.relation.value}]-> {passo.target}")
+        print(f"  {passo.source} ~[{passo.relation.value}]~ {passo.target}")
         if passo.evidence:
             print(f"     evidencia: {passo.evidence[:110]}")
     return 0

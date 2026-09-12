@@ -64,11 +64,23 @@ def looks_like_acronym(name: str) -> bool:
 @dataclass
 class _Cluster:
     key: str
-    type: EntityType
+    types: dict[EntityType, int] = field(default_factory=dict)
     variants: dict[str, int] = field(default_factory=dict)
 
-    def add(self, name: str, count: int = 1) -> None:
+    def add(self, name: str, type_: EntityType, count: int = 1) -> None:
         self.variants[name] = self.variants.get(name, 0) + count
+        self.types[type_] = self.types.get(type_, 0) + count
+
+    @property
+    def type(self) -> EntityType:
+        """Tipo por VOTO entre as mencoes, nao por primeira ocorrencia.
+
+        O tipo e a parte menos confiavel da saida do LLM -- o mesmo texto
+        rendeu "Cemig" como Organizacao num trecho e como Evento em outro. O
+        nome, esse, e estavel. Votar corrige o erro pontual em vez de deixar
+        que a ultima extracao processada decida.
+        """
+        return max(self.types.items(), key=lambda kv: (kv[1], kv[0] != EntityType.OUTRO))[0]
 
     @property
     def mentions(self) -> int:
@@ -100,15 +112,22 @@ class EntityResolver:
         self._resolve_acronyms = resolve_acronyms
 
     def resolve(self, entities: list[ExtractedEntity]) -> list[GraphNode]:
-        clusters: dict[tuple[str, EntityType], _Cluster] = {}
+        """Agrupa por CHAVE, nao por (chave, tipo).
+
+        Agrupar incluindo o tipo fragmentava a mesma empresa em varios nos
+        sempre que o modelo trocava a categoria entre trechos -- e como a
+        gravacao no grafo faz MERGE so pela chave, o ultimo no processado
+        sobrescrevia os anteriores e as mencoes se perdiam. Com o agrupamento
+        por chave, as mencoes somam e o tipo sai por voto.
+        """
+        clusters: dict[str, _Cluster] = {}
 
         for entity in entities:
-            chave = (entity.key, entity.type)
-            cluster = clusters.get(chave)
+            cluster = clusters.get(entity.key)
             if cluster is None:
-                cluster = _Cluster(key=entity.key, type=entity.type)
-                clusters[chave] = cluster
-            cluster.add(entity.name)
+                cluster = _Cluster(key=entity.key)
+                clusters[entity.key] = cluster
+            cluster.add(entity.name, entity.type)
 
         if self._resolve_acronyms:
             clusters = self._merge_acronyms(clusters)
@@ -124,18 +143,16 @@ class EntityResolver:
             for cluster in clusters.values()
         ]
 
-    def _merge_acronyms(
-        self, clusters: dict[tuple[str, EntityType], _Cluster]
-    ) -> dict[tuple[str, EntityType], _Cluster]:
+    def _merge_acronyms(self, clusters: dict[str, _Cluster]) -> dict[str, _Cluster]:
         # Indexa as formas extensas pela sigla que elas geram.
-        extensos: dict[tuple[str, EntityType], list[tuple[str, EntityType]]] = {}
+        extensos: dict[str, list[str]] = {}
         for chave, cluster in clusters.items():
             for variante in cluster.variants:
                 if " " not in variante.strip():
                     continue
                 sigla = acronym_of(variante)
                 if len(sigla) >= 2:
-                    extensos.setdefault((sigla, cluster.type), []).append(chave)
+                    extensos.setdefault(sigla, []).append(chave)
 
         resultado = dict(clusters)
         for chave, cluster in list(clusters.items()):
@@ -146,7 +163,7 @@ class EntityResolver:
                 continue
 
             for sigla_bruta in candidatos:
-                alvos = extensos.get((sigla_bruta.strip().upper(), cluster.type), [])
+                alvos = extensos.get(sigla_bruta.strip().upper(), [])
                 # Ambiguidade nao se resolve no chute: duas formas extensas
                 # gerando a mesma sigla ficam separadas.
                 alvos = [a for a in alvos if a != chave and a in resultado]
@@ -155,7 +172,9 @@ class EntityResolver:
 
                 destino = resultado[alvos[0]]
                 for nome, n in cluster.variants.items():
-                    destino.add(nome, n)
+                    destino.variants[nome] = destino.variants.get(nome, 0) + n
+                for tipo, n in cluster.types.items():
+                    destino.types[tipo] = destino.types.get(tipo, 0) + n
                 resultado.pop(chave, None)
                 break
 

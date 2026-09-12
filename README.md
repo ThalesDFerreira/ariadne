@@ -17,7 +17,7 @@ Ariadne resolve o segundo caso mantendo, alem dos vetores, um grafo `(entidade) 
 
 ## Estado atual
 
-**Fase 1.5 — servidor MCP no ar.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container; ingestao da Wikipedia-pt, chunking estrutural, embeddings locais via Ollama (BGE-M3) e busca vetorial com citacao de fonte. Corpus de demonstracao: 28 empresas brasileiras, 450 chunks. O motor ja e consumivel por qualquer assistente de IA via MCP. 56 testes passando. Proximo passo: Fase 2 (o grafo).
+**Fase 2 — o grafo de conhecimento.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container; ingestao da Wikipedia-pt, chunking estrutural, embeddings locais via Ollama (BGE-M3) e busca vetorial com citacao de fonte. Corpus de demonstracao: 28 empresas brasileiras, 450 chunks. Corpus de 28 empresas brasileiras: 450 chunks, **1289 entidades e 1036 relacoes** extraidas com LLM local, cada aresta com o trecho que a justifica. 107 testes passando. Proximo passo: Fase 3 (recuperacao hibrida).
 
 ## Stack
 
@@ -56,6 +56,9 @@ uv run pytest
 ariadne ingest                      # ingere o corpus de demonstracao
 ariadne ingest "Petrobras" "Vale S.A."   # ou paginas especificas
 ariadne search "Quem extrai minério de ferro?"
+ariadne graph-build                 # extrai entidades e relacoes (LLM local)
+ariadne explore "Petrobras"
+ariadne connect "Vale" "BNDES"
 ariadne stats
 ```
 
@@ -83,6 +86,9 @@ Tools expostas nesta fase:
 |---|---|
 | `search_knowledge(query, mode, limit)` | Busca trechos no corpus. Todo resultado traz a citacao da fonte |
 | `graph_stats()` | Contagens do indice e do grafo |
+
+| `explore_entity(name, depth)` | Vizinhanca de uma entidade no grafo, com evidencia |
+| `find_connection(entity_a, entity_b)` | Caminho entre duas entidades, com o trecho que justifica cada passo |
 
 Resource: `ariadne://graph/schema`.
 
@@ -128,7 +134,7 @@ src/ariadne/
 - [x] **Fase 0** — Fundacao: Docker com pgvector + AGE, configuracao, lint/tipos/testes, CI
 - [x] **Fase 1** — Ingestao e RAG baseline: parsing, chunking, embeddings, busca vetorial
 - [x] **Fase 1.5** — MCP minimo ponta a ponta
-- [ ] **Fase 2** — O grafo: extracao de entidades/relacoes, entity resolution, Cypher
+- [x] **Fase 2** — O grafo: extracao de entidades/relacoes, entity resolution, Cypher
 - [ ] **Fase 3** — Recuperacao hibrida: BM25, RRF, expansao k-hop, reranking
 - [ ] **Fase 4** — Servidor MCP completo
 - [ ] **Fase 5** — Camada agentica: roteador e perguntas multi-hop
@@ -138,3 +144,44 @@ src/ariadne/
 ## Licenca
 
 MIT
+
+
+## O que aprendemos apanhando
+
+Notas de coisas que so aparecem construindo, todas medidas e viradas em teste.
+
+### Similaridade de embedding nao resolve entidades
+
+A ideia obvia -- fundir nomes cujo embedding seja proximo -- foi medida com o
+BGE-M3 neste corpus e reprovada:
+
+| Par | Similaridade | Deveria fundir? |
+|---|---|---|
+| Banco do Brasil ~ Banco **Central** do Brasil | 0,928 | nao |
+| Petrobras ~ Petrobras Distribuidora | 0,783 | nao |
+| Vale ~ Vale S.A. | 0,758 | sim |
+| Petrobras ~ Petroleo Brasileiro S.A. | 0,542 | sim |
+| CSN ~ Companhia Siderurgica Nacional | 0,384 | sim |
+
+Os conjuntos nao so se sobrepoem: eles se invertem. Em nome curto, o embedding
+mede parecenca de palavra, nao identidade. A resolucao aqui e deterministica --
+chave normalizada e casamento de sigla -- e prefere duplicata a fusao errada.
+
+### Campo opcional em structured output e campo que o modelo omite
+
+`entities` tinha `default_factory=list`, o que o deixa fora de `required` no
+JSON Schema. Os modelos passaram a devolver `{"relations": [...]}` sem
+`entities`, a limpeza descartava tudo por falta de pontas e a extracao saia
+vazia **em silencio**.
+
+### O Apache AGE tem arestas afiadas
+
+- Nao aceita list comprehension de Cypher (`[n IN nodes(p) | n.name]`).
+- Em caminho de comprimento variavel, `r` e uma lista e `r[-1]` nao funciona.
+- **`SET` numa aresta recem-criada por `MERGE` nao grava nada** -- nem
+  propriedade unica, nem `+=`, e sem erro nenhum. A evidencia sumia.
+- `create_graph` cria um schema com o NOME DO GRAFO. Com `"$user"` no
+  `search_path` e o grafo homonimo ao usuario do banco, as tabelas do projeto
+  nasceram dentro do proprio grafo.
+
+Cada uma virou teste de regressao.

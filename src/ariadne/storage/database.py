@@ -30,22 +30,28 @@ _pool: ConnectionPool | None = None
 def _prepare_connection(conn: psycopg.Connection[Any]) -> None:
     """Roda a cada conexao nova do pool.
 
-    A ORDEM do search_path importa mais do que parece. A documentacao do AGE
-    sugere `ag_catalog, "$user", public`, mas o primeiro schema do caminho e
-    onde um `CREATE TABLE` sem qualificacao cria a tabela -- e com ag_catalog
-    na frente, as tabelas do PROJETO (documents, chunks, extraction_cache)
-    nascem dentro do schema interno da extensao.
+    O search_path e `public, ag_catalog`, e cada parte da escolha custou um bug:
 
-    Isso e pior do que desarrumado: um `DROP EXTENSION age` levaria os dados do
-    projeto junto, e nenhuma ferramenta externa enxerga as tabelas com o
-    search_path padrao. Colocando ag_catalog por ULTIMO, as funcoes do AGE
-    continuam resolviveis e as tabelas do projeto ficam onde devem, em public.
+    - `ag_catalog` NAO pode vir primeiro, como sugere a documentacao do AGE. O
+      primeiro schema do caminho e onde um `CREATE TABLE` sem qualificacao cria
+      a tabela, e com ele na frente documents, chunks e extraction_cache nascem
+      dentro do schema interno da extensao -- onde um `DROP EXTENSION age` as
+      levaria junto.
+
+    - `"$user"` tambem nao entra. O AGE cria UM SCHEMA COM O NOME DO GRAFO, e
+      aqui o grafo se chama "ariadne" igual ao usuario do banco. Com `"$user"`
+      no caminho, ele resolvia para o schema do proprio grafo e as tabelas do
+      projeto passaram a ser criadas la dentro, ao lado de Entity e
+      RELATES_TO.
+
+    Com `public, ag_catalog` as funcoes do AGE continuam resolviveis e as
+    tabelas do projeto ficam onde qualquer ferramenta as encontra.
     """
     with conn.cursor() as cur:
         # Redundante quando shared_preload_libraries=age, mas mantem o projeto
         # funcionando tambem num Postgres sem esse preload configurado.
         cur.execute("LOAD 'age'")
-        cur.execute('SET search_path = "$user", public, ag_catalog')
+        cur.execute("SET search_path = public, ag_catalog")
     conn.commit()
 
 

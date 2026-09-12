@@ -45,6 +45,14 @@ class Neighbor(BaseModel):
 
 
 class PathStep(BaseModel):
+    """Um passo do caminho.
+
+    `source` e `target` seguem a ordem de LEITURA do caminho, que nem sempre e
+    a direcao da aresta: numa busca nao dirigida, o passo pode ter sido
+    percorrido ao contrario. Quem manda e a `evidence`, que traz a frase
+    original e nao deixa duvida sobre quem faz o que.
+    """
+
     source: str
     relation: RelationType
     target: str
@@ -69,7 +77,14 @@ class AgeGraphStore:
     Todo valor vai por parametro agtype, nunca concatenado: os nomes vem de
     documentos, que sao input nao confiavel, e concatenar abriria injecao de
     Cypher.
+
+    `graph_name` permite apontar para outro grafo. Os testes usam um grafo
+    proprio: sem isso eles operavam sobre o grafo real, e um `clear()` de
+    fixture apagaria o corpus inteiro.
     """
+
+    def __init__(self, graph_name: str | None = None) -> None:
+        self._graph = graph_name
 
     def upsert_nodes(self, conn: psycopg.Connection[Any], nodes: list[GraphNode]) -> None:
         for node in nodes:
@@ -81,6 +96,7 @@ class AgeGraphStore:
                     n.aliases = $aliases
                 RETURN n
                 """,
+                graph_name=self._graph,
                 params={
                     "key": node.key,
                     "name": node.name,
@@ -118,6 +134,7 @@ class AgeGraphStore:
                 }]->(b)
                 RETURN r
                 """,
+                graph_name=self._graph,
                 params={
                     "source": edge.source_key,
                     "target": edge.target_key,
@@ -143,6 +160,7 @@ class AgeGraphStore:
             rows = run_cypher(
                 conn,
                 f"MATCH {padrao} RETURN b.name, b.type, r.type, r.evidence LIMIT {limit}",
+                graph_name=self._graph,
                 params={"key": key},
                 columns=4,
             )
@@ -177,6 +195,7 @@ class AgeGraphStore:
             MATCH (a:Entity {{key: $key}})-[:RELATES_TO*2..{depth}]->(b:Entity)
             RETURN DISTINCT b.name, b.type LIMIT {limit}
             """,
+            graph_name=self._graph,
             params={"key": key},
             columns=2,
         )
@@ -193,29 +212,56 @@ class AgeGraphStore:
         ]
 
     def shortest_path(
-        self, conn: psycopg.Connection[Any], source: str, target: str, *, max_hops: int = 4
+        self,
+        conn: psycopg.Connection[Any],
+        source: str,
+        target: str,
+        *,
+        max_hops: int = 4,
+        directed: bool = False,
+        avoid_hub_types: tuple[EntityType, ...] = (EntityType.LUGAR,),
     ) -> list[PathStep]:
         """Caminho entre duas entidades, com a evidencia de cada aresta.
 
         Busca por comprimento crescente: o primeiro que casar e o mais curto.
+
+        `directed=False` por padrao. Quem pergunta "qual a ligacao entre X e
+        Y?" raramente quer uma direcao so -- a ligacao real entre Vale e BNDES
+        passa por `BNDES CONTROLA CSN`, ou seja, chega pela ponta oposta.
+        Exigir direcao unica devolvia "nenhum caminho" para pares claramente
+        conectados.
+
+        `avoid_hub_types` corta lugares como no INTERMEDIARIO. "As duas
+        empresas ficam no Rio de Janeiro" e um caminho tecnicamente valido e
+        informativamente vazio, e como quase toda empresa tem sede em algum
+        lugar, esses hubs ligam praticamente qualquer par -- afogando as
+        conexoes que de fato explicam alguma coisa.
         """
         max_hops = max(1, min(max_hops, 5))
+        seta = "->" if directed else "-"
+        excluidos = [t.value for t in avoid_hub_types]
 
         for hops in range(1, max_hops + 1):
             partes: list[str] = []
             retorno: list[str] = []
+            filtros: list[str] = []
             for i in range(hops):
                 origem = "a" if i == 0 else f"n{i}"
                 destino = "b" if i == hops - 1 else f"n{i + 1}"
                 sufixo = "" if i == hops - 1 else ":Entity"
-                partes.append(f"({origem})-[r{i}:RELATES_TO]->({destino}{sufixo})")
+                partes.append(f"({origem})-[r{i}:RELATES_TO]{seta}({destino}{sufixo})")
                 retorno.extend([f"{origem}.name", f"r{i}.type", f"r{i}.evidence"])
+                if i < hops - 1 and excluidos:
+                    for tipo in excluidos:
+                        filtros.append(f"{destino}.type <> '{tipo}'")
             retorno.append("b.name")
 
+            onde = f" WHERE {' AND '.join(filtros)}" if filtros else ""
             rows = run_cypher(
                 conn,
                 f"MATCH (a:Entity {{key: $source}}), (b:Entity {{key: $target}}), "
-                f"{', '.join(partes)} RETURN {', '.join(retorno)} LIMIT 1",
+                f"{', '.join(partes)}{onde} RETURN {', '.join(retorno)} LIMIT 1",
+                graph_name=self._graph,
                 params={"source": source, "target": target},
                 columns=len(retorno),
             )
@@ -224,8 +270,10 @@ class AgeGraphStore:
         return []
 
     def stats(self, conn: psycopg.Connection[Any]) -> dict[str, int]:
-        nos = run_cypher(conn, "MATCH (n:Entity) RETURN count(n)")
-        arestas = run_cypher(conn, "MATCH ()-[r:RELATES_TO]->() RETURN count(r)")
+        nos = run_cypher(conn, "MATCH (n:Entity) RETURN count(n)", graph_name=self._graph)
+        arestas = run_cypher(
+            conn, "MATCH ()-[r:RELATES_TO]->() RETURN count(r)", graph_name=self._graph
+        )
         return {
             "nodes": _agint(nos[0]["c0"]) if nos else 0,
             "edges": _agint(arestas[0]["c0"]) if arestas else 0,
@@ -237,13 +285,14 @@ class AgeGraphStore:
         rows = run_cypher(
             conn,
             "MATCH (n:Entity {key: $key}) RETURN n.key",
+            graph_name=self._graph,
             params={"key": chave},
         )
         return _agtext(rows[0]["c0"]) if rows else None
 
     def clear(self, conn: psycopg.Connection[Any]) -> None:
         """Esvazia o grafo. Usado em teste e em reconstrucao completa."""
-        run_cypher(conn, "MATCH (n:Entity) DETACH DELETE n RETURN 1")
+        run_cypher(conn, "MATCH (n:Entity) DETACH DELETE n RETURN 1", graph_name=self._graph)
 
 
 def _agtext(value: Any) -> str:

@@ -30,6 +30,26 @@ def _require_database(settings: Settings) -> None:
         pytest.skip(f"Postgres indisponivel em {settings.pg_host}:{settings.pg_port} ({exc})")
 
 
+TEST_GRAPH = "ariadne_test"
+
+
+@pytest.fixture(scope="session")
+def test_graph(_require_database: None) -> str:
+    """Grafo separado para os testes.
+
+    Sem isolamento, um `clear()` de fixture apagaria o grafo real -- e os
+    testes passariam a depender de quais entidades o corpus tem no momento.
+    """
+    with database.connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT count(*) FROM ag_catalog.ag_graph WHERE name = %s", (TEST_GRAPH,))
+            existe = cur.fetchone()[0]
+            if not existe:
+                cur.execute("SELECT ag_catalog.create_graph(%s)", (TEST_GRAPH,))
+        conn.commit()
+    return TEST_GRAPH
+
+
 @pytest.fixture
 def db(_require_database: None) -> Iterator[psycopg.Connection[Any]]:
     """Conexao preparada para o AGE, com rollback no fim.

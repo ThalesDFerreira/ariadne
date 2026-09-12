@@ -76,12 +76,12 @@ def test_modo_vetorial_nao_gera_aviso():
     assert r["note"] is None
 
 
-def test_stats_reporta_corpus_e_grafo_vazio():
+def test_stats_reporta_corpus_e_grafo():
     r = payload(run(server.call_tool("graph_stats", {})))
     assert r["documents"] > 0
     assert r["chunks"] >= r["documents"]
-    assert r["nodes"] == 0 and r["edges"] == 0
-    assert "Fase 2" in (r["note"] or "")
+    assert r["nodes"] > 0, "o grafo deveria estar populado -- rodou graph-build?"
+    assert r["edges"] > 0
 
 
 def test_resource_do_esquema_esta_registrado():
