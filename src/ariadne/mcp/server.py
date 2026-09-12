@@ -17,6 +17,8 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import BaseModel, Field
 
 from ariadne.domain.graph import EntityType, RelationType, normalize_name
+from ariadne.ingestion.pipeline import IngestionPipeline
+from ariadne.ingestion.sources import SourceRejectedError, resolve_source
 from ariadne.retrieval.hybrid import HybridSearch
 from ariadne.retrieval.hybrid import SearchMode as EngineMode
 from ariadne.storage.database import connection
@@ -108,6 +110,13 @@ class ConnectionResponse(BaseModel):
     hops: int
     path: list[PathStepOut]
     note: str | None = None
+
+
+class IngestResponse(BaseModel):
+    ok: bool
+    title: str | None = None
+    chunks: int = 0
+    message: str
 
 
 class GraphStats(BaseModel):
@@ -266,6 +275,47 @@ def find_connection(entity_a: str, entity_b: str, max_hops: int = 4) -> Connecti
         note=None
         if caminho
         else "Nenhum caminho encontrado. As entidades podem nao existir no grafo.",
+    )
+
+
+@server.tool(
+    title="Ingerir documento",
+    description=(
+        "Indexa um documento novo a partir de um caminho de arquivo ou URL. "
+        "Por seguranca, so aceita caminhos dentro da raiz configurada e URLs de "
+        "dominios liberados; fora disso responde explicando o motivo."
+    ),
+)
+def ingest_document(path_or_url: str) -> IngestResponse:
+    """Ingere um documento sob demanda.
+
+    Args:
+        path_or_url: Caminho relativo a raiz permitida, ou URL de dominio liberado.
+    """
+    try:
+        documento = resolve_source(path_or_url)
+    except SourceRejectedError as exc:
+        # Recusa com o motivo: o LLM precisa saber o que ajustar, e negar em
+        # silencio faria ele tentar de novo do mesmo jeito.
+        return IngestResponse(ok=False, message=str(exc))
+    except Exception as exc:
+        return IngestResponse(ok=False, message=f"falha ao obter a fonte: {exc}")
+
+    report = IngestionPipeline().run([documento])
+    if report.skipped:
+        return IngestResponse(
+            ok=True,
+            title=documento.title,
+            message="documento ja estava indexado e nao mudou",
+        )
+    return IngestResponse(
+        ok=True,
+        title=documento.title,
+        chunks=report.chunks,
+        message=(
+            f"{documento.title!r} indexado em {report.chunks} trecho(s). "
+            "As entidades so entram no grafo apos rodar `ariadne graph-build`."
+        ),
     )
 
 

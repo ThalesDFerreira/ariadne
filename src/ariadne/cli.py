@@ -6,10 +6,12 @@ import argparse
 import sys
 import time
 
+from ariadne.console import force_utf8_output
 from ariadne.domain.graph import normalize_name
 from ariadne.ingestion.corpus import DEMO_CORPUS
 from ariadne.ingestion.graph_builder import GraphBuilder
 from ariadne.ingestion.pipeline import IngestionPipeline
+from ariadne.ingestion.sources import SourceRejectedError, resolve_source
 from ariadne.ingestion.wikipedia import WikipediaSource
 from ariadne.retrieval.hybrid import HybridSearch, SearchMode
 from ariadne.storage.database import connection
@@ -20,14 +22,30 @@ from ariadne.storage.vector_store import PgVectorStore
 
 def cmd_ingest(args: argparse.Namespace) -> int:
     titles = args.titles or DEMO_CORPUS
-    source = WikipediaSource()
-    print(f"buscando {len(titles)} pagina(s) da Wikipedia...")
-    documents = source.fetch_many(titles)
-    source.close()
+    documents = []
+
+    # URL ou caminho passa pela mesma politica de seguranca da tool MCP; o
+    # resto e tratado como titulo da Wikipedia.
+    referencias = [t for t in titles if _parece_fonte(t)]
+    paginas = [t for t in titles if not _parece_fonte(t)]
+
+    for referencia in referencias:
+        try:
+            documents.append(resolve_source(referencia))
+        except SourceRejectedError as exc:
+            print(f"  recusado ({referencia}): {exc}")
+
+    if paginas:
+        source = WikipediaSource()
+        print(f"buscando {len(paginas)} pagina(s) da Wikipedia...")
+        documents.extend(source.fetch_many(paginas))
+        source.close()
 
     faltando = len(titles) - len(documents)
     if faltando:
-        print(f"  aviso: {faltando} pagina(s) nao encontrada(s)")
+        print(f"  aviso: {faltando} fonte(s) nao ingerida(s)")
+    if not documents:
+        return 1
 
     print("gerando embeddings e indexando (a primeira chamada carrega o modelo)...")
     report = IngestionPipeline().run(documents, force=args.force)
@@ -35,6 +53,14 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     for titulo in report.skipped:
         print(f"  inalterado: {titulo}")
     return 0
+
+
+def _parece_fonte(referencia: str) -> bool:
+    """Distingue "URL/arquivo" de "titulo da Wikipedia"."""
+    baixo = referencia.lower()
+    return baixo.startswith(("http://", "https://")) or referencia.endswith(
+        (".md", ".markdown", ".txt", ".rst")
+    )
 
 
 def cmd_search(args: argparse.Namespace) -> int:
@@ -129,25 +155,17 @@ def cmd_stats(_: argparse.Namespace) -> int:
     return 0
 
 
-def _force_utf8_output() -> None:
-    """O console do Windows usa cp1252 e estoura em qualquer acento.
-
-    Sem isto, imprimir um resultado que contenha "Mineracao" com cedilha
-    derruba a CLI com UnicodeEncodeError -- um corpus em portugues seria
-    inutilizavel no terminal padrao da maquina.
-    """
-    for stream in (sys.stdout, sys.stderr):
-        if hasattr(stream, "reconfigure"):
-            stream.reconfigure(encoding="utf-8", errors="replace")
-
-
 def main(argv: list[str] | None = None) -> int:
-    _force_utf8_output()
+    force_utf8_output()
     parser = argparse.ArgumentParser(prog="ariadne", description="Motor de conhecimento")
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_ingest = sub.add_parser("ingest", help="ingere paginas da Wikipedia")
-    p_ingest.add_argument("titles", nargs="*", help="titulos (vazio = corpus de demo)")
+    p_ingest.add_argument(
+        "titles",
+        nargs="*",
+        help="titulos da Wikipedia, URLs ou arquivos (vazio = corpus de demo)",
+    )
     p_ingest.add_argument("--force", action="store_true", help="reindexa mesmo sem mudanca")
     p_ingest.set_defaults(func=cmd_ingest)
 
