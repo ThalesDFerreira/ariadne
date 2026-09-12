@@ -8,9 +8,12 @@ services:
       POSTGRES_USER: ${ARIADNE_PG_USER:-ariadne}
       POSTGRES_PASSWORD: ${ARIADNE_PG_PASSWORD:-ariadne}
       POSTGRES_DB: ${ARIADNE_PG_DATABASE:-ariadne}
-    # 5433 no host para nao brigar com um Postgres local na 5432.
+    # 15432 no host: as portas 5432 e 5433 caem dentro dos intervalos que o
+    # Hyper-V reserva no Windows (ex.: 5358-5457), e o bind falha com
+    # "forbidden by its access permissions". Ver: netsh interface ipv4
+    # show excludedportrange protocol=tcp
     ports:
-      - "${ARIADNE_PG_PORT:-5433}:5432"
+      - "${ARIADNE_PG_PORT:-15432}:5432"
     # Precarrega o AGE: sem isso, cada conexao precisaria de LOAD 'age'.
     command: ["postgres", "-c", "shared_preload_libraries=age"]
     volumes:

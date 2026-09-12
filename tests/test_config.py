@@ -7,7 +7,7 @@ from ariadne.config import LLMProvider, Settings
 
 def test_defaults_batem_com_o_docker_compose():
     cfg = Settings()
-    assert cfg.pg_port == 5433
+    assert cfg.pg_port == 15432
     assert cfg.graph_name == "ariadne"
     assert cfg.llm_provider is LLMProvider.OLLAMA
 
