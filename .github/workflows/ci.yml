@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    name: Lint, tipos e testes unitarios
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+      - name: Ruff (lint)
+        run: uv run ruff check .
+      - name: Ruff (formatacao)
+        run: uv run ruff format --check .
+      - name: Mypy (strict)
+        run: uv run mypy src
+      - name: Pytest (sem integracao)
+        run: uv run pytest -m "not integration"
+
+  integration:
+    name: Build da imagem e testes de integracao
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --frozen
+
+      # Compila o AGE do source. E o job que avisa cedo se uma mudanca no
+      # upstream quebrou o build -- sem ele, a quebra so apareceria na maquina
+      # de quem clonasse o repo.
+      - name: Sobe o Postgres com pgvector + AGE
+        run: docker compose up -d --build
+
+      - name: Espera o banco ficar saudavel
+        run: |
+          for i in $(seq 1 60); do
+            if docker compose exec -T postgres pg_isready -U ariadne -d ariadne; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Postgres nao ficou pronto a tempo"
+          docker compose logs postgres
+          exit 1
+
+      - name: Pytest (integracao)
+        run: uv run pytest -m integration
+
+      - name: Logs do Postgres em caso de falha
+        if: failure()
+        run: docker compose logs postgres
