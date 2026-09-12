@@ -53,6 +53,21 @@ class Settings(BaseSettings):
     ollama_base_url: str = "http://localhost:11434"
     llm_api_key: SecretStr | None = None
 
+    # --- Ingestao sob demanda (tool MCP) ---
+    ingest_root: str | None = None
+    """Raiz permitida para ingerir arquivos locais.
+
+    None DESLIGA a ingestao de arquivos. O padrao e negar porque a tool fica
+    exposta a um LLM que le input nao confiavel: um documento do corpus pode
+    pedir para ingerir um arquivo de credenciais, e o conteudo sairia na busca
+    seguinte.
+    """
+
+    ingest_allowed_hosts: list[str] = Field(
+        default_factory=lambda: ["pt.wikipedia.org", "en.wikipedia.org"]
+    )
+    """Dominios liberados para ingestao por URL."""
+
     # --- Embeddings ---
     # BGE-M3 produz 1024 dimensoes; o schema do pgvector depende desse numero,
     # entao trocar de modelo exige recriar a coluna e reindexar.
