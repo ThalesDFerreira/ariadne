@@ -12,9 +12,13 @@ FROM pgvector/pgvector:0.8.6-pg16
 ARG AGE_REF=PG16/v1.5.0-rc0
 
 # flex/bison sao exigidos pelo parser de Cypher do AGE.
+# ca-certificates e obrigatorio: com --no-install-recommends o git vem sem os
+# certificados raiz e o clone do GitHub falha na verificacao de TLS. A correcao
+# e instalar as CAs, nunca desligar a verificacao.
 RUN set -eux; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
+        ca-certificates \
         build-essential \
         git \
         flex \
