@@ -17,7 +17,7 @@ Ariadne resolve o segundo caso mantendo, alem dos vetores, um grafo `(entidade) 
 
 ## Estado atual
 
-**Fase 1 — RAG baseline funcionando.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container; ingestao da Wikipedia-pt, chunking estrutural, embeddings locais via Ollama (BGE-M3) e busca vetorial com citacao de fonte. Corpus de demonstracao: 28 empresas brasileiras, 450 chunks. 47 testes passando. Proximo passo: Fase 1.5 (MCP minimo).
+**Fase 1.5 — servidor MCP no ar.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container; ingestao da Wikipedia-pt, chunking estrutural, embeddings locais via Ollama (BGE-M3) e busca vetorial com citacao de fonte. Corpus de demonstracao: 28 empresas brasileiras, 450 chunks. O motor ja e consumivel por qualquer assistente de IA via MCP. 56 testes passando. Proximo passo: Fase 2 (o grafo).
 
 ## Stack
 
@@ -61,6 +61,33 @@ ariadne stats
 
 Tudo roda offline depois do `ollama pull bge-m3`: os embeddings sao gerados localmente na GPU, sem chave de API.
 
+### Servidor MCP
+
+O motor se expoe a qualquer assistente de IA pelo Model Context Protocol. Para ligar no Claude Desktop, acrescente ao `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "ariadne": {
+      "command": "/caminho/para/ariadne/.venv/Scripts/ariadne-mcp.exe"
+    }
+  }
+}
+```
+
+No macOS e Linux o caminho e `.venv/bin/ariadne-mcp`. Reinicie o Claude Desktop depois de editar.
+
+Tools expostas nesta fase:
+
+| Tool | O que faz |
+|---|---|
+| `search_knowledge(query, mode, limit)` | Busca trechos no corpus. Todo resultado traz a citacao da fonte |
+| `graph_stats()` | Contagens do indice e do grafo |
+
+Resource: `ariadne://graph/schema`.
+
+`mode` aceita `vector`, `graph` e `hybrid`, mas so `vector` esta implementado — os outros respondem com busca vetorial **e um aviso explicito** de que a expansao pelo grafo ainda nao existe. Devolver silenciosamente um resultado pior seria mentir para o modelo que chamou a tool.
+
 ## Desenvolvimento
 
 ```bash
@@ -100,7 +127,7 @@ src/ariadne/
 
 - [x] **Fase 0** — Fundacao: Docker com pgvector + AGE, configuracao, lint/tipos/testes, CI
 - [x] **Fase 1** — Ingestao e RAG baseline: parsing, chunking, embeddings, busca vetorial
-- [ ] **Fase 1.5** — MCP minimo ponta a ponta
+- [x] **Fase 1.5** — MCP minimo ponta a ponta
 - [ ] **Fase 2** — O grafo: extracao de entidades/relacoes, entity resolution, Cypher
 - [ ] **Fase 3** — Recuperacao hibrida: BM25, RRF, expansao k-hop, reranking
 - [ ] **Fase 4** — Servidor MCP completo
