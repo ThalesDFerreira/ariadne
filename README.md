@@ -17,7 +17,7 @@ Ariadne resolve o segundo caso mantendo, alem dos vetores, um grafo `(entidade) 
 
 ## Estado atual
 
-**Fase 0 — Fundacao concluida.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container, configuracao, lint/tipos/testes e CI. 15 testes passando, dos quais 9 de integracao contra o banco real. Proximo passo: Fase 1.
+**Fase 1 — RAG baseline funcionando.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container; ingestao da Wikipedia-pt, chunking estrutural, embeddings locais via Ollama (BGE-M3) e busca vetorial com citacao de fonte. Corpus de demonstracao: 28 empresas brasileiras, 450 chunks. 47 testes passando. Proximo passo: Fase 1.5 (MCP minimo).
 
 ## Stack
 
@@ -49,6 +49,17 @@ docker compose up -d --build   # o primeiro build compila o AGE do source (algun
 uv sync
 uv run pytest
 ```
+
+### Uso
+
+```bash
+ariadne ingest                      # ingere o corpus de demonstracao
+ariadne ingest "Petrobras" "Vale S.A."   # ou paginas especificas
+ariadne search "Quem extrai minério de ferro?"
+ariadne stats
+```
+
+Tudo roda offline depois do `ollama pull bge-m3`: os embeddings sao gerados localmente na GPU, sem chave de API.
 
 ## Desenvolvimento
 
@@ -88,7 +99,7 @@ src/ariadne/
 ## Roadmap
 
 - [x] **Fase 0** — Fundacao: Docker com pgvector + AGE, configuracao, lint/tipos/testes, CI
-- [ ] **Fase 1** — Ingestao e RAG baseline: parsing, chunking, embeddings, busca vetorial
+- [x] **Fase 1** — Ingestao e RAG baseline: parsing, chunking, embeddings, busca vetorial
 - [ ] **Fase 1.5** — MCP minimo ponta a ponta
 - [ ] **Fase 2** — O grafo: extracao de entidades/relacoes, entity resolution, Cypher
 - [ ] **Fase 3** — Recuperacao hibrida: BM25, RRF, expansao k-hop, reranking
