@@ -1,0 +1,8 @@
+# Normaliza para LF no repositorio. Sem isso, o Windows commita CRLF e o
+# Dockerfile, os scripts de initdb e os workflows chegam quebrados no Linux.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.gif binary
+*.pdf binary
