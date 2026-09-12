@@ -40,6 +40,24 @@ CREATE TABLE IF NOT EXISTS chunks (
 );
 
 CREATE INDEX IF NOT EXISTS chunks_document_id_idx ON chunks (document_id);
+
+-- Coluna GERADA: o tsvector se mantem sozinho a cada INSERT/UPDATE, sem
+-- trigger e sem risco de ficar dessincronizado do texto.
+ALTER TABLE chunks ADD COLUMN IF NOT EXISTS content_tsv tsvector
+    GENERATED ALWAYS AS (to_tsvector('portuguese', content)) STORED;
+
+CREATE INDEX IF NOT EXISTS chunks_content_tsv_idx ON chunks USING gin (content_tsv);
+
+-- Liga entidade do grafo aos trechos onde ela foi mencionada. E o que torna a
+-- expansao k-hop possivel: recuperar chunks -> descobrir entidades -> andar
+-- pelo grafo -> voltar para os chunks das entidades vizinhas.
+CREATE TABLE IF NOT EXISTS entity_mentions (
+    entity_key  TEXT NOT NULL,
+    chunk_id    UUID NOT NULL REFERENCES chunks(id) ON DELETE CASCADE,
+    PRIMARY KEY (entity_key, chunk_id)
+);
+
+CREATE INDEX IF NOT EXISTS entity_mentions_chunk_idx ON entity_mentions (chunk_id);
 """
 
 # HNSW e um grafo de navegacao: em vez de comparar a consulta com todos os

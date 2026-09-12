@@ -89,6 +89,8 @@ class GraphBuilder:
         report = GraphReport()
         todas_entidades: list[ExtractedEntity] = []
         arestas_brutas: list[tuple[UUID, str, str, RelationType, str]] = []
+        # (chunk, nome cru) -- a chave canonica so existe apos a resolucao.
+        mencoes_brutas: list[tuple[UUID, str]] = []
 
         with connection() as conn:
             self.ensure_cache(conn)
@@ -134,6 +136,7 @@ class GraphBuilder:
 
                 report.chunks_processed += 1
                 todas_entidades.extend(extraction.entities)
+                mencoes_brutas.extend((chunk_id, e.name) for e in extraction.entities)
                 arestas_brutas.extend(
                     (chunk_id, r.source, r.target, r.type, r.evidence) for r in extraction.relations
                 )
@@ -146,6 +149,7 @@ class GraphBuilder:
 
             self._store.upsert_nodes(conn, nos)
             self._store.upsert_edges(conn, arestas)
+            self._write_mentions(conn, nos, mencoes_brutas)
             conn.commit()
 
         report.nodes = len(nos)
@@ -188,6 +192,35 @@ class GraphBuilder:
                 )
             )
         return arestas, descartadas
+
+    def _write_mentions(
+        self,
+        conn: psycopg.Connection[Any],
+        nos: list[Any],
+        brutas: list[tuple[UUID, str]],
+    ) -> None:
+        """Grava onde cada entidade aparece.
+
+        E o elo que falta para a expansao k-hop: sem ele da para andar pelo
+        grafo, mas nao para voltar dele ao texto -- e resposta sem trecho de
+        origem nao serve neste projeto.
+        """
+        alias_para_chave = {
+            normalize_name(variante): no.key for no in nos for variante in [no.name, *no.aliases]
+        }
+        pares = {
+            (chave, chunk_id)
+            for chunk_id, nome in brutas
+            if (chave := alias_para_chave.get(normalize_name(nome))) is not None
+        }
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM entity_mentions")
+            if pares:
+                cur.executemany(
+                    "INSERT INTO entity_mentions (entity_key, chunk_id) VALUES (%s, %s) "
+                    "ON CONFLICT DO NOTHING",
+                    sorted(pares),
+                )
 
     def _load_cache(self, conn: psycopg.Connection[Any]) -> dict[str, Extraction]:
         with conn.cursor() as cur:
