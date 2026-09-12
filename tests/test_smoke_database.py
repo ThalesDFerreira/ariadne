@@ -70,3 +70,38 @@ def test_vetor_e_grafo_commitam_juntos(db):
     db.rollback()
     remaining = run_cypher(db, "MATCH (n:Entity {name: 'Ariadne'}) RETURN n")
     assert remaining == []
+
+
+def test_cypher_aceita_parametros(db):
+    """Valores vao por params, nunca concatenados na query."""
+    run_cypher(
+        db,
+        "CREATE (n:Entity {name: $nome, tipo: $tipo}) RETURN n",
+        params={"nome": "Petrobras", "tipo": "Empresa"},
+    )
+    rows = run_cypher(
+        db,
+        "MATCH (n:Entity {name: $nome}) RETURN n.tipo",
+        params={"nome": "Petrobras"},
+    )
+    assert len(rows) == 1
+    assert "Empresa" in str(rows[0]["c0"])
+
+
+def test_valor_malicioso_nao_vira_cypher(db):
+    """Uma entidade extraida de documento e input nao confiavel.
+
+    Se o valor fosse concatenado na query, o trecho abaixo viraria comando.
+    Indo por params, ele continua sendo apenas um nome esquisito.
+    """
+    veneno = "x$ariadne$}) DETACH DELETE (n) //"
+    run_cypher(db, "CREATE (n:Entity {name: $nome}) RETURN n", params={"nome": veneno})
+    rows = run_cypher(db, "MATCH (n:Entity {name: $nome}) RETURN n.name", params={"nome": veneno})
+    assert len(rows) == 1
+    assert veneno in str(rows[0]["c0"])
+
+
+def test_query_com_o_delimitador_e_rejeitada(db):
+    """O dollar-quoting so e seguro se o delimitador nao aparecer na query."""
+    with pytest.raises(ValueError, match="delimitador"):
+        run_cypher(db, "MATCH (n) RETURN $ariadne$ n")
