@@ -16,6 +16,12 @@ dependencies = [
 ariadne = "ariadne.cli:main"
 ariadne-mcp = "ariadne.mcp.server:main"
 
+[project.optional-dependencies]
+rerank = [
+    "sentence-transformers>=3.0",
+    "torch>=2.5",
+]
+
 [dependency-groups]
 dev = [
     "ruff>=0.7",
@@ -53,3 +59,15 @@ testpaths = ["tests"]
 markers = [
     "integration: precisa do Postgres do docker-compose rodando",
 ]
+
+# PyTorch em CPU: o reranker reordena algumas dezenas de candidatos, o que a
+# CPU faz em ~1s. Evita de vez o risco da wheel CUDA para Blackwell (sm_120),
+# que instala "com sucesso" e so falha na primeira inferencia -- e deixa a GPU
+# livre para o LLM de extracao, que e quem precisa dela.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
