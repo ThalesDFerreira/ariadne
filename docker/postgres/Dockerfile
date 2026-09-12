@@ -3,7 +3,8 @@
 # Partimos da imagem oficial do pgvector porque compilar pgvector e o passo
 # chato; o AGE, por sua vez, nao tem imagem oficial com pgvector junto, entao
 # ele e compilado do source aqui.
-FROM pgvector/pgvector:pg16
+# Versao fixa, nao a tag movel 'pg16': mesma razao de fixar o AGE numa tag.
+FROM pgvector/pgvector:0.8.6-pg16
 
 # Tag fixa, nao a branch PG16: a branch e desenvolvimento e pode quebrar sem
 # aviso, o que furaria a promessa de que clonar o repo e subir sempre funciona.
