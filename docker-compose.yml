@@ -1,0 +1,26 @@
+services:
+  postgres:
+    build:
+      context: ./docker/postgres
+    image: ariadne/postgres:16-pgvector-age
+    container_name: ariadne-postgres
+    environment:
+      POSTGRES_USER: ${ARIADNE_PG_USER:-ariadne}
+      POSTGRES_PASSWORD: ${ARIADNE_PG_PASSWORD:-ariadne}
+      POSTGRES_DB: ${ARIADNE_PG_DATABASE:-ariadne}
+    # 5433 no host para nao brigar com um Postgres local na 5432.
+    ports:
+      - "${ARIADNE_PG_PORT:-5433}:5432"
+    # Precarrega o AGE: sem isso, cada conexao precisaria de LOAD 'age'.
+    command: ["postgres", "-c", "shared_preload_libraries=age"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${ARIADNE_PG_USER:-ariadne} -d ${ARIADNE_PG_DATABASE:-ariadne}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  pgdata:
