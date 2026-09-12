@@ -1,0 +1,225 @@
+[
+  {
+    "id": "vale-privatizacao-ano",
+    "question": "Em que ano a Vale foi privatizada?",
+    "kind": "factual",
+    "anchors": ["1997"],
+    "note": "Resposta num unico trecho da pagina da Vale."
+  },
+  {
+    "id": "vale-fundacao",
+    "question": "Com que nome a Vale foi fundada em 1942?",
+    "kind": "factual",
+    "anchors": ["Companhia Vale do Rio Doce"]
+  },
+  {
+    "id": "vale-itabira",
+    "question": "Em qual municipio de Minas Gerais ficam as minas de ferro da Vale?",
+    "kind": "factual",
+    "anchors": ["Itabira"],
+    "note": "O vetorial confundia com Itabirito, da Gerdau."
+  },
+  {
+    "id": "petrobras-sede",
+    "question": "Onde fica a sede da Petrobras?",
+    "kind": "factual",
+    "anchors": ["Rio de Janeiro"]
+  },
+  {
+    "id": "embraer-privatizacao",
+    "question": "Em que ano a Embraer foi leiloada na privatizacao?",
+    "kind": "factual",
+    "anchors": ["1994"]
+  },
+  {
+    "id": "cemig-fundacao",
+    "question": "Quem fundou a Cemig em 1952?",
+    "kind": "factual",
+    "anchors": ["Juscelino Kubitschek"]
+  },
+  {
+    "id": "cemig-controlador",
+    "question": "Quem controla a Cemig?",
+    "kind": "factual",
+    "anchors": ["Minas Gerais"]
+  },
+  {
+    "id": "copel-estado",
+    "question": "Em que estado a Copel distribui energia eletrica?",
+    "kind": "factual",
+    "anchors": ["Paran"]
+  },
+  {
+    "id": "bradesco-bmc",
+    "question": "Qual banco o Bradesco adquiriu em janeiro de 2007?",
+    "kind": "factual",
+    "anchors": ["BMC"]
+  },
+  {
+    "id": "eletrobras-amforp",
+    "question": "Em que ano a Eletrobras comprou a Amforp?",
+    "kind": "factual",
+    "anchors": ["1964"]
+  },
+  {
+    "id": "itaipu-criacao",
+    "question": "Em que ano foi criada a Itaipu Binacional?",
+    "kind": "factual",
+    "anchors": ["1974"]
+  },
+  {
+    "id": "eletrosul-criacao",
+    "question": "Para que regiao a Eletrosul foi criada para gerar e transmitir energia?",
+    "kind": "factual",
+    "anchors": ["Sul"]
+  },
+  {
+    "id": "ambev-fusao",
+    "question": "A fusao de quais duas cervejarias deu origem a Ambev?",
+    "kind": "factual",
+    "anchors": ["Antarctica", "Brahma"]
+  },
+  {
+    "id": "usiminas-sumitomo",
+    "question": "Com qual grupo japones a Usiminas criou uma joint venture de mineracao?",
+    "kind": "factual",
+    "anchors": ["Sumitomo"]
+  },
+  {
+    "id": "weg-katt",
+    "question": "Qual fabricante alema de motores eletricos a WEG adquiriu?",
+    "kind": "factual",
+    "anchors": ["Katt"]
+  },
+  {
+    "id": "csn-desestatizacao",
+    "question": "Em qual plano do governo Collor a CSN foi incluida?",
+    "kind": "factual",
+    "anchors": ["Desestatiza"]
+  },
+
+  {
+    "id": "bradesco-previ-ligacao",
+    "question": "Qual a ligacao entre o Bradesco e a Previ?",
+    "kind": "relacional",
+    "anchors": ["CSN"],
+    "note": "Nenhum trecho contem a ligacao; ela passa pela CSN."
+  },
+  {
+    "id": "vale-bndes",
+    "question": "Qual a relacao entre a Vale e o BNDES?",
+    "kind": "relacional",
+    "anchors": ["privatiza"],
+    "note": "O BNDES financiou os compradores na privatizacao."
+  },
+  {
+    "id": "vale-csn",
+    "question": "Que vinculo existe entre a Vale e a CSN?",
+    "kind": "relacional",
+    "anchors": ["CSN"]
+  },
+  {
+    "id": "eletrobras-furnas",
+    "question": "Qual a relacao entre a Eletrobras e Furnas?",
+    "kind": "relacional",
+    "anchors": ["Furnas"]
+  },
+  {
+    "id": "eletrobras-itaipu",
+    "question": "Como a Eletrobras se relaciona com a Itaipu Binacional?",
+    "kind": "relacional",
+    "anchors": ["Itaipu"]
+  },
+  {
+    "id": "cosan-comgas",
+    "question": "Qual a ligacao entre a Cosan e a Comgas?",
+    "kind": "relacional",
+    "anchors": ["Comg"]
+  },
+  {
+    "id": "petrobras-braskem",
+    "question": "Que relacao a Petrobras tem com a Braskem?",
+    "kind": "relacional",
+    "anchors": ["Braskem"]
+  },
+  {
+    "id": "usiminas-mrs",
+    "question": "Qual a ligacao entre a Usiminas e a MRS?",
+    "kind": "relacional",
+    "anchors": ["MRS"]
+  },
+  {
+    "id": "vale-mrs",
+    "question": "Que vinculo existe entre a Vale e a MRS Logistica?",
+    "kind": "relacional",
+    "anchors": ["MRS"]
+  },
+  {
+    "id": "bndes-csn",
+    "question": "Qual a relacao entre o BNDES e a CSN?",
+    "kind": "relacional",
+    "anchors": ["CSN"]
+  },
+  {
+    "id": "ambev-antarctica",
+    "question": "Qual a ligacao entre a Ambev e a Companhia Antarctica Paulista?",
+    "kind": "relacional",
+    "anchors": ["Antarctica"]
+  },
+  {
+    "id": "petrobras-gaspetro",
+    "question": "Que relacao a Petrobras teve com a Gaspetro?",
+    "kind": "relacional",
+    "anchors": ["Gaspetro"]
+  },
+  {
+    "id": "bradesco-agora",
+    "question": "Qual a ligacao entre o Bradesco e a Agora Corretora?",
+    "kind": "relacional",
+    "anchors": ["gora"],
+    "note": "Sem acento na ancora para casar com 'Agora' e 'Ágora'."
+  },
+  {
+    "id": "weg-efacec",
+    "question": "Qual o vinculo entre a WEG e a Efacec Energy Service?",
+    "kind": "relacional",
+    "anchors": ["Efacec"]
+  },
+  {
+    "id": "itaipu-ande",
+    "question": "Qual a relacao entre a Itaipu Binacional e a ANDE?",
+    "kind": "relacional",
+    "anchors": ["Itaipu"]
+  },
+  {
+    "id": "cemig-minas",
+    "question": "Que ligacao a Cemig tem com o governo de Minas Gerais?",
+    "kind": "relacional",
+    "anchors": ["Minas Gerais"]
+  },
+
+  {
+    "id": "privatizadas-bndes",
+    "question": "Quais empresas foram privatizadas com apoio do BNDES?",
+    "kind": "sintese",
+    "anchors": ["BNDES"]
+  },
+  {
+    "id": "empresas-energia",
+    "question": "Quais empresas do corpus atuam no setor de energia eletrica?",
+    "kind": "sintese",
+    "anchors": ["energia"]
+  },
+  {
+    "id": "bancos-corpus",
+    "question": "Quais bancos aparecem no corpus?",
+    "kind": "sintese",
+    "anchors": ["Banco"]
+  },
+  {
+    "id": "aquisicoes-bradesco",
+    "question": "Quais aquisicoes o Bradesco fez na decada de 2000?",
+    "kind": "sintese",
+    "anchors": ["Bradesco"]
+  }
+]
