@@ -17,13 +17,14 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import BaseModel, Field
 
 from ariadne.domain.graph import EntityType, RelationType, normalize_name
-from ariadne.retrieval.vector_search import VectorSearch
+from ariadne.retrieval.hybrid import HybridSearch
+from ariadne.retrieval.hybrid import SearchMode as EngineMode
 from ariadne.storage.database import connection
 from ariadne.storage.graph_store import AgeGraphStore
 from ariadne.storage.schema import apply_schema
 from ariadne.storage.vector_store import PgVectorStore
 
-SearchMode = Literal["vector", "graph", "hybrid"]
+SearchMode = Literal["vector", "lexical", "graph", "hybrid"]
 
 server = MCPServer(
     name="ariadne",
@@ -41,7 +42,13 @@ class SearchHit(BaseModel):
     content: str
     citation: str = Field(description="Documento e secao de origem deste trecho")
     url: str | None = None
-    score: float = Field(description="Similaridade de cosseno, de 0 a 1")
+    score: float = Field(
+        description=(
+            "Relevancia. A escala depende do modo e da etapa final (cosseno, "
+            "RRF ou cross-encoder), entao compare os valores entre si e nao "
+            "com um limiar fixo."
+        )
+    )
 
 
 class SearchResponse(BaseModel):
@@ -100,7 +107,10 @@ class GraphStats(BaseModel):
     title="Buscar no conhecimento",
     description=(
         "Busca trechos relevantes no corpus indexado. Cada resultado vem com a "
-        "citacao da fonte, que deve ser repassada ao usuario."
+        "citacao da fonte, que deve ser repassada ao usuario. O modo padrao "
+        "(hybrid) combina busca vetorial, lexical e expansao pelo grafo, e e o "
+        "unico que responde perguntas cuja resposta esta espalhada entre "
+        "documentos diferentes."
     ),
 )
 def search_knowledge(query: str, mode: SearchMode = "vector", limit: int = 5) -> SearchResponse:
@@ -108,25 +118,23 @@ def search_knowledge(query: str, mode: SearchMode = "vector", limit: int = 5) ->
 
     Args:
         query: A pergunta ou termo a buscar.
-        mode: Estrategia de busca. Hoje so `vector` esta implementado.
+        mode: `hybrid` (padrao, recomendado), `vector`, `lexical` ou `graph`.
         limit: Quantidade maxima de trechos a devolver.
     """
     limit = max(1, min(limit, 20))
+    resultado = HybridSearch().search(query, mode=EngineMode(mode), limit=limit)
 
-    note: str | None = None
-    if mode in ("graph", "hybrid"):
-        # Honestidade em vez de silencio: dizer que caiu no vetorial e melhor
-        # do que fingir que a expansao pelo grafo aconteceu.
-        note = (
-            f"O modo '{mode}' ainda nao existe (chega na Fase 3). "
-            "Esta resposta usou busca vetorial."
-        )
-
-    hits = VectorSearch().search(query, limit=limit)
     return SearchResponse(
         query=query,
-        mode="vector",
-        note=note,
+        mode=resultado.mode.value,
+        note=(
+            f"Etapas: {resultado.trace.summary()}."
+            + (
+                f" Entidades que guiaram a expansao: {', '.join(resultado.trace.entities[:5])}."
+                if resultado.trace.entities
+                else ""
+            )
+        ),
         hits=[
             SearchHit(
                 content=hit.chunk.content,
@@ -134,7 +142,7 @@ def search_knowledge(query: str, mode: SearchMode = "vector", limit: int = 5) ->
                 url=hit.document_url,
                 score=round(hit.score, 4),
             )
-            for hit in hits
+            for hit in resultado.hits
         ],
     )
 

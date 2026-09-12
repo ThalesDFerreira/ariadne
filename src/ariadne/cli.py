@@ -11,7 +11,7 @@ from ariadne.ingestion.corpus import DEMO_CORPUS
 from ariadne.ingestion.graph_builder import GraphBuilder
 from ariadne.ingestion.pipeline import IngestionPipeline
 from ariadne.ingestion.wikipedia import WikipediaSource
-from ariadne.retrieval.vector_search import VectorSearch
+from ariadne.retrieval.hybrid import HybridSearch, SearchMode
 from ariadne.storage.database import connection
 from ariadne.storage.graph_store import AgeGraphStore
 from ariadne.storage.schema import apply_schema
@@ -38,11 +38,20 @@ def cmd_ingest(args: argparse.Namespace) -> int:
 
 
 def cmd_search(args: argparse.Namespace) -> int:
-    results = VectorSearch().search(args.query, limit=args.limit)
-    if not results:
+    resultado = HybridSearch().search(
+        args.query,
+        mode=SearchMode(args.mode),
+        limit=args.limit,
+        rerank=not args.no_rerank,
+    )
+    if not resultado.hits:
         print("nenhum resultado -- o corpus foi ingerido?")
         return 1
-    for i, hit in enumerate(results, 1):
+    if args.explain:
+        print(f"  etapas: {resultado.trace.summary()}")
+        if resultado.trace.entities:
+            print(f"  entidades semente: {', '.join(resultado.trace.entities[:6])}")
+    for i, hit in enumerate(resultado.hits, 1):
         trecho = hit.chunk.content.replace("\n", " ")[:220]
         print(f"\n[{i}] score={hit.score:.4f}")
         print(f"    fonte: {hit.citation()}")
@@ -142,9 +151,17 @@ def main(argv: list[str] | None = None) -> int:
     p_ingest.add_argument("--force", action="store_true", help="reindexa mesmo sem mudanca")
     p_ingest.set_defaults(func=cmd_ingest)
 
-    p_search = sub.add_parser("search", help="busca vetorial")
+    p_search = sub.add_parser("search", help="busca no corpus")
     p_search.add_argument("query")
     p_search.add_argument("--limit", type=int, default=5)
+    p_search.add_argument(
+        "--mode",
+        choices=[m.value for m in SearchMode],
+        default=SearchMode.HYBRID.value,
+        help="estrategia de busca (padrao: hybrid)",
+    )
+    p_search.add_argument("--no-rerank", action="store_true", help="pula o cross-encoder")
+    p_search.add_argument("--explain", action="store_true", help="mostra o que cada etapa rendeu")
     p_search.set_defaults(func=cmd_search)
 
     p_build = sub.add_parser("graph-build", help="extrai o grafo dos chunks indexados")
