@@ -17,7 +17,7 @@ Ariadne resolve o segundo caso mantendo, alem dos vetores, um grafo `(entidade) 
 
 ## Estado atual
 
-**Fase 0 — Fundacao.** Em construcao. Veja o [roadmap](#roadmap).
+**Fase 0 — Fundacao concluida.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container, configuracao, lint/tipos/testes e CI. 15 testes passando, dos quais 9 de integracao contra o banco real. Proximo passo: Fase 1.
 
 ## Stack
 
@@ -60,6 +60,14 @@ uv run pytest            # testes; os de integracao pulam sozinhos se o banco es
 uv run pytest -m integration
 ```
 
+### Porta do Postgres
+
+O container publica a **15432** no host, e nao a 5432. No Windows, as portas 5432 e 5433 costumam cair dentro dos intervalos que o Hyper-V reserva, e o bind falha com `forbidden by its access permissions`. Para conferir os intervalos reservados na sua maquina:
+
+```bash
+netsh interface ipv4 show excludedportrange protocol=tcp
+```
+
 ## Estrutura
 
 ```
@@ -79,7 +87,7 @@ src/ariadne/
 
 ## Roadmap
 
-- [ ] **Fase 0** — Fundacao: Docker com pgvector + AGE, configuracao, lint/tipos/testes, CI
+- [x] **Fase 0** — Fundacao: Docker com pgvector + AGE, configuracao, lint/tipos/testes, CI
 - [ ] **Fase 1** — Ingestao e RAG baseline: parsing, chunking, embeddings, busca vetorial
 - [ ] **Fase 1.5** — MCP minimo ponta a ponta
 - [ ] **Fase 2** — O grafo: extracao de entidades/relacoes, entity resolution, Cypher
