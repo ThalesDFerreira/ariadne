@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import time
 
 from ariadne.domain.graph import normalize_name
 from ariadne.ingestion.corpus import DEMO_CORPUS
@@ -51,10 +52,25 @@ def cmd_search(args: argparse.Namespace) -> int:
 
 def cmd_graph_build(args: argparse.Namespace) -> int:
     print("extraindo entidades e relacoes (uma chamada de LLM por chunk novo)...")
-    report = GraphBuilder().build(limit=args.limit, refresh=args.refresh)
+    inicio = time.monotonic()
+
+    def progresso(feito: int, total: int) -> None:
+        decorrido = time.monotonic() - inicio
+        ritmo = feito / decorrido if decorrido else 0
+        faltam = (total - feito) / ritmo if ritmo else 0
+        print(
+            f"  {feito}/{total} chunks  ({ritmo:.2f}/s, ~{faltam / 60:.0f} min restantes)",
+            flush=True,
+        )
+
+    report = GraphBuilder().build(limit=args.limit, refresh=args.refresh, on_progress=progresso)
     print(report.summary())
+    if report.dropped_edges:
+        print(f"  {report.dropped_edges} relacao(oes) descartada(s) por ponta desconhecida")
     for erro in report.errors[:5]:
         print(f"  erro: {erro}")
+    if len(report.errors) > 5:
+        print(f"  ... e mais {len(report.errors) - 5} erro(s)")
     return 0
 
 

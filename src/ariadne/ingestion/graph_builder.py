@@ -1,13 +1,14 @@
 """Construcao do grafo a partir dos chunks ja indexados.
 
 O caro aqui e a chamada de LLM por chunk. Com 8 GB de VRAM e um modelo 7B,
-450 chunks levam mais de uma hora -- por isso o cache por fingerprint nao e
+450 chunks passam de uma hora -- por isso o cache por fingerprint nao e
 otimizacao, e requisito: sem ele, qualquer ajuste no pipeline custaria a hora
 inteira de novo.
 """
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 from uuid import UUID
@@ -43,6 +44,9 @@ class GraphReport:
     chunks_from_cache: int = 0
     nodes: int = 0
     edges: int = 0
+    dropped_edges: int = 0
+    """Relacoes descartadas por apontarem para entidade que nao sobreviveu."""
+
     errors: list[str] = field(default_factory=list)
 
     def summary(self) -> str:
@@ -69,12 +73,26 @@ class GraphBuilder:
             cur.execute(_CACHE_DDL)
         conn.commit()
 
-    def build(self, *, limit: int | None = None, refresh: bool = False) -> GraphReport:
-        """Percorre os chunks, extrai e grava o grafo."""
+    def build(
+        self,
+        *,
+        limit: int | None = None,
+        refresh: bool = False,
+        on_progress: Callable[[int, int], None] | None = None,
+    ) -> GraphReport:
+        """Percorre os chunks, extrai e grava o grafo.
+
+        Usa UMA conexao para todo o percurso. A versao anterior abria uma
+        conexao por chunk e reexecutava o DDL do cache a cada leitura -- 900
+        conexoes e 450 DDLs num corpus deste tamanho.
+        """
         report = GraphReport()
+        todas_entidades: list[ExtractedEntity] = []
+        arestas_brutas: list[tuple[UUID, str, str, RelationType, str]] = []
 
         with connection() as conn:
             self.ensure_cache(conn)
+
             with conn.cursor() as cur:
                 cur.execute(
                     """
@@ -86,47 +104,79 @@ class GraphBuilder:
                 )
                 chunks = cur.fetchall()
 
-        todas_entidades: list[ExtractedEntity] = []
-        arestas_brutas: list[tuple[UUID, str, str, RelationType, str]] = []
+            # Le o cache inteiro de uma vez: 450 SELECTs individuais custam
+            # mais que uma varredura da tabela.
+            cache: dict[str, Extraction] = {}
+            if not refresh:
+                cache = self._load_cache(conn)
 
-        for chunk_id, content, section, title in chunks:
-            contexto = f"{title} > {section}" if section else title
-            fingerprint = chunk_fingerprint(
-                content, self._extractor.fingerprint_model, self._extractor.PROMPT_VERSION
-            )
+            total = len(chunks)
+            for i, (chunk_id, content, section, title) in enumerate(chunks, 1):
+                contexto = f"{title} > {section}" if section else title
+                fingerprint = chunk_fingerprint(
+                    content,
+                    self._extractor.fingerprint_model,
+                    self._extractor.PROMPT_VERSION,
+                )
 
-            extraction = None if refresh else self._read_cache(fingerprint)
-            if extraction is None:
-                try:
-                    extraction = self._extractor.extract(content, context=contexto)
-                except Exception as exc:
-                    # Um chunk problematico nao pode derrubar a construcao
-                    # inteira depois de uma hora de GPU.
-                    report.errors.append(f"{title}: {exc}")
-                    continue
-                self._write_cache(fingerprint, chunk_id, extraction)
-            else:
-                report.chunks_from_cache += 1
+                extraction = cache.get(fingerprint)
+                if extraction is None:
+                    try:
+                        extraction = self._extractor.extract(content, context=contexto)
+                    except Exception as exc:
+                        # Um chunk problematico nao pode derrubar a construcao
+                        # inteira depois de meia hora de GPU.
+                        report.errors.append(f"{title}: {type(exc).__name__}: {exc}")
+                        continue
+                    self._write_cache(conn, fingerprint, chunk_id, extraction)
+                else:
+                    report.chunks_from_cache += 1
 
-            report.chunks_processed += 1
-            todas_entidades.extend(extraction.entities)
-            for rel in extraction.relations:
-                arestas_brutas.append((chunk_id, rel.source, rel.target, rel.type, rel.evidence))
+                report.chunks_processed += 1
+                todas_entidades.extend(extraction.entities)
+                arestas_brutas.extend(
+                    (chunk_id, r.source, r.target, r.type, r.evidence) for r in extraction.relations
+                )
 
-        nos = self._resolver.resolve(todas_entidades)
-        # A resolucao pode ter fundido nomes, entao as arestas precisam ser
-        # reescritas para as chaves canonicas -- senao apontariam para nos que
-        # deixaram de existir.
-        por_chave = {no.key: no for no in nos}
+                if on_progress and (i % 10 == 0 or i == total):
+                    on_progress(i, total)
+
+            nos = self._resolver.resolve(todas_entidades)
+            arestas, descartadas = self._rewrite_edges(nos, arestas_brutas)
+
+            self._store.upsert_nodes(conn, nos)
+            self._store.upsert_edges(conn, arestas)
+            conn.commit()
+
+        report.nodes = len(nos)
+        report.edges = len(arestas)
+        report.dropped_edges = descartadas
+        return report
+
+    def _rewrite_edges(
+        self,
+        nos: list[Any],
+        brutas: list[tuple[UUID, str, str, RelationType, str]],
+    ) -> tuple[list[GraphEdge], int]:
+        """Reaponta as arestas para as chaves canonicas apos a resolucao.
+
+        A fusao de entidades faz variantes deixarem de existir como no proprio.
+        Sem esta reescrita, a aresta extraida de "CSN" apontaria para uma chave
+        que nao esta mais no grafo.
+        """
         alias_para_chave = {
-            normalize_name(alias): no.key for no in nos for alias in [*no.aliases, no.name]
+            normalize_name(variante): no.key for no in nos for variante in [no.name, *no.aliases]
         }
+        for no in nos:
+            alias_para_chave[no.key] = no.key
 
         arestas: list[GraphEdge] = []
-        for chunk_id, origem, destino, tipo, evidencia in arestas_brutas:
+        descartadas = 0
+        for chunk_id, origem, destino, tipo, evidencia in brutas:
             ok = alias_para_chave.get(normalize_name(origem))
             od = alias_para_chave.get(normalize_name(destino))
             if ok is None or od is None or ok == od:
+                descartadas += 1
                 continue
             arestas.append(
                 GraphEdge(
@@ -137,35 +187,36 @@ class GraphBuilder:
                     evidence=evidencia,
                 )
             )
+        return arestas, descartadas
 
-        with connection() as conn:
-            self._store.upsert_nodes(conn, list(por_chave.values()))
-            self._store.upsert_edges(conn, arestas)
+    def _load_cache(self, conn: psycopg.Connection[Any]) -> dict[str, Extraction]:
+        with conn.cursor() as cur:
+            cur.execute("SELECT fingerprint, payload FROM extraction_cache")
+            linhas = cur.fetchall()
+        saida: dict[str, Extraction] = {}
+        for fingerprint, payload in linhas:
+            try:
+                saida[fingerprint] = Extraction.model_validate(payload)
+            except ValueError:
+                continue  # cache de um formato antigo: sera regravado
+        return saida
 
-        report.nodes = len(por_chave)
-        report.edges = len(arestas)
-        return report
-
-    def _read_cache(self, fingerprint: str) -> Extraction | None:
-        with connection() as conn:
-            self.ensure_cache(conn)
-            with conn.cursor() as cur:
-                cur.execute(
-                    "SELECT payload FROM extraction_cache WHERE fingerprint = %s",
-                    (fingerprint,),
-                )
-                row = cur.fetchone()
-        if row is None:
-            return None
-        return Extraction.model_validate(row[0])
-
-    def _write_cache(self, fingerprint: str, chunk_id: UUID, extraction: Extraction) -> None:
-        with connection() as conn, conn.cursor() as cur:
+    def _write_cache(
+        self,
+        conn: psycopg.Connection[Any],
+        fingerprint: str,
+        chunk_id: UUID,
+        extraction: Extraction,
+    ) -> None:
+        with conn.cursor() as cur:
             cur.execute(
                 """
-                    INSERT INTO extraction_cache (fingerprint, chunk_id, payload)
-                    VALUES (%s, %s, %s::jsonb)
-                    ON CONFLICT (fingerprint) DO NOTHING
-                    """,
+                INSERT INTO extraction_cache (fingerprint, chunk_id, payload)
+                VALUES (%s, %s, %s::jsonb)
+                ON CONFLICT (fingerprint) DO NOTHING
+                """,
                 (fingerprint, chunk_id, extraction.model_dump_json()),
             )
+        # Commit a cada chunk: uma hora de GPU nao pode ser perdida porque o
+        # processo caiu no chunk 400.
+        conn.commit()

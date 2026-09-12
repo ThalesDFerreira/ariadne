@@ -28,12 +28,24 @@ _pool: ConnectionPool | None = None
 
 
 def _prepare_connection(conn: psycopg.Connection[Any]) -> None:
-    """Roda a cada conexao nova do pool."""
+    """Roda a cada conexao nova do pool.
+
+    A ORDEM do search_path importa mais do que parece. A documentacao do AGE
+    sugere `ag_catalog, "$user", public`, mas o primeiro schema do caminho e
+    onde um `CREATE TABLE` sem qualificacao cria a tabela -- e com ag_catalog
+    na frente, as tabelas do PROJETO (documents, chunks, extraction_cache)
+    nascem dentro do schema interno da extensao.
+
+    Isso e pior do que desarrumado: um `DROP EXTENSION age` levaria os dados do
+    projeto junto, e nenhuma ferramenta externa enxerga as tabelas com o
+    search_path padrao. Colocando ag_catalog por ULTIMO, as funcoes do AGE
+    continuam resolviveis e as tabelas do projeto ficam onde devem, em public.
+    """
     with conn.cursor() as cur:
         # Redundante quando shared_preload_libraries=age, mas mantem o projeto
         # funcionando tambem num Postgres sem esse preload configurado.
         cur.execute("LOAD 'age'")
-        cur.execute('SET search_path = ag_catalog, "$user", public')
+        cur.execute('SET search_path = "$user", public, ag_catalog')
     conn.commit()
 
 

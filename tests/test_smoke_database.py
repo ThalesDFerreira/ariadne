@@ -26,6 +26,27 @@ def test_search_path_da_conexao_do_pool_enxerga_o_age(db):
     assert "ag_catalog" in search_path
 
 
+def test_tabelas_do_projeto_ficam_em_public(db):
+    """ag_catalog NAO pode vir primeiro no search_path.
+
+    Se vier, todo CREATE TABLE sem qualificacao cria a tabela dentro do schema
+    interno da extensao -- e um DROP EXTENSION age levaria os dados do projeto
+    junto. Ja aconteceu neste repo; este teste impede a reincidencia.
+    """
+    (search_path,) = db.execute("SHOW search_path").fetchone()
+    posicoes = [s.strip().strip('"') for s in search_path.split(",")]
+    assert posicoes[-1] == "ag_catalog", f"ag_catalog deve ser o ultimo: {search_path}"
+
+    rows = db.execute(
+        """
+        SELECT schemaname FROM pg_tables
+         WHERE tablename IN ('documents', 'chunks', 'extraction_cache')
+        """
+    ).fetchall()
+    assert rows, "tabelas do projeto nao encontradas"
+    assert all(r[0] == "public" for r in rows), f"tabela fora de public: {rows}"
+
+
 def test_o_grafo_ariadne_existe(db):
     (count,) = db.execute(
         "SELECT count(*) FROM ag_catalog.ag_graph WHERE name = 'ariadne'"
