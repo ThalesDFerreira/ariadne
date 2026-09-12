@@ -17,7 +17,7 @@ Ariadne resolve o segundo caso mantendo, alem dos vetores, um grafo `(entidade) 
 
 ## Estado atual
 
-**Fase 3 — recuperacao hibrida.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container; ingestao da Wikipedia-pt, chunking estrutural, embeddings locais via Ollama (BGE-M3) e busca vetorial com citacao de fonte. Corpus de demonstracao: 28 empresas brasileiras, 450 chunks. Corpus de 28 empresas brasileiras: 450 chunks, **1289 entidades e 1036 relacoes** extraidas com LLM local, cada aresta com o trecho que a justifica. A busca combina vetorial, lexical (BM25), expansao k-hop pelo grafo e reranking com cross-encoder. Proximo passo: Fase 4 (MCP completo).
+**Fase 3 — recuperacao hibrida.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container; ingestao da Wikipedia-pt, chunking estrutural, embeddings locais via Ollama (BGE-M3) e busca vetorial com citacao de fonte. Corpus de demonstracao: 28 empresas brasileiras, 450 chunks. Corpus de 28 empresas brasileiras: 450 chunks, **1289 entidades e 1036 relacoes** extraidas com LLM local, cada aresta com o trecho que a justifica. A busca combina vetorial, lexical (BM25), expansao k-hop pelo grafo e reranking com cross-encoder. 130 testes passando. Proximo passo: Fase 4 (MCP completo).
 
 ## Stack
 

@@ -64,16 +64,24 @@ def test_limit_e_respeitado_e_limitado():
     assert len(grande["hits"]) <= 20
 
 
-def test_modo_ainda_inexistente_avisa_em_vez_de_fingir():
-    """Prometer expansao por grafo que nao existe seria mentir para o LLM."""
-    r = payload(run(server.call_tool("search_knowledge", {"query": "vale", "mode": "graph"})))
-    assert r["mode"] == "vector"
-    assert r["note"] and "Fase 3" in r["note"]
+def test_modo_pedido_e_o_modo_usado():
+    """Ate a Fase 2 os modos graph e hybrid caiam no vetorial com aviso.
+
+    Agora existem de verdade, e a tool precisa reportar o que realmente usou --
+    responder "vector" a um pedido de "hybrid" enganaria o modelo que chamou.
+    """
+    for modo in ("vector", "lexical", "hybrid"):
+        r = payload(run(server.call_tool("search_knowledge", {"query": "vale", "mode": modo})))
+        assert r["mode"] == modo, f"pedi {modo}, recebi {r['mode']}"
 
 
-def test_modo_vetorial_nao_gera_aviso():
-    r = payload(run(server.call_tool("search_knowledge", {"query": "vale", "mode": "vector"})))
-    assert r["note"] is None
+def test_nota_explica_as_etapas():
+    """Quem chamou a tool precisa conseguir dizer de onde veio a resposta."""
+    r = payload(
+        run(server.call_tool("search_knowledge", {"query": "privatização", "mode": "hybrid"}))
+    )
+    assert r["note"], "resposta sem explicacao das etapas"
+    assert "vetorial=" in r["note"] and "grafo=" in r["note"]
 
 
 def test_stats_reporta_corpus_e_grafo():

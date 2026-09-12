@@ -26,6 +26,22 @@ from ariadne.storage.vector_store import PgVectorStore
 
 SearchMode = Literal["vector", "lexical", "graph", "hybrid"]
 
+_engine: HybridSearch | None = None
+
+
+def get_engine() -> HybridSearch:
+    """Motor unico do processo.
+
+    Instanciar a cada chamada faria o cross-encoder recarregar ~2 GB por
+    consulta. O servidor MCP vive enquanto o cliente estiver aberto, entao o
+    modelo carrega uma vez e serve todas as perguntas seguintes.
+    """
+    global _engine
+    if _engine is None:
+        _engine = HybridSearch()
+    return _engine
+
+
 server = MCPServer(
     name="ariadne",
     instructions=(
@@ -122,7 +138,7 @@ def search_knowledge(query: str, mode: SearchMode = "vector", limit: int = 5) ->
         limit: Quantidade maxima de trechos a devolver.
     """
     limit = max(1, min(limit, 20))
-    resultado = HybridSearch().search(query, mode=EngineMode(mode), limit=limit)
+    resultado = get_engine().search(query, mode=EngineMode(mode), limit=limit)
 
     return SearchResponse(
         query=query,
