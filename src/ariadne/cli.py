@@ -5,11 +5,14 @@ from __future__ import annotations
 import argparse
 import sys
 
+from ariadne.domain.graph import normalize_name
 from ariadne.ingestion.corpus import DEMO_CORPUS
+from ariadne.ingestion.graph_builder import GraphBuilder
 from ariadne.ingestion.pipeline import IngestionPipeline
 from ariadne.ingestion.wikipedia import WikipediaSource
 from ariadne.retrieval.vector_search import VectorSearch
 from ariadne.storage.database import connection
+from ariadne.storage.graph_store import AgeGraphStore
 from ariadne.storage.schema import apply_schema
 from ariadne.storage.vector_store import PgVectorStore
 
@@ -46,10 +49,53 @@ def cmd_search(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_graph_build(args: argparse.Namespace) -> int:
+    print("extraindo entidades e relacoes (uma chamada de LLM por chunk novo)...")
+    report = GraphBuilder().build(limit=args.limit, refresh=args.refresh)
+    print(report.summary())
+    for erro in report.errors[:5]:
+        print(f"  erro: {erro}")
+    return 0
+
+
+def cmd_explore(args: argparse.Namespace) -> int:
+    store = AgeGraphStore()
+    with connection() as conn:
+        chave = store.find_key(conn, args.name) or normalize_name(args.name)
+        vizinhos = store.neighbors(conn, chave, depth=args.depth)
+    if not vizinhos:
+        print(f"nenhuma relacao encontrada para {args.name!r}")
+        return 1
+    print(f"{args.name} ({len(vizinhos)} relacao(oes)):")
+    for v in vizinhos:
+        seta = "->" if v.direction == "saindo" else "<-"
+        print(f"  {seta} {v.relation.value:<16} {v.name}")
+        if v.evidence:
+            print(f"       {v.evidence[:110]}")
+    return 0
+
+
+def cmd_connect(args: argparse.Namespace) -> int:
+    store = AgeGraphStore()
+    with connection() as conn:
+        a = store.find_key(conn, args.source) or normalize_name(args.source)
+        b = store.find_key(conn, args.target) or normalize_name(args.target)
+        caminho = store.shortest_path(conn, a, b, max_hops=args.max_hops)
+    if not caminho:
+        print(f"nenhum caminho de {args.source!r} ate {args.target!r}")
+        return 1
+    for passo in caminho:
+        print(f"  {passo.source} -[{passo.relation.value}]-> {passo.target}")
+        if passo.evidence:
+            print(f"     evidencia: {passo.evidence[:110]}")
+    return 0
+
+
 def cmd_stats(_: argparse.Namespace) -> int:
     with connection() as conn:
         apply_schema(conn)
         stats = PgVectorStore().stats(conn)
+        stats.update(AgeGraphStore().stats(conn))
     for chave, valor in stats.items():
         print(f"  {chave}: {valor}")
     return 0
@@ -81,6 +127,22 @@ def main(argv: list[str] | None = None) -> int:
     p_search.add_argument("query")
     p_search.add_argument("--limit", type=int, default=5)
     p_search.set_defaults(func=cmd_search)
+
+    p_build = sub.add_parser("graph-build", help="extrai o grafo dos chunks indexados")
+    p_build.add_argument("--limit", type=int, default=None, help="processa so N chunks")
+    p_build.add_argument("--refresh", action="store_true", help="ignora o cache de extracao")
+    p_build.set_defaults(func=cmd_graph_build)
+
+    p_explore = sub.add_parser("explore", help="vizinhanca de uma entidade")
+    p_explore.add_argument("name")
+    p_explore.add_argument("--depth", type=int, default=1)
+    p_explore.set_defaults(func=cmd_explore)
+
+    p_connect = sub.add_parser("connect", help="caminho entre duas entidades")
+    p_connect.add_argument("source")
+    p_connect.add_argument("target")
+    p_connect.add_argument("--max-hops", type=int, default=4, dest="max_hops")
+    p_connect.set_defaults(func=cmd_connect)
 
     p_stats = sub.add_parser("stats", help="contagens do indice")
     p_stats.set_defaults(func=cmd_stats)

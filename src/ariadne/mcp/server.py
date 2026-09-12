@@ -16,8 +16,10 @@ from typing import Literal
 from mcp.server.mcpserver import MCPServer
 from pydantic import BaseModel, Field
 
+from ariadne.domain.graph import EntityType, RelationType, normalize_name
 from ariadne.retrieval.vector_search import VectorSearch
 from ariadne.storage.database import connection
+from ariadne.storage.graph_store import AgeGraphStore
 from ariadne.storage.schema import apply_schema
 from ariadne.storage.vector_store import PgVectorStore
 
@@ -50,6 +52,39 @@ class SearchResponse(BaseModel):
         default=None,
         description="Aviso sobre limitacoes do modo usado, quando houver",
     )
+
+
+class NeighborOut(BaseModel):
+    """Uma relacao da vizinhanca, com a frase que a sustenta."""
+
+    name: str
+    type: EntityType
+    relation: RelationType
+    direction: str
+    evidence: str = Field(default="", description="Trecho do documento que justifica esta relacao")
+
+
+class ExploreResponse(BaseModel):
+    entity: str
+    found: bool
+    neighbors: list[NeighborOut]
+    note: str | None = None
+
+
+class PathStepOut(BaseModel):
+    source: str
+    relation: RelationType
+    target: str
+    evidence: str = ""
+
+
+class ConnectionResponse(BaseModel):
+    source: str
+    target: str
+    found: bool
+    hops: int
+    path: list[PathStepOut]
+    note: str | None = None
 
 
 class GraphStats(BaseModel):
@@ -113,14 +148,98 @@ def graph_stats() -> GraphStats:
     with connection() as conn:
         apply_schema(conn)
         stats = PgVectorStore().stats(conn)
+        grafo = AgeGraphStore().stats(conn)
 
     return GraphStats(
         documents=stats["documents"],
         chunks=stats["chunks"],
         embedded_chunks=stats["embedded_chunks"],
-        nodes=0,
-        edges=0,
-        note="O grafo ainda esta vazio: a extracao de entidades chega na Fase 2.",
+        nodes=grafo["nodes"],
+        edges=grafo["edges"],
+        note=None
+        if grafo["nodes"]
+        else "O grafo esta vazio. Rode `ariadne graph-build` para popula-lo.",
+    )
+
+
+@server.tool(
+    title="Explorar entidade",
+    description=(
+        "Mostra com quem uma entidade se relaciona no grafo de conhecimento. "
+        "Cada relacao vem com o trecho do documento que a justifica."
+    ),
+)
+def explore_entity(name: str, depth: int = 1) -> ExploreResponse:
+    """Vizinhanca de uma entidade.
+
+    Args:
+        name: Nome da entidade (ex.: "Petrobras"). Aceita variacoes de grafia.
+        depth: Quantos saltos percorrer, de 1 a 3.
+    """
+    depth = max(1, min(depth, 3))
+    store = AgeGraphStore()
+    with connection() as conn:
+        chave = store.find_key(conn, name) or normalize_name(name)
+        vizinhos = store.neighbors(conn, chave, depth=depth)
+
+    nota = None
+    if depth > 1:
+        nota = (
+            "Relacoes a mais de um salto vem sem evidencia por limitacao do "
+            "Apache AGE. Use find_connection para ver a justificativa do caminho."
+        )
+    return ExploreResponse(
+        entity=name,
+        found=bool(vizinhos),
+        note=nota if vizinhos else "Entidade nao encontrada no grafo.",
+        neighbors=[
+            NeighborOut(
+                name=v.name,
+                type=v.type,
+                relation=v.relation,
+                direction=v.direction,
+                evidence=v.evidence,
+            )
+            for v in vizinhos
+        ],
+    )
+
+
+@server.tool(
+    title="Encontrar conexao",
+    description=(
+        "Encontra o caminho mais curto entre duas entidades no grafo, com o "
+        "trecho de origem que justifica cada passo. Responde perguntas cuja "
+        "resposta nao esta escrita em nenhum documento isolado."
+    ),
+)
+def find_connection(entity_a: str, entity_b: str, max_hops: int = 4) -> ConnectionResponse:
+    """Menor caminho entre duas entidades.
+
+    Args:
+        entity_a: Entidade de origem.
+        entity_b: Entidade de destino.
+        max_hops: Comprimento maximo do caminho, de 1 a 5.
+    """
+    max_hops = max(1, min(max_hops, 5))
+    store = AgeGraphStore()
+    with connection() as conn:
+        a = store.find_key(conn, entity_a) or normalize_name(entity_a)
+        b = store.find_key(conn, entity_b) or normalize_name(entity_b)
+        caminho = store.shortest_path(conn, a, b, max_hops=max_hops)
+
+    return ConnectionResponse(
+        source=entity_a,
+        target=entity_b,
+        found=bool(caminho),
+        hops=len(caminho),
+        path=[
+            PathStepOut(source=p.source, relation=p.relation, target=p.target, evidence=p.evidence)
+            for p in caminho
+        ],
+        note=None
+        if caminho
+        else "Nenhum caminho encontrado. As entidades podem nao existir no grafo.",
     )
 
 
@@ -131,14 +250,24 @@ def graph_stats() -> GraphStats:
     mime_type="text/markdown",
 )
 def graph_schema() -> str:
-    """Expoe o esquema para o LLM saber o que existe antes de perguntar."""
+    """Expoe o esquema para o LLM saber o que existe antes de perguntar.
+
+    Gerado a partir dos enums, nao escrito a mao: um esquema documentado que
+    diverge do codigo ensina o modelo a pedir tipo que nao existe.
+    """
+    quebra = chr(10)
+    tipos_no = quebra.join(f"- `{t.value}`" for t in EntityType)
+    tipos_aresta = quebra.join(f"- `{r.value}`" for r in RelationType)
+    with connection() as conn:
+        grafo = AgeGraphStore().stats(conn)
     return (
-        "# Esquema do grafo Ariadne\n\n"
-        "O grafo ainda nao foi populado: a extracao de entidades e relacoes\n"
-        "chega na Fase 2. Por ora, use `search_knowledge` com `mode=vector`.\n\n"
-        "## Previsto\n\n"
-        "- No `Entity`: name, type\n"
-        "- Aresta `RELATES_TO`: tipo da relacao e o chunk que a justifica\n"
+        f"# Esquema do grafo Ariadne{quebra}{quebra}"
+        f"Estado: {grafo['nodes']} entidades, {grafo['edges']} relacoes."
+        f"{quebra}{quebra}## Tipos de entidade{quebra}{quebra}"
+        f"{tipos_no}{quebra}{quebra}"
+        f"## Tipos de relacao{quebra}{quebra}"
+        f"{tipos_aresta}{quebra}{quebra}"
+        f"Toda relacao carrega o trecho do documento que a justifica.{quebra}"
     )
 
 
