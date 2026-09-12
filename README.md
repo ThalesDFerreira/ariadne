@@ -146,6 +146,30 @@ src/ariadne/
 MIT
 
 
+## Escolha do modelo de extracao
+
+Medida contra um golden set de 8 trechos anotados a mao
+(`data/golden/extraction_golden.json`), reproduzivel com:
+
+```bash
+uv run python scripts/benchmark_extraction.py qwen2.5:7b-instruct llama3.1:8b qwen2.5-coder:7b
+```
+
+| modelo | ent F1 | rel P | rel F1 | segundos |
+|---|---|---|---|---|
+| **qwen2.5:7b-instruct** | 0,72 | **0,60** | **0,57** | 102 |
+| qwen2.5-coder:7b | 0,78 | 0,46 | 0,50 | 111 |
+| llama3.1:8b | **0,82** | 0,29 | 0,32 | **33** |
+
+O resultado contraria a intuicao e decide a escolha. O `llama3.1:8b` ganha em
+entidades e e tres vezes mais rapido, mas perde feio em **relacoes** -- e e a
+relacao que faz o grafo valer alguma coisa. Um grafo com nomes otimos e arestas
+erradas nao e um grafo pobre, e uma lista de nomes que afirma bobagem.
+
+Entre as metricas de relacao, a que mais pesou foi a **precisao** (0,60 contra
+0,29): aresta inventada envenena o grafo de forma permanente e aparece na
+resposta com ar de fato, enquanto aresta faltante apenas o deixa incompleto.
+
 ## O que aprendemos apanhando
 
 Notas de coisas que so aparecem construindo, todas medidas e viradas em teste.
