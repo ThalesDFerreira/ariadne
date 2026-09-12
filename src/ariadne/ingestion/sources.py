@@ -22,17 +22,19 @@ diferente de um texto no corpus decidir isso sozinho.
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TypedDict
 from urllib.parse import urlparse
 
 import httpx
 
 from ariadne.config import Settings, get_settings
 from ariadne.domain.models import Document
+from ariadne.ingestion.parsers import SUPPORTED, ParserUnavailableError, parse_file
 from ariadne.ingestion.wikipedia import SOURCE as WIKI_SOURCE
 from ariadne.ingestion.wikipedia import WikipediaSource
 
-TEXT_SUFFIXES = {".md", ".markdown", ".txt", ".rst"}
-MAX_BYTES = 5 * 1024 * 1024
+MAX_BYTES = 50 * 1024 * 1024
+"""50 MB: PDF digitalizado de algumas dezenas de paginas passa facil dos 5."""
 
 
 class SourceRejectedError(ValueError):
@@ -119,21 +121,93 @@ def _from_path(referencia: str, cfg: Settings) -> Document:
     if not alvo.is_file():
         msg = f"arquivo nao encontrado: {alvo}"
         raise SourceRejectedError(msg)
-    if alvo.suffix.lower() not in TEXT_SUFFIXES:
-        msg = f"extensao {alvo.suffix!r} nao suportada. Aceitas: {', '.join(sorted(TEXT_SUFFIXES))}"
+    if alvo.suffix.lower() not in SUPPORTED:
+        msg = f"extensao {alvo.suffix!r} nao suportada. Aceitas: {', '.join(sorted(SUPPORTED))}"
         raise SourceRejectedError(msg)
     if alvo.stat().st_size > MAX_BYTES:
         msg = f"arquivo maior que o limite de {MAX_BYTES // 1024 // 1024} MB"
         raise SourceRejectedError(msg)
 
-    texto = alvo.read_text(encoding="utf-8", errors="replace")
+    try:
+        analisado = parse_file(alvo)
+    except ParserUnavailableError as exc:
+        raise SourceRejectedError(str(exc)) from exc
+    except Exception as exc:
+        # Arquivo com a extensao certa mas conteudo corrompido faz a biblioteca
+        # de parsing estourar sua propria excecao (FileDataError, BadZipFile,
+        # ...). Deixar vazar entregaria um traceback ao LLM no lugar de uma
+        # instrucao; aqui vira recusa com motivo.
+        msg = f"nao foi possivel ler {alvo.name}: {type(exc).__name__}"
+        raise SourceRejectedError(msg) from exc
+
+    if not analisado.text.strip():
+        msg = (
+            f"nenhum texto extraido de {alvo.name}. "
+            "Se for um PDF digitalizado ou uma foto, verifique se o extra 'ocr' "
+            "esta instalado (uv sync --extra ocr)."
+        )
+        raise SourceRejectedError(msg)
+
     return Document(
         source="arquivo",
         external_id=str(alvo.relative_to(base)),
         title=alvo.stem,
         url=alvo.as_uri(),
-        content=texto,
+        content=analisado.text,
+        metadata={
+            "extracao": analisado.kind,
+            "paginas": analisado.pages,
+            # O aviso viaja com o documento: texto de OCR erra, e quem ler a
+            # resposta depois merece saber de onde ele veio.
+            "aviso": analisado.warning or "",
+        },
     )
 
 
-__all__ = ["WIKI_SOURCE", "SourceRejectedError", "resolve_source"]
+class AvailableFile(TypedDict):
+    """Um arquivo pronto para ingestao."""
+
+    path: str
+    format: str
+    size_kb: float
+    too_big: bool
+
+
+def list_available(settings: Settings | None = None) -> list[AvailableFile]:
+    """Arquivos na pasta de ingestao que podem ser indexados.
+
+    Existe para o fluxo ser "vejo o que tem, escolho o que quero" em vez de
+    "adivinho o nome do arquivo". Lista apenas o que a politica ja aceitaria --
+    mostrar um arquivo que seria recusado depois so gera frustracao.
+    """
+    cfg = settings or get_settings()
+    if cfg.ingest_root is None:
+        return []
+
+    base = Path(cfg.ingest_root).expanduser().resolve()
+    if not base.is_dir():
+        return []
+
+    saida: list[AvailableFile] = []
+    for caminho in sorted(base.rglob("*")):
+        if not caminho.is_file() or caminho.suffix.lower() not in SUPPORTED:
+            continue
+        tamanho = caminho.stat().st_size
+        saida.append(
+            AvailableFile(
+                path=caminho.relative_to(base).as_posix(),
+                format=caminho.suffix.lower().lstrip("."),
+                size_kb=round(tamanho / 1024, 1),
+                too_big=tamanho > MAX_BYTES,
+            )
+        )
+    return saida
+
+
+__all__ = [
+    "WIKI_SOURCE",
+    "AvailableFile",
+    "SourceRejectedError",
+    "list_available",
+    "resolve_source",
+]

@@ -18,7 +18,8 @@ from ariadne.ingestion.sources import SourceRejectedError, resolve_source
 @pytest.fixture
 def raiz(tmp_path):
     (tmp_path / "ok.md").write_text("# Documento permitido\n\nConteudo.", encoding="utf-8")
-    (tmp_path / "binario.pdf").write_bytes(b"%PDF-1.4 nao suportado")
+    (tmp_path / "programa.exe").write_bytes(b"MZ binario")
+    (tmp_path / "corrompido.pdf").write_bytes(b"isto nao e um PDF de verdade")
     segredo = tmp_path.parent / "segredo.md"
     segredo.write_text("chave secreta", encoding="utf-8")
     return tmp_path
@@ -67,9 +68,20 @@ def test_caminho_absoluto_fora_da_raiz_e_bloqueado(raiz):
         resolve_source(str(alvo), cfg(raiz))
 
 
-def test_extensao_nao_textual_e_recusada(raiz):
+def test_extensao_nao_suportada_e_recusada(raiz):
     with pytest.raises(SourceRejectedError, match="nao suportada"):
-        resolve_source("binario.pdf", cfg(raiz))
+        resolve_source("programa.exe", cfg(raiz))
+
+
+def test_arquivo_corrompido_vira_recusa_e_nao_traceback(raiz):
+    """Extensao certa, conteudo quebrado.
+
+    A biblioteca de parsing estoura sua propria excecao (FileDataError,
+    BadZipFile...). Deixar vazar entregaria um traceback ao LLM no lugar de uma
+    instrucao sobre o que fazer.
+    """
+    with pytest.raises(SourceRejectedError, match="nao foi possivel ler"):
+        resolve_source("corrompido.pdf", cfg(raiz))
 
 
 def test_arquivo_inexistente_da_mensagem_clara(raiz):
