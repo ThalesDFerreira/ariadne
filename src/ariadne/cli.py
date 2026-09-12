@@ -11,8 +11,9 @@ from ariadne.console import force_utf8_output
 from ariadne.domain.graph import normalize_name
 from ariadne.ingestion.corpus import DEMO_CORPUS
 from ariadne.ingestion.graph_builder import GraphBuilder
+from ariadne.ingestion.parsers import SUPPORTED
 from ariadne.ingestion.pipeline import IngestionPipeline
-from ariadne.ingestion.sources import SourceRejectedError, resolve_source
+from ariadne.ingestion.sources import SourceRejectedError, list_available, resolve_source
 from ariadne.ingestion.wikipedia import WikipediaSource
 from ariadne.retrieval.hybrid import HybridSearch, SearchMode
 from ariadne.storage.database import connection
@@ -57,11 +58,15 @@ def cmd_ingest(args: argparse.Namespace) -> int:
 
 
 def _parece_fonte(referencia: str) -> bool:
-    """Distingue "URL/arquivo" de "titulo da Wikipedia"."""
+    """Distingue "URL/arquivo" de "titulo da Wikipedia".
+
+    A lista de extensoes vem de SUPPORTED, e nao escrita a mao aqui: quando os
+    parsers ganharam PDF, DOCX e imagem, esta funcao continuou so com as
+    extensoes de texto e mandou "contrato.docx" para a Wikipedia. Duas listas
+    do mesmo conjunto sempre divergem.
+    """
     baixo = referencia.lower()
-    return baixo.startswith(("http://", "https://")) or referencia.endswith(
-        (".md", ".markdown", ".txt", ".rst")
-    )
+    return baixo.startswith(("http://", "https://")) or any(baixo.endswith(s) for s in SUPPORTED)
 
 
 def cmd_search(args: argparse.Namespace) -> int:
@@ -83,6 +88,25 @@ def cmd_search(args: argparse.Namespace) -> int:
         print(f"\n[{i}] score={hit.score:.4f}")
         print(f"    fonte: {hit.citation()}")
         print(f"    {trecho}...")
+    return 0
+
+
+def cmd_docs(_: argparse.Namespace) -> int:
+    from ariadne.config import get_settings
+
+    cfg = get_settings()
+    if cfg.ingest_root is None:
+        print("pasta de ingestao nao configurada.")
+        print("Defina ARIADNE_INGEST_ROOT no .env com o diretorio dos seus documentos.")
+        return 1
+    docs = list_available()
+    if not docs:
+        print(f"nenhum documento suportado em {cfg.ingest_root}")
+        return 1
+    print(f"{len(docs)} documento(s) em {cfg.ingest_root}:")
+    for d in docs:
+        marca = "  (grande demais)" if d["too_big"] else ""
+        print(f"  {d['format']:<6} {d['size_kb']:>8.1f} KB  {d['path']}{marca}")
     return 0
 
 
@@ -205,6 +229,9 @@ def main(argv: list[str] | None = None) -> int:
     p_search.add_argument("--no-rerank", action="store_true", help="pula o cross-encoder")
     p_search.add_argument("--explain", action="store_true", help="mostra o que cada etapa rendeu")
     p_search.set_defaults(func=cmd_search)
+
+    p_docs = sub.add_parser("docs", help="lista documentos disponiveis para ingestao")
+    p_docs.set_defaults(func=cmd_docs)
 
     p_ask = sub.add_parser("ask", help="pergunta em linguagem natural, com resposta citada")
     p_ask.add_argument("question")

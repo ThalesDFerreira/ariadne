@@ -17,9 +17,10 @@ from mcp.server.mcpserver import MCPServer
 from pydantic import BaseModel, Field
 
 from ariadne.agents.orchestrator import KnowledgeAgent
+from ariadne.config import get_settings
 from ariadne.domain.graph import EntityType, RelationType, normalize_name
 from ariadne.ingestion.pipeline import IngestionPipeline
-from ariadne.ingestion.sources import SourceRejectedError, resolve_source
+from ariadne.ingestion.sources import SourceRejectedError, list_available, resolve_source
 from ariadne.retrieval.hybrid import HybridSearch
 from ariadne.retrieval.hybrid import SearchMode as EngineMode
 from ariadne.storage.database import connection
@@ -134,6 +135,19 @@ class AnswerResponse(BaseModel):
     )
     strategy: str
     warning: str | None = None
+
+
+class AvailableDoc(BaseModel):
+    path: str
+    format: str
+    size_kb: float
+    too_big: bool = False
+
+
+class AvailableResponse(BaseModel):
+    root_configured: bool
+    documents: list[AvailableDoc]
+    message: str
 
 
 class IngestResponse(BaseModel):
@@ -325,6 +339,38 @@ def answer_question(question: str) -> AnswerResponse:
         grounded=resultado.answer.grounded,
         strategy=resultado.strategy.kind.value,
         warning=resultado.answer.warning,
+    )
+
+
+@server.tool(
+    title="Listar documentos disponiveis",
+    description=(
+        "Lista os arquivos que estao na pasta de ingestao e podem ser indexados. "
+        "Use antes de ingest_document para o usuario escolher qual quer, em vez "
+        "de adivinhar nomes de arquivo."
+    ),
+)
+def list_documents() -> AvailableResponse:
+    """O que esta esperando na pasta de ingestao."""
+    docs = list_available()
+    cfg = get_settings()
+    if cfg.ingest_root is None:
+        return AvailableResponse(
+            root_configured=False,
+            documents=[],
+            message=(
+                "A pasta de ingestao nao esta configurada. Defina "
+                "ARIADNE_INGEST_ROOT no .env com o diretorio onde os documentos ficam."
+            ),
+        )
+    return AvailableResponse(
+        root_configured=True,
+        documents=[AvailableDoc(**d) for d in docs],
+        message=(
+            f"{len(docs)} documento(s) disponivel(is) em {cfg.ingest_root}"
+            if docs
+            else f"nenhum documento suportado em {cfg.ingest_root}"
+        ),
     )
 
 

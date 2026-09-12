@@ -92,6 +92,7 @@ Tools expostas nesta fase:
 
 | `explore_entity(name, depth)` | Vizinhanca de uma entidade no grafo, com evidencia |
 | `find_connection(entity_a, entity_b)` | Caminho entre duas entidades, com o trecho que justifica cada passo |
+| `list_documents()` | Lista os arquivos disponiveis na pasta, para o usuario escolher |
 | `ingest_document(path_or_url)` | Indexa um documento novo, dentro da politica de seguranca abaixo |
 
 Resource: `ariadne://graph/schema`.
@@ -180,6 +181,40 @@ A trava 2 e a que vale: instrucao em prompt e pedido, nao garantia. Um modelo
 de 7B cita `[7]` tendo recebido quatro trechos, e deixar passar seria pior do
 que nao citar -- a resposta ganharia aparencia de verificada justamente onde
 nao esta.
+
+## Usando com os seus documentos
+
+O corpus de empresas e so a demonstracao. Para indexar os seus arquivos, aponte
+uma pasta no `.env`:
+
+```bash
+ARIADNE_INGEST_ROOT=C:/Users/voce/meus-documentos
+```
+
+Depois e "vejo o que tem, escolho o que quero":
+
+```bash
+uv run ariadne docs                        # lista o que esta na pasta
+uv run ariadne ingest "contrato.pdf" "custos.xlsx" "nota.jpg"
+uv run ariadne graph-build                 # so os trechos novos custam GPU
+uv run ariadne ask "Quem fornece bauxita para a Beta?"
+```
+
+No Claude Desktop o fluxo e o mesmo por conversa: `list_documents` mostra o que
+esta disponivel e voce diz qual quer.
+
+### Formatos, e por que cada um precisa de tratamento proprio
+
+| formato | tratamento |
+|---|---|
+| `.pdf` | Texto nativo via PyMuPDF. Se o PDF for **digitalizado**, o texto vem quase vazio **sem erro nenhum** -- entao o parser detecta isso e cai no OCR, em vez de indexar um documento vazio que sumiria da busca |
+| `.docx` | Titulos sao ESTILO, nao marcacao. Convertidos para `==`, alimentam o chunking por secao; sem isso o documento vira um bloco unico sem hierarquia |
+| `.xlsx`, `.csv` | Cada linha vira uma **frase com o nome das colunas**. `"1200"` isolado nao significa nada para um embedding; `"fornecedor: Alfa; valor: 1200"` significa |
+| imagens | OCR local via RapidOCR -- escolhido por nao exigir binario externo (Tesseract precisaria de instalacao manual). O resultado vem **marcado como OCR**, porque texto de OCR erra e quem le a resposta merece saber |
+| `.md`, `.txt`, `.rst` | Direto |
+
+Arquivo com extensao certa e conteudo corrompido vira **recusa com motivo**, nao
+traceback: a mensagem vai para um LLM, que precisa saber o que fazer a seguir.
 
 ## Seguranca da ingestao
 
