@@ -20,9 +20,9 @@ DEMO_CORPUS: list[str] = [
     "Gerdau",
     "Braskem",
     # Energia: participacoes cruzadas e concessoes.
-    "Eletrobras",
-    "Cemig",
-    "Copel",
+    "Axia Energia",  # ex-Eletrobras; a Wikipedia ja usa o nome novo
+    "Companhia Energética de Minas Gerais",
+    "Companhia Paranaense de Energia",
     "Engie Brasil",
     # Papel, celulose e agro.
     "Suzano Papel e Celulose",
@@ -34,15 +34,15 @@ DEMO_CORPUS: list[str] = [
     # Financeiro: aparecem como acionistas e credores dos demais.
     "Banco do Brasil",
     "Itaú Unibanco",
-    "Banco Bradesco",
+    "Bradesco",
     "Banco Nacional de Desenvolvimento Econômico e Social",
-    "B3 (empresa)",
+    "B3 (bolsa de valores)",
     "Banco Central do Brasil",
     # Industria e consumo.
     "Embraer",
-    "WEG (empresa)",
+    "WEG S.A.",
     "Ambev",
     "Localiza",
-    "Ultrapar",
-    "Natura &Co",
+    "Grupo Ultra",
+    "Natura",
 ]
