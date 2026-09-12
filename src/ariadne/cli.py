@@ -55,7 +55,20 @@ def cmd_stats(_: argparse.Namespace) -> int:
     return 0
 
 
+def _force_utf8_output() -> None:
+    """O console do Windows usa cp1252 e estoura em qualquer acento.
+
+    Sem isto, imprimir um resultado que contenha "Mineracao" com cedilha
+    derruba a CLI com UnicodeEncodeError -- um corpus em portugues seria
+    inutilizavel no terminal padrao da maquina.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
+
 def main(argv: list[str] | None = None) -> int:
+    _force_utf8_output()
     parser = argparse.ArgumentParser(prog="ariadne", description="Motor de conhecimento")
     sub = parser.add_subparsers(dest="command", required=True)
 
