@@ -1,0 +1,111 @@
+[
+  {
+    "id": "cemig-controle",
+    "context": "Companhia Energética de Minas Gerais > História",
+    "text": "A Cemig foi fundada em 1952 pelo governador de Minas Gerais, Juscelino Kubitschek de Oliveira. Trata-se de uma companhia de capital aberto controlada pelo Governo do Estado de Minas Gerais.",
+    "entities": [
+      {"name": "Cemig", "type": "Organizacao"},
+      {"name": "Minas Gerais", "type": "Lugar"},
+      {"name": "Juscelino Kubitschek de Oliveira", "type": "Pessoa"},
+      {"name": "Governo do Estado de Minas Gerais", "type": "Organizacao"}
+    ],
+    "relations": [
+      {"source": "Governo do Estado de Minas Gerais", "target": "Cemig", "type": "CONTROLA"}
+    ]
+  },
+  {
+    "id": "weg-aquisicoes",
+    "context": "WEG S.A. > Expansão",
+    "text": "Em setembro, a WEG comprou a Efacec Energy Service no estado de Pernambuco. Em dezembro, adquiriu 100% da fabricante de equipamentos de motores elétricos alemã Katt.",
+    "entities": [
+      {"name": "WEG", "type": "Organizacao"},
+      {"name": "Efacec Energy Service", "type": "Organizacao"},
+      {"name": "Pernambuco", "type": "Lugar"},
+      {"name": "Katt", "type": "Organizacao"}
+    ],
+    "relations": [
+      {"source": "WEG", "target": "Efacec Energy Service", "type": "ADQUIRIU"},
+      {"source": "WEG", "target": "Katt", "type": "ADQUIRIU"}
+    ]
+  },
+  {
+    "id": "copel-privatizacao",
+    "context": "Companhia Paranaense de Energia",
+    "text": "A Companhia Paranaense de Energia (COPEL) é uma empresa brasileira de energia, responsável pela geração, transmissão e distribuição de energia elétrica no estado do Paraná. Até agosto de 2023, o acionista majoritário da empresa era o Governo do Paraná.",
+    "entities": [
+      {"name": "Companhia Paranaense de Energia", "type": "Organizacao"},
+      {"name": "COPEL", "type": "Organizacao"},
+      {"name": "Paraná", "type": "Lugar"},
+      {"name": "Governo do Paraná", "type": "Organizacao"}
+    ],
+    "relations": [
+      {"source": "Governo do Paraná", "target": "Companhia Paranaense de Energia", "type": "CONTROLA"},
+      {"source": "Companhia Paranaense de Energia", "target": "Paraná", "type": "ATUA_EM"}
+    ]
+  },
+  {
+    "id": "cosan-comgas",
+    "context": "Cosan > Grupo Cosan > Compass > Comgás",
+    "text": "Desde 2012, a Companhia de Gás de São Paulo - Comgás também faz parte dos negócios da Cosan. A Comgás fornece energia para residências, veículos, indústrias e termelétricas no Estado de São Paulo.",
+    "entities": [
+      {"name": "Comgás", "type": "Organizacao"},
+      {"name": "Cosan", "type": "Organizacao"},
+      {"name": "São Paulo", "type": "Lugar"}
+    ],
+    "relations": [
+      {"source": "Cosan", "target": "Comgás", "type": "CONTROLA"},
+      {"source": "Comgás", "target": "São Paulo", "type": "ATUA_EM"}
+    ]
+  },
+  {
+    "id": "bradesco-aquisicoes",
+    "context": "Bradesco > História > Década de 2000",
+    "text": "Em 24 de janeiro de 2007, o Bradesco adquiriu o Banco BMC, instituição voltada para o crédito consignado de INSS por R$ 800 milhões. Em 6 de março de 2008, o Bradesco, por meio do Banco Bradesco de Investimento (BBI), adquiriu a Ágora Corretora.",
+    "entities": [
+      {"name": "Bradesco", "type": "Organizacao"},
+      {"name": "Banco BMC", "type": "Organizacao"},
+      {"name": "Banco Bradesco de Investimento", "type": "Organizacao"},
+      {"name": "Ágora Corretora", "type": "Organizacao"}
+    ],
+    "relations": [
+      {"source": "Bradesco", "target": "Banco BMC", "type": "ADQUIRIU"},
+      {"source": "Bradesco", "target": "Ágora Corretora", "type": "ADQUIRIU"}
+    ]
+  },
+  {
+    "id": "vale-privatizacao",
+    "context": "Vale S.A. > História > Privatização",
+    "text": "A Vale foi privatizada em 6 de maio de 1997, durante o governo de Fernando Henrique Cardoso, com financiamento subsidiado disponibilizado aos compradores pelo BNDES.",
+    "entities": [
+      {"name": "Vale", "type": "Organizacao"},
+      {"name": "Fernando Henrique Cardoso", "type": "Pessoa"},
+      {"name": "BNDES", "type": "Organizacao"}
+    ],
+    "relations": []
+  },
+  {
+    "id": "usiminas-jv",
+    "context": "Usiminas > Empresas do Grupo",
+    "text": "A Mineração Usiminas foi criada em 2010 através de uma joint venture com o grupo japonês Sumitomo Corporation. Tem participação de 20% no capital da MRS.",
+    "entities": [
+      {"name": "Mineração Usiminas", "type": "Organizacao"},
+      {"name": "Sumitomo Corporation", "type": "Organizacao"},
+      {"name": "MRS", "type": "Organizacao"}
+    ],
+    "relations": [
+      {"source": "Mineração Usiminas", "target": "MRS", "type": "CONTROLA"}
+    ]
+  },
+  {
+    "id": "sem-relacao",
+    "context": "Cemig > Empresas > Distribuição",
+    "text": "A Cemig D distribui energia para uma base de quase 9 milhões de consumidores. É a maior distribuidora de energia elétrica do Brasil em extensão de rede, com mais de 415 subestações.",
+    "entities": [
+      {"name": "Cemig D", "type": "Organizacao"},
+      {"name": "Brasil", "type": "Lugar"}
+    ],
+    "relations": [
+      {"source": "Cemig D", "target": "Brasil", "type": "ATUA_EM"}
+    ]
+  }
+]
