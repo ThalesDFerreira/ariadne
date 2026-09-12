@@ -46,6 +46,10 @@ class Settings(BaseSettings):
     # --- LLM ---
     llm_provider: LLMProvider = LLMProvider.OLLAMA
     llm_model: str = "qwen2.5:7b-instruct"
+    extraction_model: str = "qwen2.5:7b-instruct"
+    """Modelo da extracao de entidades. Escolhido por benchmark, nao por
+    intuicao -- ver scripts/benchmark_extraction.py."""
+
     ollama_base_url: str = "http://localhost:11434"
     llm_api_key: SecretStr | None = None
 
