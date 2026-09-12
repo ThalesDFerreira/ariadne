@@ -16,6 +16,7 @@ from typing import Literal
 from mcp.server.mcpserver import MCPServer
 from pydantic import BaseModel, Field
 
+from ariadne.agents.orchestrator import KnowledgeAgent
 from ariadne.domain.graph import EntityType, RelationType, normalize_name
 from ariadne.ingestion.pipeline import IngestionPipeline
 from ariadne.ingestion.sources import SourceRejectedError, resolve_source
@@ -29,6 +30,7 @@ from ariadne.storage.vector_store import PgVectorStore
 SearchMode = Literal["vector", "lexical", "graph", "hybrid"]
 
 _engine: HybridSearch | None = None
+_agent: KnowledgeAgent | None = None
 
 
 def get_engine() -> HybridSearch:
@@ -42,6 +44,14 @@ def get_engine() -> HybridSearch:
     if _engine is None:
         _engine = HybridSearch()
     return _engine
+
+
+def get_agent() -> KnowledgeAgent:
+    """Agente unico do processo, pela mesma razao do motor de busca."""
+    global _agent
+    if _agent is None:
+        _agent = KnowledgeAgent()
+    return _agent
 
 
 server = MCPServer(
@@ -110,6 +120,20 @@ class ConnectionResponse(BaseModel):
     hops: int
     path: list[PathStepOut]
     note: str | None = None
+
+
+class AnswerResponse(BaseModel):
+    question: str
+    answer: str
+    sources: list[str]
+    grounded: bool = Field(
+        description=(
+            "False quando a resposta nao citou nenhuma fonte valida. "
+            "Nesse caso, trate o texto como nao verificado."
+        )
+    )
+    strategy: str
+    warning: str | None = None
 
 
 class IngestResponse(BaseModel):
@@ -275,6 +299,32 @@ def find_connection(entity_a: str, entity_b: str, max_hops: int = 4) -> Connecti
         note=None
         if caminho
         else "Nenhum caminho encontrado. As entidades podem nao existir no grafo.",
+    )
+
+
+@server.tool(
+    title="Responder pergunta",
+    description=(
+        "Responde uma pergunta em linguagem natural sobre o corpus, escolhendo "
+        "sozinha a estrategia de busca e devolvendo a resposta com as fontes. "
+        "Prefira esta tool a search_knowledge quando o usuario fez uma pergunta "
+        "em vez de pedir trechos."
+    ),
+)
+def answer_question(question: str) -> AnswerResponse:
+    """Pergunta em linguagem natural, resposta citada.
+
+    Args:
+        question: A pergunta do usuario, como ele a escreveu.
+    """
+    resultado = get_agent().ask(question)
+    return AnswerResponse(
+        question=question,
+        answer=resultado.answer.text,
+        sources=resultado.answer.sources,
+        grounded=resultado.answer.grounded,
+        strategy=resultado.strategy.kind.value,
+        warning=resultado.answer.warning,
     )
 
 

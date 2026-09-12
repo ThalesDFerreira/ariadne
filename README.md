@@ -17,7 +17,7 @@ Ariadne resolve o segundo caso mantendo, alem dos vetores, um grafo `(entidade) 
 
 ## Estado atual
 
-**Fase 4 — servidor MCP completo.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container; ingestao da Wikipedia-pt, chunking estrutural, embeddings locais via Ollama (BGE-M3) e busca vetorial com citacao de fonte. Corpus de demonstracao: 28 empresas brasileiras, 450 chunks. Corpus de 28 empresas brasileiras: 450 chunks, **1289 entidades e 1036 relacoes** extraidas com LLM local, cada aresta com o trecho que a justifica. A busca combina vetorial, lexical (BM25), expansao k-hop pelo grafo e reranking com cross-encoder. 130 testes passando. Proximo passo: Fase 4 (MCP completo).
+**Fase 5 — camada agentica.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container; ingestao da Wikipedia-pt, chunking estrutural, embeddings locais via Ollama (BGE-M3) e busca vetorial com citacao de fonte. Corpus de demonstracao: 28 empresas brasileiras, 450 chunks. Corpus de 28 empresas brasileiras: 450 chunks, **1289 entidades e 1036 relacoes** extraidas com LLM local, cada aresta com o trecho que a justifica. A busca combina vetorial, lexical (BM25), expansao k-hop pelo grafo e reranking com cross-encoder. 130 testes passando. Proximo passo: Fase 4 (MCP completo).
 
 ## Stack
 
@@ -59,6 +59,7 @@ ariadne search "Quem extrai minério de ferro?"
 ariadne graph-build                 # extrai entidades e relacoes (LLM local)
 ariadne explore "Petrobras"
 ariadne connect "Vale" "BNDES"
+ariadne ask "Quando a Vale foi privatizada?"        # resposta citada
 ariadne search "pergunta" --mode vector --explain   # compara estrategias
 ariadne stats
 ```
@@ -85,6 +86,7 @@ Tools expostas nesta fase:
 
 | Tool | O que faz |
 |---|---|
+| `answer_question(question)` | **Responde** em linguagem natural, escolhendo a estrategia sozinha, com as fontes |
 | `search_knowledge(query, mode, limit)` | Busca hibrida. `mode`: `hybrid` (padrao), `vector`, `lexical`, `graph`. Todo resultado traz a citacao |
 | `graph_stats()` | Contagens do indice e do grafo |
 
@@ -139,7 +141,7 @@ src/ariadne/
 - [x] **Fase 2** — O grafo: extracao de entidades/relacoes, entity resolution, Cypher
 - [x] **Fase 3** — Recuperacao hibrida: BM25, RRF, expansao k-hop, reranking
 - [x] **Fase 4** — Servidor MCP completo
-- [ ] **Fase 5** — Camada agentica: roteador e perguntas multi-hop
+- [x] **Fase 5** — Camada agentica: roteador e perguntas multi-hop
 - [ ] **Fase 6** — Avaliacao (RAGAS) e observabilidade
 - [ ] **Fase 7** — Vitrine: UI do grafo e dataset publico
 
@@ -147,6 +149,37 @@ src/ariadne/
 
 MIT
 
+
+## Camada agentica
+
+Nem toda pergunta quer a mesma busca. Um roteador classifica antes e ajusta os
+parametros:
+
+| tipo | exemplo | o que muda |
+|---|---|---|
+| **factual** | "Quando a Vale foi privatizada?" | poucos candidatos, grafo com peso baixo (0,2), reranking ligado |
+| **relacional** | "Qual a ligacao entre Bradesco e Previ?" | grafo com peso maximo (1,0) e o caminho entre as entidades entra no contexto |
+| **sintese** | "Quais empresas foram privatizadas?" | pool grande e **sem** reranking, porque o cross-encoder ordena por "melhor resposta unica" e enterra itens validos de uma lista |
+
+A classificacao usa o LLM local com schema fechado e **cai numa heuristica**
+quando o modelo nao responde: classificar errado degrada a resposta, nao poder
+classificar nao pode derrubar o sistema.
+
+### Como as citacoes sao garantidas
+
+Este e o unico ponto do sistema onde um LLM escreve prosa nova -- todo o resto
+apenas recupera texto que existe. Tres travas, e nenhuma confia no modelo:
+
+1. Os trechos entram **numerados**, e o prompt exige citar o numero. Pedir
+   "cite as fontes" sem dar identificador produz citacao inventada.
+2. A resposta e **validada depois**: citacao a um numero que nao existe e
+   removida, e a resposta vira `grounded: false` com aviso.
+3. O objeto devolvido carrega os trechos usados, entao da para conferir.
+
+A trava 2 e a que vale: instrucao em prompt e pedido, nao garantia. Um modelo
+de 7B cita `[7]` tendo recebido quatro trechos, e deixar passar seria pior do
+que nao citar -- a resposta ganharia aparencia de verificada justamente onde
+nao esta.
 
 ## Seguranca da ingestao
 

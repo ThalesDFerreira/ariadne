@@ -6,6 +6,7 @@ import argparse
 import sys
 import time
 
+from ariadne.agents.orchestrator import KnowledgeAgent
 from ariadne.console import force_utf8_output
 from ariadne.domain.graph import normalize_name
 from ariadne.ingestion.corpus import DEMO_CORPUS
@@ -83,6 +84,29 @@ def cmd_search(args: argparse.Namespace) -> int:
         print(f"    fonte: {hit.citation()}")
         print(f"    {trecho}...")
     return 0
+
+
+def cmd_ask(args: argparse.Namespace) -> int:
+    agente = KnowledgeAgent()
+    try:
+        resultado = agente.ask(args.question)
+    finally:
+        agente.close()
+
+    print(f"  {resultado.summary()}")
+    if args.explain:
+        print(f"  rota: {resultado.strategy.reason[:100]}")
+        if resultado.strategy.entities:
+            print(f"  entidades: {', '.join(resultado.strategy.entities)}")
+    print()
+    print(resultado.answer.text)
+    if resultado.answer.sources:
+        print("\nFontes:")
+        for i, fonte in enumerate(resultado.answer.sources, 1):
+            print(f"  [{i}] {fonte}")
+    if resultado.answer.warning:
+        print(f"\n  aviso: {resultado.answer.warning}")
+    return 0 if resultado.answer.grounded else 1
 
 
 def cmd_graph_build(args: argparse.Namespace) -> int:
@@ -181,6 +205,11 @@ def main(argv: list[str] | None = None) -> int:
     p_search.add_argument("--no-rerank", action="store_true", help="pula o cross-encoder")
     p_search.add_argument("--explain", action="store_true", help="mostra o que cada etapa rendeu")
     p_search.set_defaults(func=cmd_search)
+
+    p_ask = sub.add_parser("ask", help="pergunta em linguagem natural, com resposta citada")
+    p_ask.add_argument("question")
+    p_ask.add_argument("--explain", action="store_true", help="mostra a rota escolhida")
+    p_ask.set_defaults(func=cmd_ask)
 
     p_build = sub.add_parser("graph-build", help="extrai o grafo dos chunks indexados")
     p_build.add_argument("--limit", type=int, default=None, help="processa so N chunks")
