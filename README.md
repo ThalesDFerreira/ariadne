@@ -17,7 +17,7 @@ Ariadne resolve o segundo caso mantendo, alem dos vetores, um grafo `(entidade) 
 
 ## Estado atual
 
-**Fase 2 — o grafo de conhecimento.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container; ingestao da Wikipedia-pt, chunking estrutural, embeddings locais via Ollama (BGE-M3) e busca vetorial com citacao de fonte. Corpus de demonstracao: 28 empresas brasileiras, 450 chunks. Corpus de 28 empresas brasileiras: 450 chunks, **1289 entidades e 1036 relacoes** extraidas com LLM local, cada aresta com o trecho que a justifica. 107 testes passando. Proximo passo: Fase 3 (recuperacao hibrida).
+**Fase 3 — recuperacao hibrida.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container; ingestao da Wikipedia-pt, chunking estrutural, embeddings locais via Ollama (BGE-M3) e busca vetorial com citacao de fonte. Corpus de demonstracao: 28 empresas brasileiras, 450 chunks. Corpus de 28 empresas brasileiras: 450 chunks, **1289 entidades e 1036 relacoes** extraidas com LLM local, cada aresta com o trecho que a justifica. A busca combina vetorial, lexical (BM25), expansao k-hop pelo grafo e reranking com cross-encoder. Proximo passo: Fase 4 (MCP completo).
 
 ## Stack
 
@@ -59,6 +59,7 @@ ariadne search "Quem extrai minério de ferro?"
 ariadne graph-build                 # extrai entidades e relacoes (LLM local)
 ariadne explore "Petrobras"
 ariadne connect "Vale" "BNDES"
+ariadne search "pergunta" --mode vector --explain   # compara estrategias
 ariadne stats
 ```
 
@@ -84,7 +85,7 @@ Tools expostas nesta fase:
 
 | Tool | O que faz |
 |---|---|
-| `search_knowledge(query, mode, limit)` | Busca trechos no corpus. Todo resultado traz a citacao da fonte |
+| `search_knowledge(query, mode, limit)` | Busca hibrida. `mode`: `hybrid` (padrao), `vector`, `lexical`, `graph`. Todo resultado traz a citacao |
 | `graph_stats()` | Contagens do indice e do grafo |
 
 | `explore_entity(name, depth)` | Vizinhanca de uma entidade no grafo, com evidencia |
@@ -135,7 +136,7 @@ src/ariadne/
 - [x] **Fase 1** — Ingestao e RAG baseline: parsing, chunking, embeddings, busca vetorial
 - [x] **Fase 1.5** — MCP minimo ponta a ponta
 - [x] **Fase 2** — O grafo: extracao de entidades/relacoes, entity resolution, Cypher
-- [ ] **Fase 3** — Recuperacao hibrida: BM25, RRF, expansao k-hop, reranking
+- [x] **Fase 3** — Recuperacao hibrida: BM25, RRF, expansao k-hop, reranking
 - [ ] **Fase 4** — Servidor MCP completo
 - [ ] **Fase 5** — Camada agentica: roteador e perguntas multi-hop
 - [ ] **Fase 6** — Avaliacao (RAGAS) e observabilidade
@@ -145,6 +146,45 @@ src/ariadne/
 
 MIT
 
+
+## Como a busca funciona
+
+```
+vetorial  ---\
+lexical   ----+--> RRF --> expansao k-hop --> RRF --> cross-encoder --> topo
+              /
+```
+
+Cada etapa cobre uma falha especifica da anterior:
+
+**Vetorial** aproxima por significado, e por isso confunde coisas parecidas.
+Perguntando "quem extrai minerio de ferro em **Itabira**?", ele devolvia em
+primeiro lugar a Gerdau -- que opera em **Itabirito**. Palavras diferentes,
+vetores vizinhos, empresa errada.
+
+**Lexical** casa termo exato e falha no oposto: o stemmer portugues reduz
+"minerio" a `miner` e "mineradora" a `mineradour`, que nao casam. Detalhe que
+custou caro: tanto `plainto_tsquery` quanto `websearch_to_tsquery` ligam os
+termos com **E**, entao a pergunta acima exigia um trecho contendo todos os
+termos ao mesmo tempo -- e devolvia zero. A tsquery aqui e montada com **OU**.
+
+**RRF** funde os dois olhando so a POSICAO, nunca o score. E o que dispensa
+calibrar similaridade de cosseno (0 a 1) contra `ts_rank_cd` (escala aberta):
+nenhuma normalizacao, nenhum ajuste que quebra no proximo corpus.
+
+**Expansao k-hop** e o que o RAG tradicional nao tem: dos chunks recuperados
+para as entidades, das entidades para os vizinhos no grafo, e de volta para os
+trechos onde esses vizinhos aparecem.
+
+**Cross-encoder** le pergunta e trecho JUNTOS e da a palavra final. O embedding
+e um bi-encoder: vetoriza o trecho na ingestao, sem nunca ter visto a pergunta.
+Na pratica isso decidiu o caso "qual banco adquiriu a Agora Corretora?", em que
+a fusao colocava o Banco do Brasil em primeiro e o reranker corrigiu para o
+Bradesco com folga (0,999 contra 0,675).
+
+Roda em **CPU** de proposito: sao poucas dezenas de pares por consulta, o que
+leva cerca de um segundo, e deixa a GPU livre para o LLM de extracao -- que e
+quem precisa dela nesta maquina de 8 GB.
 
 ## Escolha do modelo de extracao
 
