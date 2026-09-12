@@ -21,6 +21,14 @@ rerank = [
     "sentence-transformers>=3.0",
     "torch>=2.5",
 ]
+docs = [
+    "openpyxl>=3.1",
+    "pymupdf4llm>=0.0.17",
+    "python-docx>=1.1",
+]
+ocr = [
+    "rapidocr-onnxruntime>=1.3",
+]
 
 [dependency-groups]
 dev = [
