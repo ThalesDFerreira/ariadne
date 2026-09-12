@@ -53,6 +53,9 @@ class Settings(BaseSettings):
     # BGE-M3 produz 1024 dimensoes; o schema do pgvector depende desse numero,
     # entao trocar de modelo exige recriar a coluna e reindexar.
     embedding_model: str = "BAAI/bge-m3"
+    embedding_model_ollama: str = "bge-m3"
+    """Mesmo modelo, nome como o Ollama o registra."""
+
     embedding_dim: int = Field(default=1024, gt=0)
 
     @property
