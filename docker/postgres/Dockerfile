@@ -5,7 +5,10 @@
 # ele e compilado do source aqui.
 FROM pgvector/pgvector:pg16
 
-ARG AGE_BRANCH=PG16
+# Tag fixa, nao a branch PG16: a branch e desenvolvimento e pode quebrar sem
+# aviso, o que furaria a promessa de que clonar o repo e subir sempre funciona.
+# Para testar o upstream mais novo: --build-arg AGE_REF=PG16
+ARG AGE_REF=PG16/v1.5.0-rc0
 
 # flex/bison sao exigidos pelo parser de Cypher do AGE.
 RUN set -eux; \
@@ -18,7 +21,7 @@ RUN set -eux; \
         postgresql-server-dev-16 \
         libreadline-dev \
         zlib1g-dev; \
-    git clone --depth 1 --branch "${AGE_BRANCH}" https://github.com/apache/age.git /tmp/age; \
+    git clone --depth 1 --branch "${AGE_REF}" https://github.com/apache/age.git /tmp/age; \
     make -C /tmp/age -j"$(nproc)" install; \
     rm -rf /tmp/age; \
     apt-get purge -y --auto-remove \
