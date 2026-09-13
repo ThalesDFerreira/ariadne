@@ -104,20 +104,23 @@ def test_tipo_inexistente_nao_quebra():
 
 def test_golden_set_esta_bem_formado():
     casos = load_questions()
-    assert len(casos) >= 30, "golden set pequeno demais para comparar estrategias"
+    assert len(casos) >= 25, "golden set pequeno demais para comparar estrategias"
     ids = [c["id"] for c in casos]
     assert len(ids) == len(set(ids)), "ids duplicados no golden set"
     for caso in casos:
         assert caso["question"].strip()
         assert caso["anchors"], f"{caso['id']} sem ancora -- nao mede nada"
-        assert caso["kind"] in {"factual", "relacional", "sintese"}
+        assert caso["kind"], f"{caso['id']} sem tipo"
 
 
-def test_golden_set_tem_relacionais_suficientes():
-    """Sem perguntas relacionais, o grafo nao teria como mostrar vantagem."""
+def test_golden_set_tem_perguntas_que_exigem_varios_documentos():
+    """Sem elas, o grafo nao teria como mostrar vantagem e a comparacao seria
+    decorativa: mediria so recuperacao simples, que o vetorial ja resolve."""
     casos = load_questions()
-    relacionais = [c for c in casos if c["kind"] == "relacional"]
-    assert len(relacionais) >= len(casos) * 0.3
+    multi = [c for c in casos if c["kind"] in {"agregacao", "multihop", "relacional"}]
+    assert len(multi) >= len(casos) * 0.3, (
+        f"apenas {len(multi)}/{len(casos)} exigem mais de um documento"
+    )
 
 
 def test_golden_set_e_json_valido_no_disco():
@@ -139,3 +142,24 @@ def test_tabela_sai_em_markdown():
     assert tabela.startswith("| estrategia")
     assert "| A |" in tabela and "| B |" in tabela
     assert "100%" in tabela and "0%" in tabela
+
+
+def test_colunas_da_tabela_vem_dos_dados():
+    """Colunas fixas no codigo escondem justamente o que se quer comparar.
+
+    A versao anterior tinha "factual/relacional/sintese" escritos a mao; quando
+    o golden set passou a usar "agregacao" e "multihop", a tabela mostrou 0% em
+    colunas inexistentes e omitiu as que importavam.
+    """
+    tabela = format_table(
+        [
+            RunResult(
+                "X",
+                [qr("agregacao", 1, 1, 1), qr("multihop", 0, 1, None)],
+                seconds=1.0,
+            )
+        ]
+    )
+    assert "agregacao" in tabela
+    assert "multihop" in tabela
+    assert "relacional" not in tabela

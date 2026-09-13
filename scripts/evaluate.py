@@ -11,8 +11,15 @@ from __future__ import annotations
 
 import sys
 
+from ariadne.agents.router import STRATEGIES, QueryRouter
 from ariadne.console import force_utf8_output
-from ariadne.eval.harness import RunResult, evaluate_run, format_table, load_questions
+from ariadne.eval.harness import (
+    RunResult,
+    evaluate_routed,
+    evaluate_run,
+    format_table,
+    load_questions,
+)
 from ariadne.llm.embeddings import build_embedder
 from ariadne.retrieval.hybrid import HybridSearch, SearchMode
 from ariadne.retrieval.reranking import build_reranker
@@ -50,16 +57,29 @@ def main() -> int:
         print(f"avaliando {label}...", flush=True)
         runs.append(evaluate_run(label, engine, questions, mode=mode, limit=5, rerank=rerank))
 
+    # O sistema real ROTEIA: peso de grafo por tipo de pergunta. Medir um peso
+    # fixo mede uma configuracao que ele nunca usa.
+    print("avaliando GraphRAG roteado...", flush=True)
+    router = QueryRouter(use_llm=False)
+    engines = {e.graph_weight: motor(e.graph_weight, e.candidate_pool) for e in STRATEGIES.values()}
+    runs.append(evaluate_routed("GraphRAG roteado", engines, router, questions, limit=5))
+    router.close()
+
     print()
     print(format_table(runs))
 
     base = next(r for r in runs if r.label.startswith("RAG puro"))
     melhor = max(runs, key=lambda r: r.recall())
-    delta = melhor.recall() - base.recall()
+
+    # Os tipos saem do golden set, nao de uma lista escrita aqui. A versao
+    # anterior imprimia o delta de "relacional" -- tipo que o golden set da CVM
+    # nao tem -- e portanto anunciava +0% justamente na comparacao que motiva o
+    # projeto.
+    tipos = sorted({r.kind for r in base.results})
+    por_tipo = ", ".join(f"{melhor.recall(t) - base.recall(t):+.0%} em {t}" for t in tipos)
     print(
         f"\nGanho de {melhor.label} sobre o RAG puro: "
-        f"{delta:+.0%} no recall geral, "
-        f"{melhor.recall('relacional') - base.recall('relacional'):+.0%} nas relacionais."
+        f"{melhor.recall() - base.recall():+.0%} no recall geral ({por_tipo})."
     )
     return 0
 

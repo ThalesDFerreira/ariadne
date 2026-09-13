@@ -28,10 +28,17 @@ import pathlib
 import time
 import unicodedata
 from dataclasses import dataclass, field
+from typing import Any, Protocol
 
 from ariadne.retrieval.hybrid import HybridSearch, SearchMode
 
 GOLDEN = pathlib.Path(__file__).resolve().parents[3] / "data/golden/questions.json"
+
+
+class RouterLike(Protocol):
+    """So o que o harness precisa de um roteador."""
+
+    def route(self, query: str) -> Any: ...
 
 
 def fold(texto: str) -> str:
@@ -85,14 +92,15 @@ class RunResult:
         return sum(1 / r.rank if r.rank else 0.0 for r in alvo) / len(alvo)
 
 
-def load_questions(path: pathlib.Path | None = None) -> list[dict]:
-    return json.loads((path or GOLDEN).read_text(encoding="utf-8"))
+def load_questions(path: pathlib.Path | None = None) -> list[dict[str, Any]]:
+    casos: list[dict[str, Any]] = json.loads((path or GOLDEN).read_text(encoding="utf-8"))
+    return casos
 
 
 def evaluate_run(
     label: str,
     engine: HybridSearch,
-    questions: list[dict],
+    questions: list[dict[str, Any]],
     *,
     mode: SearchMode,
     limit: int = 5,
@@ -122,16 +130,79 @@ def evaluate_run(
     return RunResult(label=label, results=resultados, seconds=time.monotonic() - inicio)
 
 
+def evaluate_routed(
+    label: str,
+    engines: dict[float, HybridSearch],
+    router: RouterLike,
+    questions: list[dict[str, Any]],
+    *,
+    limit: int = 5,
+) -> RunResult:
+    """Avalia o sistema COMO ELE REALMENTE FUNCIONA: com roteamento.
+
+    Medir um peso de grafo fixo para todas as perguntas mede uma configuracao
+    que o sistema nunca usa. O roteador escolhe 0,2 para factual e 1,0 para
+    relacional justamente porque expandir numa pergunta factual empurra o
+    trecho certo para fora do topo -- foi o que a primeira medicao mostrou, e
+    ela estava medindo a configuracao errada, nao encontrando um defeito.
+    """
+    inicio = time.monotonic()
+    resultados: list[QuestionResult] = []
+
+    for caso in questions:
+        estrategia = router.route(caso["question"])
+        engine = engines[estrategia.graph_weight]
+        # O limite vem da ESTRATEGIA, nao do parametro. Passar um limite fixo
+        # aqui media o roteador com metade dos resultados que ele pede: a
+        # estrategia de sintese usa 10, e truncar em 5 derrubava o recall de
+        # perguntas de lista em 19 pontos -- um defeito da medicao que parecia
+        # defeito do roteamento.
+        hits = engine.search(
+            caso["question"],
+            mode=estrategia.mode,
+            limit=estrategia.limit,
+            rerank=estrategia.rerank,
+        ).hits
+        textos = [fold(h.chunk.content) for h in hits]
+        ancoras = [fold(a) for a in caso["anchors"]]
+        resultados.append(
+            QuestionResult(
+                id=caso["id"],
+                kind=caso["kind"],
+                found=sum(1 for a in ancoras if any(a in t for t in textos)),
+                expected=len(ancoras),
+                rank=next(
+                    (i for i, t in enumerate(textos, 1) if any(a in t for a in ancoras)),
+                    None,
+                ),
+            )
+        )
+
+    return RunResult(label=label, results=resultados, seconds=time.monotonic() - inicio)
+
+
 def format_table(runs: list[RunResult]) -> str:
-    """Tabela em markdown, pronta para colar no README."""
+    """Tabela em markdown, pronta para colar no README.
+
+    As colunas por tipo saem dos DADOS, nao de uma lista fixa. A versao
+    anterior tinha "factual/relacional/sintese" escritos no codigo, e quando o
+    golden set passou a usar "agregacao" e "multihop" a tabela mostrou 0% em
+    colunas que nao existiam -- escondendo justamente a comparacao que motivava
+    a medicao.
+    """
+    tipos = sorted({r.kind for run in runs for r in run.results})
+    cabecalho = ["estrategia", "recall geral", *tipos, "MRR", "seg"]
     linhas = [
-        "| estrategia | recall geral | factual | relacional | sintese | MRR | seg |",
-        "|---|---|---|---|---|---|---|",
+        "| " + " | ".join(cabecalho) + " |",
+        "|" + "---|" * len(cabecalho),
     ]
     for r in runs:
-        linhas.append(
-            f"| {r.label} | {r.recall():.0%} | {r.recall('factual'):.0%} | "
-            f"{r.recall('relacional'):.0%} | {r.recall('sintese'):.0%} | "
-            f"{r.mrr():.3f} | {r.seconds:.0f} |"
-        )
+        celulas = [
+            r.label,
+            f"{r.recall():.0%}",
+            *[f"{r.recall(t):.0%}" for t in tipos],
+            f"{r.mrr():.3f}",
+            f"{r.seconds:.0f}",
+        ]
+        linhas.append("| " + " | ".join(celulas) + " |")
     return "\n".join(linhas)
