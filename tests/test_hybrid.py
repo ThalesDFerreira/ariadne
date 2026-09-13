@@ -1,19 +1,39 @@
 """Recuperacao hibrida contra o corpus real.
 
 Estes testes assumem o corpus de demonstracao ingerido e o grafo construido
-(`ariadne ingest && ariadne graph-build`). Sem isso, pulam com motivo legivel
-em vez de falhar.
+(`ariadne ingest-dir data/cvm && ariadne graph-build`). Sem isso, pulam com
+motivo legivel em vez de falhar.
+
+AS CONSULTAS SAEM DO GOLDEN SET
+-------------------------------
+A primeira versao destes testes tinha "privatizacao BNDES" e "Itabira" escritos
+no codigo. Eles passaram a falhar no dia em que o corpus virou CVM -- e ninguem
+viu, porque teste de integracao pula sozinho quando o banco esta fora, e o banco
+passou semanas fora. Consulta escrita a mao envelhece junto com o corpus.
+
+Agora os termos vem de `data/golden/questions.json`, que e versionado junto com
+o corpus que ele descreve.
 """
+
+from typing import Any
 
 import httpx
 import pytest
 
 from ariadne.config import get_settings
+from ariadne.eval.harness import fold, load_questions
 from ariadne.retrieval.hybrid import HybridSearch, SearchMode
 from ariadne.retrieval.lexical import LexicalSearch
 from ariadne.storage.database import connection
 
 pytestmark = pytest.mark.integration
+
+CASOS: list[dict[str, Any]] = load_questions()
+PERGUNTA = next(c for c in CASOS if c["kind"] == "factual")
+MULTIHOP = [c for c in CASOS if c["kind"] == "multihop"]
+# Uma ancora puramente alfabetica: "14,30%" e "24 mes" nao servem para testar
+# casamento de termo exato numa tsquery.
+TERMO = next(a for c in CASOS for a in c["anchors"] if a.replace(" ", "").isalpha())
 
 
 @pytest.fixture(scope="module")
@@ -38,17 +58,18 @@ def motor():
 
 
 def test_lexical_encontra_por_termo_exato(db):
-    hits = LexicalSearch().search(db, "privatização BNDES", limit=5)
-    assert hits, "busca lexical nao devolveu nada"
+    hits = LexicalSearch().search(db, TERMO, limit=5)
+    assert hits, f"busca lexical nao devolveu nada para {TERMO!r}"
 
 
 def test_lexical_nao_exige_todos_os_termos(db):
     """O bug que quase passou: com AND, pergunta natural devolvia zero.
 
-    "Quem extrai minerio de ferro em Itabira?" so casaria com um trecho que
-    contivesse todos os termos ao mesmo tempo -- e nenhum contem.
+    Uma pergunta inteira so casaria com um trecho que contivesse TODOS os seus
+    termos ao mesmo tempo -- e nenhum contem. Tanto `plainto_tsquery` quanto
+    `websearch_to_tsquery` ligam os termos com E; a tsquery aqui usa OU.
     """
-    hits = LexicalSearch().search(db, "Quem extrai minério de ferro em Itabira?", limit=5)
+    hits = LexicalSearch().search(db, PERGUNTA["question"], limit=5)
     assert hits, "pergunta em linguagem natural devolveu zero resultado"
 
 
@@ -66,14 +87,14 @@ def test_lexical_com_query_so_de_stopwords_nao_quebra(db):
 
 @pytest.mark.parametrize("modo", [SearchMode.VECTOR, SearchMode.LEXICAL, SearchMode.HYBRID])
 def test_todos_os_modos_devolvem_resultado_com_citacao(motor, modo):
-    r = motor.search("privatização da Vale", mode=modo, limit=3, rerank=False)
+    r = motor.search(PERGUNTA["question"], mode=modo, limit=3, rerank=False)
     assert r.hits
     for hit in r.hits:
         assert hit.citation().strip(), "resultado sem citacao de fonte"
 
 
 def test_trace_conta_cada_etapa(motor):
-    r = motor.search("aquisições do Bradesco", mode=SearchMode.HYBRID, limit=3, rerank=False)
+    r = motor.search(PERGUNTA["question"], mode=SearchMode.HYBRID, limit=3, rerank=False)
     assert r.trace.vector > 0
     assert r.trace.lexical > 0
     assert r.trace.fused > 0
@@ -82,30 +103,47 @@ def test_trace_conta_cada_etapa(motor):
 
 def test_hibrido_usa_o_grafo(motor):
     """Se a expansao nao rende nada, o hibrido virou so vetorial+lexical."""
-    r = motor.search("minério de ferro", mode=SearchMode.HYBRID, limit=3, rerank=False)
+    r = motor.search(TERMO, mode=SearchMode.HYBRID, limit=3, rerank=False)
     assert r.trace.graph > 0, "expansao pelo grafo nao trouxe nenhum candidato"
     assert r.trace.entities, "nenhuma entidade semente guiou a expansao"
 
 
-def test_hibrido_corrige_erro_do_vetorial(motor):
-    """O caso registrado na Fase 1.
+def _trouxe_as_ancoras(motor, caso: dict[str, Any], **kwargs: Any) -> bool:
+    hits = motor.search(caso["question"], **kwargs).hits
+    textos = [fold(h.chunk.content) for h in hits]
+    return all(any(fold(a) in t for t in textos) for a in caso["anchors"])
 
-    A pergunta diz "Itabira", que e da Vale. A busca vetorial trazia em
-    primeiro lugar a Gerdau, que opera em "Itabirito" -- palavras parecidas,
-    vetores vizinhos, empresa errada.
+
+def test_multihop_precisa_do_pipeline_completo(motor):
+    """A afirmacao que justifica o projeto inteiro, como teste.
+
+    Se o RAG puro resolvesse todas as perguntas multi-hop, nao havia por que
+    manter grafo, expansao e cross-encoder. A tabela do README mede isso em
+    agregado (75% contra 100%); aqui fica travado como propriedade: existe pelo
+    menos uma pergunta que o pipeline completo responde e a busca vetorial nao.
+
+    Se este teste comecar a falhar porque o vetorial passou a acertar tudo, a
+    conclusao nao e "conserte o teste" -- e que o corpus ficou facil demais para
+    sustentar a comparacao, e o golden set precisa de perguntas melhores.
     """
-    pergunta = "Quem extrai minério de ferro em Itabira?"
+    assert MULTIHOP, "golden set sem pergunta multi-hop"
 
-    vetorial = motor.search(pergunta, mode=SearchMode.VECTOR, limit=3, rerank=False)
-    hibrido = motor.search(pergunta, mode=SearchMode.HYBRID, limit=3, rerank=False)
+    completo = [
+        c
+        for c in MULTIHOP
+        if _trouxe_as_ancoras(motor, c, mode=SearchMode.HYBRID, limit=5, rerank=True)
+    ]
+    assert completo, "o pipeline completo nao respondeu nenhuma pergunta multi-hop"
 
-    titulos_hibrido = [h.document_title for h in hibrido.hits]
-    assert any("Vale" in t for t in titulos_hibrido), (
-        f"o hibrido deveria trazer a Vale; trouxe {titulos_hibrido}"
+    so_vetorial = [
+        c
+        for c in completo
+        if _trouxe_as_ancoras(motor, c, mode=SearchMode.VECTOR, limit=5, rerank=False)
+    ]
+    assert len(so_vetorial) < len(completo), (
+        "a busca vetorial pura resolveu todas as multi-hop -- o corpus nao "
+        "sustenta mais a comparacao que motiva o GraphRAG"
     )
-    # Registro do baseline: se o vetorial sozinho tambem passar a acertar, o
-    # comentario acima ficou desatualizado -- o que seria uma boa noticia.
-    assert vetorial.hits
 
 
 def test_pergunta_sem_resposta_no_corpus_nao_inventa(motor):

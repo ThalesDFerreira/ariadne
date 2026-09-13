@@ -17,7 +17,9 @@ Ariadne resolve o segundo caso mantendo, alem dos vetores, um grafo `(entidade) 
 
 ## Estado atual
 
-**Fase 5 — camada agentica.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container; ingestao da Wikipedia-pt, chunking estrutural, embeddings locais via Ollama (BGE-M3) e busca vetorial com citacao de fonte. Corpus de demonstracao: 28 empresas brasileiras, 450 chunks. Corpus de 28 empresas brasileiras: 450 chunks, **1289 entidades e 1036 relacoes** extraidas com LLM local, cada aresta com o trecho que a justifica. A busca combina vetorial, lexical (BM25), expansao k-hop pelo grafo e reranking com cross-encoder. 130 testes passando. Proximo passo: Fase 4 (MCP completo).
+**Fases 0 a 7 concluidas.** Postgres 16 com pgvector 0.8.6 e Apache AGE 1.5.0 no mesmo container. Chunking estrutural, embeddings locais via Ollama (BGE-M3), busca hibrida (vetorial + BM25 + expansao k-hop no grafo + reranking com cross-encoder), roteador de query e servidor MCP completo. Toda resposta traz citacao de origem.
+
+Corpus de demonstracao: **40 fatos relevantes da CVM**, 135 chunks, 201 entidades e 209 relacoes extraidas com LLM local, cada aresta guardando o trecho que a justifica. A escolha do corpus foi uma correcao de rota medida — ver [Por que o corpus deixou de ser a Wikipedia](#por-que-o-corpus-deixou-de-ser-a-wikipedia).
 
 ## Stack
 
@@ -53,16 +55,19 @@ uv run pytest
 ### Uso
 
 ```bash
-ariadne ingest                      # ingere o corpus de demonstracao
-ariadne ingest "Petrobras" "Vale S.A."   # ou paginas especificas
-ariadne search "Quem extrai minério de ferro?"
-ariadne graph-build                 # extrai entidades e relacoes (LLM local)
-ariadne explore "Petrobras"
-ariadne connect "Vale" "BNDES"
-ariadne ask "Quando a Vale foi privatizada?"        # resposta citada
-ariadne search "pergunta" --mode vector --explain   # compara estrategias
+uv run python scripts/fetch_cvm.py   # baixa o corpus de demonstracao (CVM)
+ariadne ingest-dir data/cvm          # parse + chunk + embeddings
+ariadne graph-build                  # extrai entidades e relacoes (LLM local)
+
+ariadne ask "De qual subsidiaria a PetroReconcavo comprou os ativos de midstream?"
+ariadne explore "CSN Mineracao"
+ariadne connect "Marfrig" "Minerva"
+ariadne search "participacao na MRS" --mode vector --explain   # compara estrategias
 ariadne stats
 ```
+
+`ariadne ingest` tambem aceita titulos da Wikipedia, URLs e arquivos avulsos —
+util para juntar contexto enciclopedico ao corpus, e foi como o projeto comecou.
 
 Tudo roda offline depois do `ollama pull bge-m3`: os embeddings sao gerados localmente na GPU, sem chave de API.
 
@@ -97,16 +102,14 @@ Tools expostas nesta fase:
 
 Resource: `ariadne://graph/schema`.
 
-`mode` aceita `vector`, `graph` e `hybrid`, mas so `vector` esta implementado — os outros respondem com busca vetorial **e um aviso explicito** de que a expansao pelo grafo ainda nao existe. Devolver silenciosamente um resultado pior seria mentir para o modelo que chamou a tool.
-
 ## Desenvolvimento
 
 ```bash
 uv run ruff check .      # lint
 uv run ruff format .     # formatacao
 uv run mypy src          # tipos (modo strict)
-uv run pytest            # testes; os de integracao pulam sozinhos se o banco estiver fora
-uv run pytest -m integration
+uv run pytest            # 222 testes; os de integracao pulam se o banco estiver fora
+uv run pytest -m integration   # 68 deles precisam do banco e do Ollama
 ```
 
 ### Porta do Postgres
@@ -129,7 +132,7 @@ src/ariadne/
 ├── llm/          # adapter de provedor (Ollama | API) + embeddings
 ├── agents/       # roteador de query
 ├── mcp/          # servidor MCP
-└── eval/         # golden dataset + RAGAS
+└── eval/         # golden set e harness de comparacao (sem juiz LLM)
 ```
 
 `domain/` nao importa nada do resto — e o nucleo. `storage/` guarda as interfaces e seus adapters, o que permite trocar o backend do grafo sem tocar em `retrieval/`.
@@ -143,8 +146,9 @@ src/ariadne/
 - [x] **Fase 3** — Recuperacao hibrida: BM25, RRF, expansao k-hop, reranking
 - [x] **Fase 4** — Servidor MCP completo
 - [x] **Fase 5** — Camada agentica: roteador e perguntas multi-hop
-- [ ] **Fase 6** — Avaliacao (RAGAS) e observabilidade
-- [ ] **Fase 7** — Vitrine: UI do grafo e dataset publico
+- [x] **Fase 6** — Avaliacao: golden set, tabela comparativa, limitacoes medidas
+      (RAGAS descartado com justificativa; observabilidade **nao** feita)
+- [x] **Fase 7** — Vitrine: visualizacao do grafo e corpus reproduzivel por manifesto
 
 ## Licenca
 
@@ -237,6 +241,68 @@ mesmo jeito.
 
 Cada vetor tem teste em `tests/test_sources.py`.
 
+## O corpus
+
+### Por que o corpus deixou de ser a Wikipedia
+
+A Fase 1 escolheu a Wikipedia-pt com um argumento que parecia bom: os links
+internos ja formam um grafo de referencia. O argumento estava certo sobre os
+links e errado sobre o que importa — **artigo de enciclopedia e auto-contido**.
+A pagina da Klabin ja diz onde fica a fabrica; a da Usiminas ja diz quem e o
+socio japones. Nao existe informacao dividida entre documentos, e sem isso o
+grafo nao tem o que costurar.
+
+Isso nao foi intuicao, foi medicao. Escrevi 22 perguntas que *deveriam* exigir
+dois documentos e passei cada uma por um validador
+(`scripts/build_multihop.py`) que checa se a resposta ja cabe num trecho so:
+**17 das 22 foram descartadas**. E o RAG puro batia 94% de recall justamente
+porque quase nada exigia atravessar documentos. Um benchmark em que o baseline
+ja ganha nao mede a coisa que o projeto construiu.
+
+Os fatos relevantes da CVM tem a propriedade que faltava, e por exigencia
+regulatoria: numa fusao, a empresa A publica o fato relevante **dela** e a
+empresa B publica o **dela** — mesma operacao, documentos separados, cada um
+com a metade que o outro nao conta. Quem quiser a operacao inteira precisa
+ligar os dois.
+
+### Como remontar o corpus
+
+```bash
+uv run python scripts/fetch_cvm.py     # baixa os PDFs listados no manifesto
+uv run ariadne ingest-dir data/cvm
+uv run ariadne graph-build
+```
+
+Os PDFs sao da CVM e nao entram no repositorio. O que entra e o **manifesto**
+(`data/golden/corpus_cvm.json`): a lista de protocolos que forma o corpus. Sem
+ele a promessa de "clone e reproduza a tabela" nao se sustenta, porque rodar a
+selecao de novo da outro corpus — o CSV do ano corrente ganha linhas toda
+semana, e o proprio criterio de selecao ja mudou uma vez (ver abaixo). Corpus
+diferente invalida o golden set, cujas ancoras apontam para trechos destes
+documentos.
+
+`--refazer-selecao` monta um corpus novo de proposito. Quem faz isso precisa
+refazer o golden set junto.
+
+## Visualizacao do grafo
+
+```bash
+uv run ariadne graph-export      # escreve docs/graph.json
+python -m http.server -d docs    # abre em localhost:8000
+```
+
+Pagina estatica, sem servidor de aplicacao: simulacao de forca em canvas, cor
+por tipo de entidade, tamanho por grau. Clicar num no mostra as relacoes **com
+o trecho que justifica cada uma** — que e a propriedade que separa este grafo de
+um desenho bonito. Aresta afirmada em mais de um documento aparece com a
+contagem, porque relacao corroborada por duas fontes nao e a mesma coisa que
+relacao afirmada uma vez.
+
+Precisa ser servida por HTTP; aberta como `file://` o navegador bloqueia a
+leitura do JSON. Para publicar: **Settings → Pages → Source: `main`, pasta
+`/docs`** — `docs/graph.json` esta versionado justamente para a pagina
+funcionar sem banco nenhum do outro lado.
+
 ## Demonstracao
 
 ```bash
@@ -285,6 +351,128 @@ Bradesco com folga (0,999 contra 0,675).
 Roda em **CPU** de proposito: sao poucas dezenas de pares por consulta, o que
 leva cerca de um segundo, e deixa a GPU livre para o LLM de extracao -- que e
 quem precisa dela nesta maquina de 8 GB.
+
+## Avaliacao
+
+```bash
+uv run python scripts/evaluate.py
+```
+
+### A metrica, e por que nao tem juiz LLM
+
+A pergunta que este projeto precisa responder nao e "a resposta esta boa?", e
+sim "**o GraphRAG recupera melhor que o RAG puro?**". Para isso um juiz de 7B
+rodando local adiciona variancia sem adicionar informacao: erraria dos dois
+lados e o delta ficaria enterrado no ruido. RAGAS estava no plano original e
+saiu por essa razao — nao por falta de tempo.
+
+A metrica e objetiva e deterministica. Cada pergunta do golden set
+(`data/golden/questions.json`, 28 perguntas: 16 factuais, 8 de agregacao,
+4 multi-hop) traz **ancoras** — termos que precisam aparecer no contexto
+recuperado para a pergunta ser respondivel:
+
+```
+context recall @k  =  ancoras encontradas / ancoras esperadas
+```
+
+Roda em segundos, da o mesmo numero toda vez, e qualquer um reproduz. O **MRR**
+entra ao lado porque recall sozinho engana: trazer a resposta em decimo lugar
+num contexto de cinco e o mesmo que nao trazer.
+
+### Resultados
+
+| estrategia | recall geral | agregacao | factual | multihop | MRR | seg |
+|---|---|---|---|---|---|---|
+| RAG puro (vetorial) | 96% | 100% | 100% | 75% | 0,769 | 5 |
+| Lexical (BM25) | 93% | 88% | 100% | 75% | 0,780 | 0 |
+| Hibrido sem grafo | 96% | 100% | 100% | 75% | 0,765 | 2 |
+| GraphRAG (hibrido + grafo) | 73% | 94% | 69% | 50% | 0,470 | 2 |
+| **GraphRAG + reranking** | **100%** | 100% | 100% | **100%** | **0,923** | 464 |
+| GraphRAG roteado | **100%** | 100% | 100% | **100%** | **0,923** | 490 |
+
+Tres leituras, e a segunda e desconfortavel:
+
+1. **O ganho esta onde tinha que estar.** As colunas factual e agregacao nao se
+   mexem — o RAG puro ja resolve. A diferenca aparece so em **multi-hop**, de
+   75% para 100%, que e exatamente a pergunta que motiva o projeto existir.
+
+2. **A expansao pelo grafo, sozinha, PIORA tudo — e melhorar o grafo piorou
+   mais.** A linha "GraphRAG (hibrido + grafo)" e a pior da tabela: 73% de
+   recall e MRR 0,470 contra 0,769 do RAG puro. E ela *regrediu* quando a
+   extracao melhorou: com o grafo anterior, de 108 entidades, dava 88% e 0,571;
+   com o grafo corrigido, de 201 entidades, caiu para 73% e 0,470, e a coluna
+   multi-hop foi de 75% para 50%.
+
+   Faz sentido e e incomodo: mais entidades corretas significa mais vizinhos
+   para expandir, e expansao sem reranking e ruido empurrando o trecho certo
+   para fora do top-5. **O grafo so se paga depois do cross-encoder reordenar.**
+   Vender "adicionei um grafo, melhorou" seria falso duas vezes.
+
+3. **O roteamento nao economizou tempo.** A hipotese era que rotear sairia mais
+   barato que deixar o reranker ligado sempre, porque perguntas de sintese o
+   dispensam. Medido: 490 s contra 464 s. Nao se confirmou neste corpus.
+
+### Quando a regua para de separar
+
+O roteador ganhou uma heuristica (`_PONTE`) para perguntas que **descrevem** a
+ponte em vez de nomea-la — "as concessoes *envolvidas na operacao da*
+PetroReconcavo" precisa do grafo, mas nao contem "ligacao" nem "entre". Antes
+dela, 3 das 4 perguntas multi-hop caiam em "factual", que usa peso de grafo 0,2.
+
+Medida com o A/B (`scripts/ab_roteador.py`, mesma pergunta, mesmo indice, so a
+heuristica ligada ou desligada). A medicao foi feita duas vezes, e o par de
+resultados vale mais que qualquer um deles sozinho.
+
+**Primeira rodada, no grafo antigo (108 entidades):**
+
+| | recall | agregacao | factual | multihop | MRR |
+|---|---|---|---|---|---|
+| sem `_PONTE` | 100% | 100% | 100% | 100% | 0,875 |
+| com `_PONTE` | 100% | 100% | 100% | 100% | 0,923 |
+
+As quatro colunas de recall empataram **em 100%**. Eu tinha escrito, antes de
+medir, uma regra dizendo que empate significa reverter — heuristica que nao move
+o numero e complexidade de graca. A regra estava errada num caso que nao previ:
+empate **no teto** nao e ausencia de efeito, e regua sem resolucao. Mantive a
+heuristica pelo MRR, que nao satura junto, anotando que era uma decisao tomada
+na metrica fraca.
+
+**Segunda rodada, no grafo corrigido (201 entidades):**
+
+| | recall | agregacao | factual | multihop | MRR | seg |
+|---|---|---|---|---|---|---|
+| sem `_PONTE` | 98% | 94% | 100% | 100% | 0,864 | 400 |
+| com `_PONTE` | **100%** | **100%** | 100% | 100% | **0,923** | 496 |
+
+Com o grafo melhor, o recall voltou a separar as configuracoes — e decidiu do
+mesmo lado: +1,8 pontos no geral, +6,2 em agregacao. A decisao tomada na metrica
+fraca sobreviveu a metrica forte.
+
+Duas licoes ficam, e a segunda e a que eu nao teria aprendido sem apanhar:
+empate no teto pede outra metrica, nao uma conclusao; e **um benchmark saturado
+volta a discriminar quando o sistema medido melhora**, entao "o teste nao separa"
+pode ser um sintoma do sistema, nao so do teste.
+
+### Limitacoes honestas
+
+- **O golden set e pequeno, e a coluna que interessa e a menor.** Sao 4
+  perguntas multi-hop: cada uma vale 25 pontos percentuais. "100%" ali significa
+  "acertou 4 de 4", nao uma medida com intervalo de confianca util.
+- **E a melhor configuracao gabarita.** Com 100% em todas as colunas, o recall
+  tem pouca margem para distinguir o que vier depois: a diferenca que decidiu o
+  roteador acima foi de 2 pontos. A proxima mudanca util no motor provavelmente
+  exige perguntas mais dificeis antes de poder ser defendida.
+- **Escrevi as perguntas conhecendo o corpus.** Um golden set escrito por quem
+  ja leu os documentos tende a ser mais facil do que perguntas reais de usuario.
+- **O reranking custa ~16 s por pergunta** em CPU (454 s / 28). Aceitavel para
+  medir, inviavel para uso interativo. Numa GPU livre cairia muito, mas nesta
+  maquina de 8 GB ela esta ocupada pelo LLM de extracao.
+- **Recall de contexto nao e qualidade de resposta.** A metrica diz que a
+  informacao chegou ao contexto, nao que a resposta final esta correta.
+- **40 documentos e 135 chunks.** Nenhum destes numeros extrapola para um
+  corpus de outra ordem de grandeza.
+- **Observabilidade (Langfuse) ficou de fora.** Estava no plano da Fase 6 e nao
+  foi feita; o que existe e o `--explain`, que imprime as etapas da busca.
 
 ## Escolha do modelo de extracao
 
@@ -337,6 +525,73 @@ chave normalizada e casamento de sigla -- e prefere duplicata a fusao errada.
 JSON Schema. Os modelos passaram a devolver `{"relations": [...]}` sem
 `entities`, a limpeza descartava tudo por falta de pontas e a extracao saia
 vazia **em silencio**.
+
+### Enum sem descricao no prompt e enum que o modelo chuta
+
+O prompt de extracao explicava cada tipo de RELACAO com exemplo e direcao, e nao
+dizia **uma palavra** sobre os tipos de ENTIDADE — o modelo recebia
+`Organizacao | Pessoa | Lugar | Produto | Setor | Evento | Outro` cru, pelo JSON
+Schema, e escolhia no escuro.
+
+Resultado medido no grafo: **71 das 108 entidades tipadas como `Setor`**,
+incluindo "MARFRIG GLOBAL FOODS S.A.", "Banco Santander (Brasil) S.A." e
+"Copel". O schema garantia que o campo viria preenchido e com valor valido;
+nao garantia nada sobre ele estar certo.
+
+Acrescentar um paragrafo descrevendo cada tipo — com a regra "nome que traz
+S.A., Ltda., Banco ou Cia. e Organizacao, nunca Setor" — mudou o grafo inteiro:
+
+| | prompt v2 | prompt v3 |
+|---|---|---|
+| Organizacao | 32 | **133** |
+| Setor | **71** | 2 |
+| Pessoa | 0 | 17 |
+| entidades | 108 | **201** |
+| relacoes | 131 | **209** |
+
+O defeito so ficou visivel quando a pagina de visualizacao passou a colorir os
+nos por tipo. Numero em tabela esconde esse tipo de erro; desenho nao — e foi a
+vitrine, construida como enfeite, que achou o pior defeito de qualidade do
+projeto.
+
+E a consequencia na avaliacao foi ao contrario do esperado: com o grafo melhor,
+a configuracao "GraphRAG sem reranking" **piorou** (88% → 73% de recall). Mais
+entidades corretas significa mais vizinhos para expandir, e expansao sem
+reranking e ruido. Melhorar um componente nao melhora o sistema quando o
+componente seguinte nao da conta do que ele produz.
+
+### Exemplo escrito a mao caduca em silencio
+
+Quando o corpus passou de Wikipedia para CVM, tres coisas pararam de funcionar
+sem emitir um erro sequer:
+
+- `scripts/demo.py` continuou rodando e imprimindo cenas **vazias** — a demo que
+  o README anuncia deixou de demonstrar qualquer coisa;
+- quatro testes de integracao em `tests/test_hybrid.py` passaram a falhar, e
+  ninguem viu: teste de integracao **pula sozinho** quando o banco esta fora, e o
+  banco passou semanas fora;
+- consultas como `"privatizacao BNDES"` e `"Itabira"` viraram termos que nao
+  existem em documento nenhum.
+
+A correcao nao foi trocar os exemplos por outros escritos a mao — seria a mesma
+armadilha com outro corpus. Demo e testes agora derivam as consultas de
+`data/golden/questions.json`, que e versionado junto com o corpus que descreve.
+O teste `test_multihop_precisa_do_pipeline_completo` vai mais longe e trava a
+propriedade em vez do exemplo: *existe pelo menos uma pergunta que o pipeline
+completo responde e a busca vetorial nao*. Se ele falhar, a mensagem diz que o
+corpus ficou facil demais — nao que o teste precisa de conserto.
+
+### O benchmark media uma configuracao que o sistema nunca usa
+
+`evaluate_routed` passava um limite fixo de 5 resultados, ignorando o limite que
+a estrategia escolhida pede — e a estrategia de sintese pede 10. O roteador
+aparecia 19 pontos pior em perguntas de lista. Passei dias atribuindo isso ao
+roteamento; era a regua.
+
+A mesma familia de erro apareceu duas vezes mais no mesmo arquivo: colunas de
+tipo escritas a mao ("factual/relacional/sintese") continuaram no codigo depois
+que o golden set passou a usar "agregacao" e "multihop", e a tabela imprimia 0%
+em colunas inexistentes — escondendo justamente a comparacao que motivava medir.
 
 ### O Apache AGE tem arestas afiadas
 

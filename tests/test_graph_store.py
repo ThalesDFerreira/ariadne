@@ -193,21 +193,24 @@ def test_export_colapsa_arestas_paralelas(store, db):
     linhas sobrepostas nao mostra nada -- e a contagem mostra que a relacao foi
     corroborada mais de uma vez.
     """
+    # Tipo que a fixture nao usa: a primeira versao deste teste somava as duas
+    # arestas novas as que ja existiam e afirmava `count == 2` contra um count
+    # de 3. Teste que depende do estado da fixture mede a fixture.
     store.upsert_edges(
         db,
         [
             GraphEdge(
                 source_key="alfa",
-                target_key="beta",
-                type=RelationType.FORNECE_PARA,
-                evidence="Alfa fornece minerio para a Beta.",
+                target_key="gama",
+                type=RelationType.CONCORRE_COM,
+                evidence="Alfa e Gama disputam o mesmo mercado.",
                 chunk_id=uuid4(),
             ),
             GraphEdge(
                 source_key="alfa",
-                target_key="beta",
-                type=RelationType.FORNECE_PARA,
-                evidence="O contrato de fornecimento entre Alfa e Beta segue vigente.",
+                target_key="gama",
+                type=RelationType.CONCORRE_COM,
+                evidence="A concorrencia entre Alfa e Gama se acirrou no trimestre.",
                 chunk_id=uuid4(),
             ),
         ],
@@ -217,7 +220,7 @@ def test_export_colapsa_arestas_paralelas(store, db):
     paralela = [
         e
         for e in grafo["edges"]
-        if e["source"] == "alfa" and e["target"] == "beta" and e["type"] == "FORNECE_PARA"
+        if e["source"] == "alfa" and e["target"] == "gama" and e["type"] == "CONCORRE_COM"
     ]
     assert len(paralela) == 1
     assert paralela[0]["count"] == 2
