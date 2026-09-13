@@ -279,6 +279,61 @@ class AgeGraphStore:
             "edges": _agint(arestas[0]["c0"]) if arestas else 0,
         }
 
+    def export(self, conn: psycopg.Connection[Any]) -> dict[str, list[dict[str, Any]]]:
+        """Grafo inteiro em estruturas simples, para visualizacao estatica.
+
+        Sai `dict`, nao os modelos do dominio, porque o destino e um JSON lido
+        por uma pagina HTML sem servidor -- e porque o formato de arquivo nao
+        deve virar refem do formato interno.
+
+        Arestas paralelas (a mesma relacao afirmada em trechos diferentes) sao
+        colapsadas numa so, com `count` guardando quantas vezes foi afirmada.
+        Desenhar as duas empilhadas nao mostra nada; a contagem mostra.
+        """
+        nos = run_cypher(
+            conn,
+            "MATCH (n:Entity) RETURN n.key, n.name, n.type, n.mentions",
+            graph_name=self._graph,
+            columns=4,
+        )
+        arestas = run_cypher(
+            conn,
+            """
+            MATCH (a:Entity)-[r:RELATES_TO]->(b:Entity)
+            RETURN a.key, b.key, r.type, r.evidence
+            """,
+            graph_name=self._graph,
+            columns=4,
+        )
+
+        colapsadas: dict[tuple[str, str, str], dict[str, Any]] = {}
+        for linha in arestas:
+            chave = (_agtext(linha["c0"]), _agtext(linha["c1"]), _agtext(linha["c2"]))
+            atual = colapsadas.get(chave)
+            if atual is None:
+                colapsadas[chave] = {
+                    "source": chave[0],
+                    "target": chave[1],
+                    "type": chave[2],
+                    "evidence": _agtext(linha["c3"]),
+                    "count": 1,
+                }
+            else:
+                atual["count"] += 1
+
+        return {
+            "nodes": [
+                {
+                    "key": _agtext(n["c0"]),
+                    "name": _agtext(n["c1"]),
+                    "type": _agtext(n["c2"]),
+                    "mentions": _agint(n["c3"]),
+                }
+                for n in nos
+            ],
+            "edges": list(colapsadas.values()),
+        }
+
     def find_key(self, conn: psycopg.Connection[Any], name: str) -> str | None:
         """Acha a chave canonica a partir de um nome digitado pelo usuario."""
         chave = normalize_name(name)

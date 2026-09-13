@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ariadne — grafo de conhecimento</title>
+<style>
+  :root {
+    --fundo: #0f1115;
+    --painel: #171a21;
+    --borda: #272c36;
+    --texto: #e6e8ec;
+    --fraco: #939aa8;
+    --destaque: #7aa2f7;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--fundo); color: var(--texto);
+    font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    height: 100vh; display: flex; flex-direction: column;
+  }
+  header {
+    padding: 12px 18px; border-bottom: 1px solid var(--borda);
+    display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap;
+  }
+  h1 { font-size: 15px; margin: 0; font-weight: 600; letter-spacing: .02em; }
+  header p { margin: 0; color: var(--fraco); font-size: 12.5px; }
+  #busca {
+    margin-left: auto; background: var(--painel); color: var(--texto);
+    border: 1px solid var(--borda); border-radius: 6px; padding: 6px 10px;
+    font: inherit; width: 220px;
+  }
+  #busca:focus { outline: 1px solid var(--destaque); }
+  main { flex: 1; display: flex; min-height: 0; }
+  #tela { flex: 1; display: block; cursor: grab; }
+  #tela:active { cursor: grabbing; }
+  aside {
+    width: 330px; border-left: 1px solid var(--borda); padding: 16px;
+    overflow-y: auto; background: var(--painel);
+  }
+  aside h2 { font-size: 15px; margin: 0 0 2px; }
+  .tipo { color: var(--fraco); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+  .aresta { border-top: 1px solid var(--borda); padding: 10px 0; }
+  .rel { color: var(--destaque); font-size: 12px; font-weight: 600; }
+  .ev { color: var(--fraco); font-size: 12.5px; margin-top: 4px; }
+  .vazio { color: var(--fraco); }
+  footer {
+    border-top: 1px solid var(--borda); padding: 8px 18px;
+    display: flex; gap: 14px; flex-wrap: wrap; color: var(--fraco); font-size: 12px;
+  }
+  .chip { display: flex; align-items: center; gap: 6px; }
+  .bola { width: 10px; height: 10px; border-radius: 50%; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Ariadne</h1>
+  <p>grafo extraido de fatos relevantes da CVM — clique num no para ver as arestas e a evidencia</p>
+  <input id="busca" type="search" placeholder="buscar entidade..." autocomplete="off">
+</header>
+<main>
+  <canvas id="tela"></canvas>
+  <aside id="painel"><p class="vazio">Nenhuma entidade selecionada.</p></aside>
+</main>
+<footer id="legenda"></footer>
+
+<script>
+const CORES = {
+  Organizacao: "#7aa2f7",
+  Pessoa: "#bb9af7",
+  Lugar: "#7dcfff",
+  Produto: "#9ece6a",
+  Setor: "#e0af68",
+  Evento: "#f7768e",
+  Outro: "#6b7280",
+};
+
+const tela = document.getElementById("tela");
+const ctx = tela.getContext("2d");
+const painel = document.getElementById("painel");
+const busca = document.getElementById("busca");
+
+let nos = [], arestas = [], porChave = new Map();
+let selecionado = null, realcados = null;
+let camera = { x: 0, y: 0, escala: 1 };
+let arrastando = null, panorama = null;
+
+function dimensionar() {
+  const r = tela.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  tela.width = r.width * dpr;
+  tela.height = r.height * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+fetch("graph.json")
+  .then((r) => {
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  })
+  .then(iniciar)
+  .catch(() => {
+    painel.innerHTML =
+      '<p class="vazio">Nao consegui carregar <code>graph.json</code>.' +
+      " Esta pagina precisa ser servida por HTTP (GitHub Pages ou" +
+      " <code>python -m http.server</code>), nao aberta como arquivo local.</p>";
+  });
+
+function iniciar(dados) {
+  const grau = new Map();
+  for (const e of dados.edges) {
+    grau.set(e.source, (grau.get(e.source) || 0) + 1);
+    grau.set(e.target, (grau.get(e.target) || 0) + 1);
+  }
+  // Nos isolados nao dizem nada num grafo de relacoes: ocupam espaco e
+  // empurram o resto para o centro. Ficam de fora do desenho.
+  nos = dados.nodes
+    .filter((n) => grau.has(n.key))
+    .map((n, i) => ({
+      ...n,
+      grau: grau.get(n.key),
+      // Semente em circulo: comecar todo mundo no mesmo ponto faz a simulacao
+      // explodir na primeira iteracao.
+      x: Math.cos((i / dados.nodes.length) * 6.283) * 260,
+      y: Math.sin((i / dados.nodes.length) * 6.283) * 260,
+      vx: 0,
+      vy: 0,
+    }));
+  porChave = new Map(nos.map((n) => [n.key, n]));
+  arestas = dados.edges.filter((e) => porChave.has(e.source) && porChave.has(e.target));
+
+  legenda();
+  dimensionar();
+  requestAnimationFrame(quadro);
+}
+
+function legenda() {
+  const presentes = [...new Set(nos.map((n) => n.type))].sort();
+  document.getElementById("legenda").innerHTML =
+    presentes
+      .map(
+        (t) =>
+          `<span class="chip"><span class="bola" style="background:${
+            CORES[t] || CORES.Outro
+          }"></span>${t}</span>`
+      )
+      .join("") + `<span class="chip">${nos.length} entidades · ${arestas.length} relacoes</span>`;
+}
+
+// --- simulacao -------------------------------------------------------------
+// Forca dirigida classica, O(n^2). Com ~100 nos isso e irrelevante e evita a
+// complexidade de um quadtree que ninguem aqui precisa manter.
+let calor = 1;
+// Enquanto ninguem mexeu, a camera se reenquadra sozinha a cada quadro. Fazer
+// isso uma vez so, quando a simulacao esfria, enquadra cedo demais: o layout
+// ainda se abre depois disso e metade do grafo sai da tela.
+let interagiu = false;
+
+function passo() {
+  const REPULSAO = 4200, MOLA = 0.02, COMPRIMENTO = 88, CENTRO = 0.0028;
+
+  for (let i = 0; i < nos.length; i++) {
+    const a = nos[i];
+    for (let j = i + 1; j < nos.length; j++) {
+      const b = nos[j];
+      let dx = b.x - a.x, dy = b.y - a.y;
+      let d2 = dx * dx + dy * dy;
+      // Corte de alcance: sem ele, um no periferico recebe a soma da repulsao
+      // dos outros 80 e e arremessado para longe, onde a mola demora eras para
+      // traze-lo de volta. Dois fugitivos assim esticam o enquadramento e
+      // encolhem o grafo inteiro.
+      if (d2 > 160000) continue;
+      if (d2 < 1) { d2 = 1; dx = Math.random() - 0.5; dy = Math.random() - 0.5; }
+      const f = REPULSAO / d2;
+      const d = Math.sqrt(d2);
+      a.vx -= (dx / d) * f; a.vy -= (dy / d) * f;
+      b.vx += (dx / d) * f; b.vy += (dy / d) * f;
+    }
+  }
+
+  for (const e of arestas) {
+    const a = porChave.get(e.source), b = porChave.get(e.target);
+    const dx = b.x - a.x, dy = b.y - a.y;
+    const d = Math.hypot(dx, dy) || 1;
+    const f = (d - COMPRIMENTO) * MOLA;
+    a.vx += (dx / d) * f; a.vy += (dy / d) * f;
+    b.vx -= (dx / d) * f; b.vy -= (dy / d) * f;
+  }
+
+  for (const n of nos) {
+    n.vx -= n.x * CENTRO; n.vy -= n.y * CENTRO;
+    if (n === arrastando) { n.vx = n.vy = 0; continue; }
+    n.x += n.vx * calor; n.y += n.vy * calor;
+    n.vx *= 0.86; n.vy *= 0.86;
+  }
+  // Esfria ate praticamente parar. Um piso alto deixa o grafo tremendo para
+  // sempre, o que atrapalha ler rotulo e clicar em no pequeno.
+  calor = Math.max(0.02, calor * 0.992);
+}
+
+function enquadrar() {
+  if (!nos.length) return;
+  const xs = nos.map((n) => n.x), ys = nos.map((n) => n.y);
+  // Margem proporcional, nao constante: com margem fixa um grafo pequeno
+  // fica dominado pela margem e o enquadramento devolve zoom minusculo.
+  const larg = (Math.max(...xs) - Math.min(...xs)) * 1.12 + 40;
+  const alt = (Math.max(...ys) - Math.min(...ys)) * 1.12 + 40;
+  camera.escala = Math.min(3, Math.max(0.25, Math.min(tela.clientWidth / larg, tela.clientHeight / alt)));
+  camera.x = -((Math.max(...xs) + Math.min(...xs)) / 2) * camera.escala;
+  camera.y = -((Math.max(...ys) + Math.min(...ys)) / 2) * camera.escala;
+}
+
+function raio(n) { return 4 + Math.min(11, Math.sqrt(n.grau) * 2.4); }
+
+function quadro() {
+  // Varias iteracoes por quadro enquanto esta quente: o layout converge em
+  // ~2 s em vez de ~15 s, e quem abre a pagina ve o grafo pronto, nao se
+  // arrastando ate o lugar.
+  const iteracoes = calor > 0.05 ? 4 : 1;
+  for (let i = 0; i < iteracoes; i++) passo();
+  if (!interagiu) enquadrar();
+  desenhar();
+  requestAnimationFrame(quadro);
+}
+
+function desenhar() {
+  const w = tela.clientWidth, h = tela.clientHeight;
+  ctx.clearRect(0, 0, w, h);
+  ctx.save();
+  ctx.translate(w / 2 + camera.x, h / 2 + camera.y);
+  ctx.scale(camera.escala, camera.escala);
+
+  for (const e of arestas) {
+    const a = porChave.get(e.source), b = porChave.get(e.target);
+    const ativo = !realcados || (realcados.has(a.key) && realcados.has(b.key));
+    ctx.strokeStyle = ativo ? "rgba(180,190,210,0.42)" : "rgba(140,150,170,0.07)";
+    ctx.lineWidth = ativo ? Math.min(3, e.count) : 1;
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  }
+
+  for (const n of nos) {
+    const ativo = !realcados || realcados.has(n.key);
+    ctx.globalAlpha = ativo ? 1 : 0.16;
+    ctx.fillStyle = CORES[n.type] || CORES.Outro;
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, raio(n), 0, 6.283);
+    ctx.fill();
+    if (n === selecionado) {
+      ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke();
+    }
+    // Rotulo so em quem tem grau alto ou esta realcado: o resto vira borrao.
+    if (ativo && (n.grau > 3 || realcados || camera.escala > 1.5)) {
+      ctx.fillStyle = "#e6e8ec";
+      ctx.font = "11px ui-sans-serif, system-ui, sans-serif";
+      ctx.fillText(n.name.slice(0, 26), n.x + raio(n) + 4, n.y + 4);
+    }
+    ctx.globalAlpha = 1;
+  }
+  ctx.restore();
+}
+
+// --- interacao -------------------------------------------------------------
+
+function paraMundo(ev) {
+  const r = tela.getBoundingClientRect();
+  return {
+    x: (ev.clientX - r.left - r.width / 2 - camera.x) / camera.escala,
+    y: (ev.clientY - r.top - r.height / 2 - camera.y) / camera.escala,
+  };
+}
+
+function noEm(p) {
+  return nos.find((n) => Math.hypot(n.x - p.x, n.y - p.y) <= raio(n) + 4) || null;
+}
+
+tela.addEventListener("mousedown", (ev) => {
+  const p = paraMundo(ev);
+  const alvo = noEm(p);
+  interagiu = true;
+  if (alvo) { arrastando = alvo; selecionar(alvo); }
+  else panorama = { x: ev.clientX - camera.x, y: ev.clientY - camera.y };
+});
+
+window.addEventListener("mousemove", (ev) => {
+  if (arrastando) {
+    const p = paraMundo(ev);
+    arrastando.x = p.x; arrastando.y = p.y;
+    calor = Math.max(calor, 0.5);
+  } else if (panorama) {
+    camera.x = ev.clientX - panorama.x;
+    camera.y = ev.clientY - panorama.y;
+  }
+});
+
+window.addEventListener("mouseup", () => { arrastando = null; panorama = null; });
+
+tela.addEventListener("wheel", (ev) => {
+  ev.preventDefault();
+  interagiu = true;
+  camera.escala = Math.min(4, Math.max(0.25, camera.escala * (ev.deltaY < 0 ? 1.12 : 0.89)));
+}, { passive: false });
+
+function selecionar(n) {
+  selecionado = n;
+  const ligadas = arestas.filter((e) => e.source === n.key || e.target === n.key);
+  realcados = new Set([n.key]);
+  for (const e of ligadas) { realcados.add(e.source); realcados.add(e.target); }
+
+  const itens = ligadas
+    .map((e) => {
+      const outro = porChave.get(e.source === n.key ? e.target : e.source);
+      const seta = e.source === n.key ? "→" : "←";
+      const vezes = e.count > 1 ? ` <span class="tipo">(${e.count} trechos)</span>` : "";
+      return `<div class="aresta"><span class="rel">${e.type}</span> ${seta}
+        <strong>${outro.name}</strong>${vezes}
+        <div class="ev">${(e.evidence || "").slice(0, 260)}</div></div>`;
+    })
+    .join("");
+
+  painel.innerHTML =
+    `<h2>${n.name}</h2><div class="tipo">${n.type} · ${n.mentions} mencao(oes)</div>` +
+    (itens || '<p class="vazio">Sem relacoes registradas.</p>');
+}
+
+busca.addEventListener("input", () => {
+  const termo = busca.value.trim().toLowerCase();
+  if (!termo) { realcados = null; selecionado = null; return; }
+  const achados = nos.filter((n) => n.name.toLowerCase().includes(termo));
+  realcados = new Set(achados.map((n) => n.key));
+  if (achados.length === 1) selecionar(achados[0]);
+});
+
+window.addEventListener("resize", dimensionar);
+</script>
+</body>
+</html>

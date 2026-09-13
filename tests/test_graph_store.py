@@ -183,3 +183,50 @@ def test_nome_malicioso_nao_vira_comando(db, test_graph):
     veneno = "x'}) DETACH DELETE (n) //"
     s.upsert_nodes(db, [GraphNode(key="veneno", name=veneno, type=EntityType.ORGANIZACAO)])
     assert s.stats(db)["nodes"] == 1
+
+
+def test_export_colapsa_arestas_paralelas(store, db):
+    """A mesma relacao afirmada em dois trechos vira UMA aresta com `count` 2.
+
+    As paralelas existem por decisao de design (o `chunk_id` entra na identidade
+    do MERGE para preservar a evidencia de cada trecho). Mas desenhar duas
+    linhas sobrepostas nao mostra nada -- e a contagem mostra que a relacao foi
+    corroborada mais de uma vez.
+    """
+    store.upsert_edges(
+        db,
+        [
+            GraphEdge(
+                source_key="alfa",
+                target_key="beta",
+                type=RelationType.FORNECE_PARA,
+                evidence="Alfa fornece minerio para a Beta.",
+                chunk_id=uuid4(),
+            ),
+            GraphEdge(
+                source_key="alfa",
+                target_key="beta",
+                type=RelationType.FORNECE_PARA,
+                evidence="O contrato de fornecimento entre Alfa e Beta segue vigente.",
+                chunk_id=uuid4(),
+            ),
+        ],
+    )
+    grafo = store.export(db)
+
+    paralela = [
+        e
+        for e in grafo["edges"]
+        if e["source"] == "alfa" and e["target"] == "beta" and e["type"] == "FORNECE_PARA"
+    ]
+    assert len(paralela) == 1
+    assert paralela[0]["count"] == 2
+    assert paralela[0]["evidence"]
+
+
+def test_export_traz_nos_com_tipo_e_mencoes(store, db):
+    grafo = store.export(db)
+    alfa = next(n for n in grafo["nodes"] if n["key"] == "alfa")
+    assert alfa["name"] == "Mineradora Alfa"
+    assert alfa["type"] == EntityType.ORGANIZACAO.value
+    assert alfa["mentions"] == 3

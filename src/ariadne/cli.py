@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import pathlib
 import sys
 import time
@@ -282,6 +283,24 @@ def cmd_stats(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_graph_export(args: argparse.Namespace) -> int:
+    """Despeja o grafo num JSON para a pagina de visualizacao.
+
+    A pagina e estatica de proposito: quem abre o repositorio no GitHub Pages
+    nao tem Postgres nenhum rodando, e uma vitrine que exige subir o banco para
+    ser vista nao e vitrine.
+    """
+    destino = pathlib.Path(args.out)
+    with connection() as conn:
+        apply_schema(conn)
+        grafo = AgeGraphStore().export(conn)
+
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    destino.write_text(json.dumps(grafo, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"{len(grafo['nodes'])} nos e {len(grafo['edges'])} arestas em {destino}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     force_utf8_output()
     parser = argparse.ArgumentParser(prog="ariadne", description="Motor de conhecimento")
@@ -341,6 +360,10 @@ def main(argv: list[str] | None = None) -> int:
 
     p_stats = sub.add_parser("stats", help="contagens do indice")
     p_stats.set_defaults(func=cmd_stats)
+
+    p_export = sub.add_parser("graph-export", help="exporta o grafo para JSON")
+    p_export.add_argument("--out", default="docs/graph.json")
+    p_export.set_defaults(func=cmd_graph_export)
 
     args = parser.parse_args(argv)
     result: int = args.func(args)
