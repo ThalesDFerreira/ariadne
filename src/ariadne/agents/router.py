@@ -124,6 +124,30 @@ _RELACIONAL = re.compile(
     r"fornece|controla|adquiriu|mesma|mesmo)\b",
     re.IGNORECASE,
 )
+
+# Perguntas que DESCREVEM a ponte em vez de nomea-la. Medido: 3 de 4 perguntas
+# multi-hop caiam em "factual" -- que usa peso de grafo 0,2 -- porque nenhuma
+# delas contem "ligacao" ou "entre". "As concessoes ENVOLVIDAS NA OPERACAO da
+# PetroReconcavo" e exatamente esse caso: a ponte esta na oracao subordinada.
+#
+# A segunda alternativa exige que o substantivo da operacao esteja LIGADO a
+# outra coisa ("operacao DA PetroReconcavo", "incorporacao ENVOLVENDO o Banco").
+# A primeira versao pedia so uma preposicao antes dele, e com isso mandava
+# "Qual o valor da operacao?" -- pergunta factual, sem ponte nenhuma -- para a
+# rota relacional, que custa peso de grafo 1,0 e pool 30. Foi um dos 4 falsos
+# positivos que a matriz de classificacao acusou.
+#
+# O elo aceito e possessivo (da/do/das/dos), nunca o "de" solto: em
+# "incorporacao DE acoes" o que vem depois e o objeto da operacao, nao uma
+# contraparte -- e essa versao intermediaria trocou um falso positivo por
+# outro antes de a matriz mostrar qual pergunta tinha mudado de lado.
+_PONTE = re.compile(
+    r"\b(envolvid[ao]s?|envolvendo|participante|resultante|decorrente|referid[ao]s?)\b"
+    r"|\b(opera[cç][aã]o|transa[cç][aã]o|aquisi[cç][aã]o|incorpora[cç][aã]o|"
+    r"fus[aã]o|neg[oó]cio|contrato)\s+(d[ao]s?|envolvendo|entre|com)\b"
+    r"|\bque\s+(a|o|foi|foram|fez|fizeram|comprou|vendeu|adquiriu)\b",
+    re.IGNORECASE,
+)
 _SINTESE = re.compile(
     r"\b(quais|liste|lista|resuma|resumo|panorama|todos|todas|principais)\b",
     re.IGNORECASE,
@@ -188,8 +212,12 @@ class QueryRouter:
         A ordem dos testes importa: "Quais empresas dependem da mesma
         materia-prima que a X?" casa com os dois padroes, e e relacional --
         a parte dificil da pergunta e a ligacao, nao a listagem.
+
+        `_PONTE` vem antes de sintese pelo mesmo motivo: uma pergunta que
+        descreve a ponte ("as concessoes envolvidas na operacao da X") precisa
+        do grafo mesmo sem citar "ligacao" ou "entre".
         """
-        if _RELACIONAL.search(query):
+        if _RELACIONAL.search(query) or _PONTE.search(query):
             kind = QueryKind.RELACIONAL
         elif _SINTESE.search(query):
             kind = QueryKind.SINTESE

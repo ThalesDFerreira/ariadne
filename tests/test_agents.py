@@ -62,6 +62,43 @@ def test_pergunta_que_casa_com_dois_padroes_e_relacional(router):
     )
 
 
+@pytest.mark.parametrize(
+    "pergunta",
+    [
+        "Qual a producao media das concessoes envolvidas na operacao da PetroReconcavo?",
+        "Ate que data vai o direito de retirada na incorporacao envolvendo o Banco do Nordeste?",
+        "Quais ativos foram transferidos na transacao da Neoenergia?",
+        "Qual empresa a Marfrig adquiriu por meio da MBR?",
+    ],
+)
+def test_pergunta_que_descreve_a_ponte_e_relacional(router, pergunta):
+    """A ponte pode estar na oracao subordinada, sem "ligacao" nem "entre".
+
+    Medido antes da heuristica `_PONTE`: 3 das 4 perguntas multi-hop do golden
+    set caiam em "factual", que usa peso de grafo 0,2 -- justamente as que mais
+    precisam do grafo. Nenhuma delas nomeia a ligacao; todas a descrevem
+    ("envolvidas NA OPERACAO da X", "que a Marfrig adquiriu").
+    """
+    assert router.route(pergunta).kind is QueryKind.RELACIONAL
+
+
+def test_ponte_nao_engole_pergunta_factual_simples(router):
+    """O outro lado da moeda: `_PONTE` cobra falso positivo.
+
+    Ela e deliberadamente ampla, entao precisa de um piso -- pergunta factual
+    curta, sem oracao subordinada descrevendo relacao, continua factual. Sem
+    este teste, alargar a regex de novo passaria despercebido ate a avaliacao.
+    """
+    assert router.route("Qual o valor da operacao?").kind is QueryKind.FACTUAL
+    assert router.route("Em que data foi celebrado o contrato?").kind is QueryKind.FACTUAL
+    # "incorporacao DE acoes": o que vem depois e o objeto da operacao, nao uma
+    # contraparte. So o elo possessivo (da/do/das/dos) indica ponte.
+    assert (
+        router.route("Quando sera a assembleia sobre a incorporacao de acoes?").kind
+        is QueryKind.FACTUAL
+    )
+
+
 def test_estrategias_diferem_onde_importa(router):
     factual = router.route("Quando a Vale foi privatizada?")
     relacional = router.route("Qual a ligação entre A e B?")
