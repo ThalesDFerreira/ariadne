@@ -1,225 +1,177 @@
 [
   {
-    "id": "vale-privatizacao-ano",
-    "question": "Em que ano a Vale foi privatizada?",
+    "id": "petro-midstream-pct",
+    "question": "Que percentual dos ativos de midstream de gas natural no Rio Grande do Norte a PetroReconcavo adquiriu?",
     "kind": "factual",
-    "anchors": ["1997"],
-    "note": "Resposta num unico trecho da pagina da Vale."
+    "anchors": ["50%"]
   },
   {
-    "id": "vale-fundacao",
-    "question": "Com que nome a Vale foi fundada em 1942?",
+    "id": "petro-3r-potiguar",
+    "question": "De qual subsidiaria a PetroReconcavo comprou os ativos de midstream?",
     "kind": "factual",
-    "anchors": ["Companhia Vale do Rio Doce"]
+    "anchors": ["3R Potiguar"]
   },
   {
-    "id": "vale-itabira",
-    "question": "Em qual municipio de Minas Gerais ficam as minas de ferro da Vale?",
+    "id": "petro-aditivos-prazo",
+    "question": "Qual a duracao dos aditivos aos contratos de venda de petroleo assinados pela PetroReconcavo?",
     "kind": "factual",
-    "anchors": ["Itabira"],
-    "note": "O vetorial confundia com Itabirito, da Gerdau."
+    "anchors": ["24 mes"]
   },
   {
-    "id": "petrobras-sede",
-    "question": "Onde fica a sede da Petrobras?",
+    "id": "brava-producao",
+    "question": "Qual a producao media diaria das concessoes no perimetro da transacao da Brava Energia?",
     "kind": "factual",
-    "anchors": ["Rio de Janeiro"]
+    "anchors": ["250 barris"]
   },
   {
-    "id": "embraer-privatizacao",
-    "question": "Em que ano a Embraer foi leiloada na privatizacao?",
+    "id": "cmin-mrs-votante",
+    "question": "Que percentual do capital votante da MRS a CSN Mineracao passou a deter?",
     "kind": "factual",
-    "anchors": ["1994"]
+    "anchors": ["14,30%"]
   },
   {
-    "id": "cemig-fundacao",
-    "question": "Quem fundou a Cemig em 1952?",
+    "id": "cmin-mrs-preferenciais",
+    "question": "Que percentual das acoes preferenciais da MRS a CSN Mineracao detem?",
     "kind": "factual",
-    "anchors": ["Juscelino Kubitschek"]
+    "anchors": ["49,28%"]
   },
   {
-    "id": "cemig-controlador",
-    "question": "Quem controla a Cemig?",
+    "id": "csn-mrs-reducao",
+    "question": "Para quanto a CSN reduzira sua participacao na MRS?",
     "kind": "factual",
-    "anchors": ["Minas Gerais"]
+    "anchors": ["7,59%"]
   },
   {
-    "id": "copel-estado",
-    "question": "Em que estado a Copel distribui energia eletrica?",
+    "id": "cmin-mrs-total",
+    "question": "Qual a participacao total da CSN Mineracao no capital social da MRS apos a transacao?",
     "kind": "factual",
-    "anchors": ["Paran"]
+    "anchors": ["29,91%"]
   },
   {
-    "id": "bradesco-bmc",
-    "question": "Qual banco o Bradesco adquiriu em janeiro de 2007?",
+    "id": "sendas-fic-valor",
+    "question": "Quanto a Sendas Distribuidora recebera pela venda de sua participacao na FIC?",
     "kind": "factual",
-    "anchors": ["BMC"]
+    "anchors": ["260 milh"]
   },
   {
-    "id": "eletrobras-amforp",
-    "question": "Em que ano a Eletrobras comprou a Amforp?",
+    "id": "conpel-age-data",
+    "question": "Em que data sera realizada a assembleia geral extraordinaria da Conpel sobre a incorporacao de acoes?",
     "kind": "factual",
-    "anchors": ["1964"]
+    "anchors": ["28 de mar"]
   },
   {
-    "id": "itaipu-criacao",
-    "question": "Em que ano foi criada a Itaipu Binacional?",
+    "id": "conpel-retirada",
+    "question": "Ate quando vai o prazo para exercicio do direito de retirada na operacao da Conpel?",
     "kind": "factual",
-    "anchors": ["1974"]
+    "anchors": ["28 de abril"]
   },
   {
-    "id": "eletrosul-criacao",
-    "question": "Para que regiao a Eletrosul foi criada para gerar e transmitir energia?",
+    "id": "mrs-contrato-data",
+    "question": "Em que data foi celebrado o contrato que alterou a participacao societaria na MRS?",
     "kind": "factual",
-    "anchors": ["Sul"]
+    "anchors": ["18 de dezembro"]
   },
   {
-    "id": "ambev-fusao",
-    "question": "A fusao de quais duas cervejarias deu origem a Ambev?",
+    "id": "marfrig-gelprime",
+    "question": "Qual empresa a Marfrig adquiriu por meio da MBR?",
     "kind": "factual",
-    "anchors": ["Antarctica", "Brahma"]
+    "anchors": ["Gelprime"]
   },
   {
-    "id": "usiminas-sumitomo",
-    "question": "Com qual grupo japones a Usiminas criou uma joint venture de mineracao?",
+    "id": "santander-leasing",
+    "question": "Qual empresa foi incorporada pelo Banco Santander Brasil?",
     "kind": "factual",
-    "anchors": ["Sumitomo"]
+    "anchors": ["Leasing"]
   },
   {
-    "id": "weg-katt",
-    "question": "Qual fabricante alema de motores eletricos a WEG adquiriu?",
+    "id": "mercantil-opa",
+    "question": "Qual operacao o Banco Mercantil do Brasil anunciou para fechamento de capital da Mercantil Financeira?",
     "kind": "factual",
-    "anchors": ["Katt"]
+    "anchors": ["Oferta P"]
   },
   {
-    "id": "csn-desestatizacao",
-    "question": "Em qual plano do governo Collor a CSN foi incluida?",
+    "id": "neoenergia-itabapoana",
+    "question": "Qual linha de transmissao teve participacao vendida pela Neoenergia?",
     "kind": "factual",
-    "anchors": ["Desestatiza"]
+    "anchors": ["Itabapoana"]
   },
 
   {
-    "id": "bradesco-previ-ligacao",
-    "question": "Qual a ligacao entre o Bradesco e a Previ?",
-    "kind": "relacional",
-    "anchors": ["CSN"],
-    "note": "Nenhum trecho contem a ligacao; ela passa pela CSN."
+    "id": "agg-ceu-azul",
+    "question": "Quais companhias estao envolvidas na operacao da Geracao Ceu Azul?",
+    "kind": "agregacao",
+    "anchors": ["Copel", "Neoenergia"],
+    "note": "Tres empresas publicaram sobre a mesma usina; a resposta completa exige juntar os documentos."
   },
   {
-    "id": "vale-bndes",
-    "question": "Qual a relacao entre a Vale e o BNDES?",
-    "kind": "relacional",
-    "anchors": ["privatiza"],
-    "note": "O BNDES financiou os compradores na privatizacao."
+    "id": "agg-brava-petro",
+    "question": "Que operacoes envolvem a Brava Energia e a PetroReconcavo no Rio Grande do Norte?",
+    "kind": "agregacao",
+    "anchors": ["midstream", "petr"]
   },
   {
-    "id": "vale-csn",
-    "question": "Que vinculo existe entre a Vale e a CSN?",
-    "kind": "relacional",
-    "anchors": ["CSN"]
+    "id": "agg-malha-norte",
+    "question": "Quais empresas publicaram sobre a incorporacao de acoes da Malha Norte?",
+    "kind": "agregacao",
+    "anchors": ["Rumo", "Malha Norte"]
   },
   {
-    "id": "eletrobras-furnas",
-    "question": "Qual a relacao entre a Eletrobras e Furnas?",
-    "kind": "relacional",
-    "anchors": ["Furnas"]
+    "id": "agg-fic-itau",
+    "question": "Quais companhias participam da transacao envolvendo a Financeira Itau CBD?",
+    "kind": "agregacao",
+    "anchors": ["Sendas", "Distribui"]
   },
   {
-    "id": "eletrobras-itaipu",
-    "question": "Como a Eletrobras se relaciona com a Itaipu Binacional?",
-    "kind": "relacional",
-    "anchors": ["Itaipu"]
+    "id": "agg-porto-cdf",
+    "question": "Quais empresas do grupo Porto estao envolvidas na incorporacao da CDF?",
+    "kind": "agregacao",
+    "anchors": ["Porto Seguro", "Porto Servi"]
   },
   {
-    "id": "cosan-comgas",
-    "question": "Qual a ligacao entre a Cosan e a Comgas?",
-    "kind": "relacional",
-    "anchors": ["Comg"]
+    "id": "agg-mrs-acionistas",
+    "question": "Quais acionistas alteraram participacao na MRS Logistica?",
+    "kind": "agregacao",
+    "anchors": ["CSN", "MRS"]
   },
   {
-    "id": "petrobras-braskem",
-    "question": "Que relacao a Petrobras tem com a Braskem?",
-    "kind": "relacional",
-    "anchors": ["Braskem"]
+    "id": "agg-copel-neoenergia",
+    "question": "Que ativos a Copel e a Neoenergia negociaram entre si?",
+    "kind": "agregacao",
+    "anchors": ["Baixo Igua", "Copel"]
   },
   {
-    "id": "usiminas-mrs",
-    "question": "Qual a ligacao entre a Usiminas e a MRS?",
-    "kind": "relacional",
-    "anchors": ["MRS"]
-  },
-  {
-    "id": "vale-mrs",
-    "question": "Que vinculo existe entre a Vale e a MRS Logistica?",
-    "kind": "relacional",
-    "anchors": ["MRS"]
-  },
-  {
-    "id": "bndes-csn",
-    "question": "Qual a relacao entre o BNDES e a CSN?",
-    "kind": "relacional",
-    "anchors": ["CSN"]
-  },
-  {
-    "id": "ambev-antarctica",
-    "question": "Qual a ligacao entre a Ambev e a Companhia Antarctica Paulista?",
-    "kind": "relacional",
-    "anchors": ["Antarctica"]
-  },
-  {
-    "id": "petrobras-gaspetro",
-    "question": "Que relacao a Petrobras teve com a Gaspetro?",
-    "kind": "relacional",
-    "anchors": ["Gaspetro"]
-  },
-  {
-    "id": "bradesco-agora",
-    "question": "Qual a ligacao entre o Bradesco e a Agora Corretora?",
-    "kind": "relacional",
-    "anchors": ["gora"],
-    "note": "Sem acento na ancora para casar com 'Agora' e 'Ágora'."
-  },
-  {
-    "id": "weg-efacec",
-    "question": "Qual o vinculo entre a WEG e a Efacec Energy Service?",
-    "kind": "relacional",
-    "anchors": ["Efacec"]
-  },
-  {
-    "id": "itaipu-ande",
-    "question": "Qual a relacao entre a Itaipu Binacional e a ANDE?",
-    "kind": "relacional",
-    "anchors": ["Itaipu"]
-  },
-  {
-    "id": "cemig-minas",
-    "question": "Que ligacao a Cemig tem com o governo de Minas Gerais?",
-    "kind": "relacional",
-    "anchors": ["Minas Gerais"]
+    "id": "agg-incorporacoes",
+    "question": "Quais operacoes de incorporacao de acoes foram anunciadas no corpus?",
+    "kind": "agregacao",
+    "anchors": ["Incorpora"]
   },
 
   {
-    "id": "privatizadas-bndes",
-    "question": "Quais empresas foram privatizadas com apoio do BNDES?",
-    "kind": "sintese",
-    "anchors": ["BNDES"]
+    "id": "mh-petro-producao",
+    "question": "Qual a producao media diaria das concessoes envolvidas na operacao da PetroReconcavo no Rio Grande do Norte?",
+    "kind": "multihop",
+    "anchors": ["250 barris"],
+    "bridge_entity": "PetroReconcavo"
   },
   {
-    "id": "empresas-energia",
-    "question": "Quais empresas do corpus atuam no setor de energia eletrica?",
-    "kind": "sintese",
-    "anchors": ["energia"]
+    "id": "mh-bnb-conpel",
+    "question": "Ate que data vai o direito de retirada na incorporacao envolvendo o Banco do Nordeste?",
+    "kind": "multihop",
+    "anchors": ["28 de abril"],
+    "bridge_entity": "Banco do Nordeste"
   },
   {
-    "id": "bancos-corpus",
-    "question": "Quais bancos aparecem no corpus?",
-    "kind": "sintese",
-    "anchors": ["Banco"]
+    "id": "mh-marfrig-minerva",
+    "question": "Qual empresa a Marfrig adquiriu por meio da MBR?",
+    "kind": "multihop",
+    "anchors": ["Gelprime"],
+    "bridge_entity": "Minerva"
   },
   {
-    "id": "aquisicoes-bradesco",
-    "question": "Quais aquisicoes o Bradesco fez na decada de 2000?",
-    "kind": "sintese",
-    "anchors": ["Bradesco"]
+    "id": "mh-neoenergia-itabapoana",
+    "question": "Qual usina a Neoenergia vendeu alem da participacao na LT Itabapoana?",
+    "kind": "multihop",
+    "anchors": ["Baixo Igua"],
+    "bridge_entity": "Itabapoana"
   }
 ]

@@ -1,0 +1,215 @@
+{
+  "ano": 2025,
+  "documentos": [
+    {
+      "protocolo": "001228IPE190520250161012533-38",
+      "empresa": "BANCO DO NORDESTE DO BRASIL SA",
+      "data": "2025-05-19"
+    },
+    {
+      "protocolo": "001228IPE250220250104571311-10",
+      "empresa": "BANCO DO NORDESTE DO BRASIL SA",
+      "data": "2025-02-25"
+    },
+    {
+      "protocolo": "001325IPE011020250147767710-71",
+      "empresa": "BANCO MERCANTIL BRASIL SA",
+      "data": "2025-10-01"
+    },
+    {
+      "protocolo": "001325IPE230920250129297656-14",
+      "empresa": "BANCO MERCANTIL BRASIL SA",
+      "data": "2025-09-23"
+    },
+    {
+      "protocolo": "004685IPE060320250104572211-80",
+      "empresa": "CONPEL CIA. NORDESTINA DE PAPEL - EM RECUPERAÇÃO JUDICIAL",
+      "data": "2025-03-06"
+    },
+    {
+      "protocolo": "004685IPE280320250104574410-77",
+      "empresa": "CONPEL CIA. NORDESTINA DE PAPEL - EM RECUPERAÇÃO JUDICIAL",
+      "data": "2025-03-28"
+    },
+    {
+      "protocolo": "014311IPE300620250166217683-73",
+      "empresa": "COMPANHIA PARANAENSE DE ENERGIA COPEL",
+      "data": "2025-06-30"
+    },
+    {
+      "protocolo": "014826IPE081220250190282510-33",
+      "empresa": "COMPANHIA BRASILEIRA DE DISTRIBUIÇÃO",
+      "data": "2025-12-08"
+    },
+    {
+      "protocolo": "014826IPE280320250104574410-70",
+      "empresa": "COMPANHIA BRASILEIRA DE DISTRIBUIÇÃO",
+      "data": "2025-03-28"
+    },
+    {
+      "protocolo": "015300IPE020620250143912354-78",
+      "empresa": "RUMO MALHA NORTE S.A.",
+      "data": "2025-06-02"
+    },
+    {
+      "protocolo": "015539IPE050220250104569311-35",
+      "empresa": "NEOENERGIA S.A",
+      "data": "2025-02-05"
+    },
+    {
+      "protocolo": "015539IPE070820250187768294-61",
+      "empresa": "NEOENERGIA S.A",
+      "data": "2025-08-07"
+    },
+    {
+      "protocolo": "015539IPE170220250104570512-77",
+      "empresa": "NEOENERGIA S.A",
+      "data": "2025-02-17"
+    },
+    {
+      "protocolo": "015539IPE300620250165322313-86",
+      "empresa": "NEOENERGIA S.A",
+      "data": "2025-06-30"
+    },
+    {
+      "protocolo": "016292IPE050820250120337803-38",
+      "empresa": "BRF S.A.",
+      "data": "2025-08-05"
+    },
+    {
+      "protocolo": "016292IPE160520250173418236-04",
+      "empresa": "BRF S.A.",
+      "data": "2025-05-16"
+    },
+    {
+      "protocolo": "016659IPE311020250197785816-77",
+      "empresa": "PORTO SEGURO SA",
+      "data": "2025-10-31"
+    },
+    {
+      "protocolo": "017450IPE020620250156413384-81",
+      "empresa": "RUMO S.A.",
+      "data": "2025-06-02"
+    },
+    {
+      "protocolo": "017949IPE191220250104869384-30",
+      "empresa": "MRS LOGÍSTICA S/A",
+      "data": "2025-12-19"
+    },
+    {
+      "protocolo": "020532IPE291020250154738902-10",
+      "empresa": "BANCO SANTANDER (BRASIL) S.A.",
+      "data": "2025-10-29"
+    },
+    {
+      "protocolo": "020788IPE011020250146032167-21",
+      "empresa": "MARFRIG GLOBAL FOODS SA",
+      "data": "2025-10-01"
+    },
+    {
+      "protocolo": "020788IPE160520250167815419-73",
+      "empresa": "MARFRIG GLOBAL FOODS SA",
+      "data": "2025-05-16"
+    },
+    {
+      "protocolo": "020788IPE210320250104573705-78",
+      "empresa": "MARFRIG GLOBAL FOODS SA",
+      "data": "2025-03-21"
+    },
+    {
+      "protocolo": "020788IPE260220250104571412-85",
+      "empresa": "MARFRIG GLOBAL FOODS SA",
+      "data": "2025-02-26"
+    },
+    {
+      "protocolo": "020931IPE051120250172203900-84",
+      "empresa": "MINERVA S/A",
+      "data": "2025-11-05"
+    },
+    {
+      "protocolo": "020931IPE190320250104573511-00",
+      "empresa": "MINERVA S/A",
+      "data": "2025-03-19"
+    },
+    {
+      "protocolo": "020931IPE300720250191634605-51",
+      "empresa": "MINERVA S/A",
+      "data": "2025-07-30"
+    },
+    {
+      "protocolo": "022616IPE060120250104566402-37",
+      "empresa": "BANCO BTG PACTUAL S/A",
+      "data": "2025-01-07"
+    },
+    {
+      "protocolo": "022616IPE140420250134111077-60",
+      "empresa": "BANCO BTG PACTUAL S/A",
+      "data": "2025-04-14"
+    },
+    {
+      "protocolo": "022616IPE280320250104574405-37",
+      "empresa": "BANCO BTG PACTUAL S/A",
+      "data": "2025-03-28"
+    },
+    {
+      "protocolo": "024740IPE300620250133695552-77",
+      "empresa": "COPEL GERAÇÃO E TRANSMISSÃO S/A",
+      "data": "2025-06-30"
+    },
+    {
+      "protocolo": "025097IPE250720250195695756-05",
+      "empresa": "NORTE ENERGIA S.A",
+      "data": "2025-07-25"
+    },
+    {
+      "protocolo": "025291IPE050620250152510002-33",
+      "empresa": "BRAVA ENERGIA S.A.",
+      "data": "2025-06-05"
+    },
+    {
+      "protocolo": "025291IPE100220250104569805-72",
+      "empresa": "BRAVA ENERGIA S.A.",
+      "data": "2025-02-10"
+    },
+    {
+      "protocolo": "025291IPE250220250104571312-07",
+      "empresa": "BRAVA ENERGIA S.A.",
+      "data": "2025-02-25"
+    },
+    {
+      "protocolo": "025372IPE081220250140588520-38",
+      "empresa": "SENDAS DISTRIBUIDORA S.A.",
+      "data": "2025-12-08"
+    },
+    {
+      "protocolo": "025585IPE311220250166816435-12",
+      "empresa": "CSN MINERAÇÃO S.A.",
+      "data": "2025-12-31"
+    },
+    {
+      "protocolo": "025780IPE050620250170616854-65",
+      "empresa": "PETRORECÔNCAVO S.A.",
+      "data": "2025-06-05"
+    },
+    {
+      "protocolo": "025780IPE250220250104571311-87",
+      "empresa": "PETRORECÔNCAVO S.A.",
+      "data": "2025-02-25"
+    },
+    {
+      "protocolo": "025780IPE300920250188289147-45",
+      "empresa": "PETRORECÔNCAVO S.A.",
+      "data": "2025-09-30"
+    },
+    {
+      "protocolo": "026786IPE200220250104570810-98",
+      "empresa": "SENIOR SISTEMAS S.A.",
+      "data": "2025-02-20"
+    },
+    {
+      "protocolo": "027600IPE091020250113217645-13",
+      "empresa": "PORTO SERVIÇO S.A",
+      "data": "2025-10-09"
+    }
+  ]
+}

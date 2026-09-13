@@ -1,0 +1,38 @@
+[
+  {
+    "id": "cruz-petro-producao",
+    "question": "Qual a producao media diaria das concessoes envolvidas na operacao da PetroReconcavo no Rio Grande do Norte?",
+    "kind": "multihop",
+    "anchors": [
+      "250 barris"
+    ],
+    "bridge_entity": "PetroReconcavo"
+  },
+  {
+    "id": "cruz-bnb-conpel",
+    "question": "Ate que data vai o direito de retirada na incorporacao envolvendo o Banco do Nordeste?",
+    "kind": "multihop",
+    "anchors": [
+      "28 de abril"
+    ],
+    "bridge_entity": "Banco do Nordeste"
+  },
+  {
+    "id": "cruz-marfrig-minerva",
+    "question": "Qual empresa a Marfrig adquiriu por meio da MBR?",
+    "kind": "multihop",
+    "anchors": [
+      "Gelprime"
+    ],
+    "bridge_entity": "Minerva"
+  },
+  {
+    "id": "cruz-neoenergia-itabapoana",
+    "question": "Qual usina a Neoenergia vendeu alem da participacao na LT Itabapoana?",
+    "kind": "multihop",
+    "anchors": [
+      "Baixo Igua"
+    ],
+    "bridge_entity": "Itabapoana"
+  }
+]

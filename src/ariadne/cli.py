@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import pathlib
 import sys
 import time
 
@@ -88,6 +89,84 @@ def cmd_search(args: argparse.Namespace) -> int:
         print(f"\n[{i}] score={hit.score:.4f}")
         print(f"    fonte: {hit.citation()}")
         print(f"    {trecho}...")
+    return 0
+
+
+def _irmao_de_documento(caminho: pathlib.Path) -> bool:
+    """True quando existe outro arquivo com o mesmo nome e outra extensao."""
+    return any(
+        caminho.with_suffix(ext).exists()
+        for ext in (".pdf", ".docx", ".xlsx", ".csv", ".png", ".jpg")
+    )
+
+
+def cmd_ingest_dir(args: argparse.Namespace) -> int:
+    """Ingere um diretorio inteiro de documentos."""
+    from ariadne.domain.models import Document
+    from ariadne.ingestion.parsers import SUPPORTED as _SUP
+    from ariadne.ingestion.parsers import parse_file
+
+    raiz = pathlib.Path(args.directory)
+    if not raiz.is_dir():
+        print(f"diretorio nao encontrado: {raiz}")
+        return 1
+
+    # Um .txt que acompanha um arquivo de mesmo nome e METADADO, nao documento:
+    # ingerir os dois indexaria cada documento duas vezes.
+    arquivos = [
+        p
+        for p in sorted(raiz.rglob("*"))
+        if p.suffix.lower() in _SUP and not (p.suffix.lower() == ".txt" and _irmao_de_documento(p))
+    ]
+    if not arquivos:
+        print(f"nenhum documento suportado em {raiz}")
+        return 1
+
+    print(f"lendo {len(arquivos)} arquivo(s) de {raiz}...")
+    documentos = []
+    falhas = 0
+    for i, caminho in enumerate(arquivos, 1):
+        try:
+            analisado = parse_file(caminho)
+        except Exception as exc:
+            print(f"  falhou ({caminho.name}): {type(exc).__name__}")
+            falhas += 1
+            continue
+        if not analisado.text.strip():
+            falhas += 1
+            continue
+
+        # Um .txt irmao com "empresa / assunto / data" vira o titulo legivel: o
+        # nome do arquivo e o protocolo da CVM, que nao diz nada na citacao.
+        meta = caminho.with_suffix(".txt")
+        if meta.exists():
+            linhas_meta = meta.read_text(encoding="utf-8").splitlines()
+            titulo = " - ".join(x.strip() for x in linhas_meta[:2] if x.strip())[:180]
+        else:
+            titulo = caminho.stem
+
+        documentos.append(
+            Document(
+                source=args.source,
+                external_id=caminho.relative_to(raiz).as_posix(),
+                title=titulo or caminho.stem,
+                # resolve() antes: as_uri() exige caminho absoluto.
+                url=caminho.resolve().as_uri(),
+                content=analisado.text,
+                metadata={"extracao": analisado.kind, "paginas": analisado.pages},
+            )
+        )
+        if i % 10 == 0:
+            print(f"  {i}/{len(arquivos)}", flush=True)
+
+    if falhas:
+        print(f"  {falhas} arquivo(s) sem texto utilizavel")
+    if not documentos:
+        return 1
+
+    print("gerando embeddings e indexando...")
+    report = IngestionPipeline().run(documentos, force=args.force)
+    print(report.summary())
     return 0
 
 
@@ -229,6 +308,12 @@ def main(argv: list[str] | None = None) -> int:
     p_search.add_argument("--no-rerank", action="store_true", help="pula o cross-encoder")
     p_search.add_argument("--explain", action="store_true", help="mostra o que cada etapa rendeu")
     p_search.set_defaults(func=cmd_search)
+
+    p_dir = sub.add_parser("ingest-dir", help="ingere um diretorio inteiro")
+    p_dir.add_argument("directory")
+    p_dir.add_argument("--source", default="cvm", help="rotulo da fonte no indice")
+    p_dir.add_argument("--force", action="store_true")
+    p_dir.set_defaults(func=cmd_ingest_dir)
 
     p_docs = sub.add_parser("docs", help="lista documentos disponiveis para ingestao")
     p_docs.set_defaults(func=cmd_docs)
