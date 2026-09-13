@@ -48,7 +48,7 @@ git clone https://github.com/ThalesDFerreira/ariadne.git
 cd ariadne
 cp .env.example .env
 docker compose up -d --build   # o primeiro build compila o AGE do source (alguns minutos)
-uv sync
+uv sync --extra web --extra docs --extra ocr
 uv run pytest
 ```
 
@@ -59,6 +59,7 @@ uv run python scripts/fetch_cvm.py   # baixa o corpus de demonstracao (CVM)
 ariadne ingest-dir data/cvm          # parse + chunk + embeddings
 ariadne graph-build                  # extrai entidades e relacoes (LLM local)
 
+ariadne serve                        # pagina para perguntar, em localhost:18080
 ariadne ask "De qual subsidiaria a PetroReconcavo comprou os ativos de midstream?"
 ariadne explore "CSN Mineracao"
 ariadne connect "Marfrig" "Minerva"
@@ -131,6 +132,7 @@ src/ariadne/
 ├── retrieval/    # vector, bm25, rrf, k-hop, rerank
 ├── llm/          # adapter de provedor (Ollama | API) + embeddings
 ├── agents/       # roteador de query
+├── api/          # API HTTP local (a ponte entre a pagina e o motor)
 ├── mcp/          # servidor MCP
 └── eval/         # golden set e harness de comparacao (sem juiz LLM)
 ```
@@ -148,7 +150,8 @@ src/ariadne/
 - [x] **Fase 5** — Camada agentica: roteador e perguntas multi-hop
 - [x] **Fase 6** — Avaliacao: golden set, tabela comparativa, limitacoes medidas
       (RAGAS descartado com justificativa; observabilidade **nao** feita)
-- [x] **Fase 7** — Vitrine: visualizacao do grafo e corpus reproduzivel por manifesto
+- [x] **Fase 7** — Vitrine: pagina para perguntar, visualizacao do grafo e corpus
+      reproduzivel por manifesto
 
 ## Licenca
 
@@ -284,7 +287,29 @@ documentos.
 `--refazer-selecao` monta um corpus novo de proposito. Quem faz isso precisa
 refazer o golden set junto.
 
+## Perguntar pela web
+
+```bash
+uv run ariadne serve     # http://127.0.0.1:18080
+```
+
+Caixa de pergunta, resposta com as fontes, e um painel que abre mostrando a
+rota escolhida, o caminho no grafo e os trechos que sustentam a resposta.
+
+Precisa do Docker e do Ollama ligados — a pagina conversa com um servidor local
+que conversa com eles. **Nao funciona no GitHub Pages**, e por isso ela mora em
+`web/` e nao em `docs/`.
+
+O bind e `127.0.0.1`. Esta API nao tem autenticacao nenhuma: quem alcanca a
+porta le o corpus inteiro e usa a GPU da maquina. `--host` existe, avisa, e so
+deve ser usado em rede confiavel.
+
+Primeira pergunta demora mais: carrega o cross-encoder. Depois fica na casa dos
+15 a 50 s, conforme a rota — o custo esta medido em [Avaliacao](#avaliacao).
+
 ## Visualizacao do grafo
+
+Servida junto em `/grafo/`, ou sozinha, como pagina estatica:
 
 ```bash
 uv run ariadne graph-export      # escreve docs/graph.json

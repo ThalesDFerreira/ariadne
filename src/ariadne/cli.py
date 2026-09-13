@@ -311,6 +311,14 @@ def cmd_graph_export(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_serve(args: argparse.Namespace) -> int:
+    """Sobe a API local e a pagina de perguntar."""
+    from ariadne.api.server import serve
+
+    serve(host=args.host, port=args.port)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     force_utf8_output()
     parser = argparse.ArgumentParser(prog="ariadne", description="Motor de conhecimento")
@@ -375,6 +383,15 @@ def main(argv: list[str] | None = None) -> int:
 
     p_stats = sub.add_parser("stats", help="contagens do indice")
     p_stats.set_defaults(func=cmd_stats)
+
+    p_serve = sub.add_parser("serve", help="pagina web para perguntar (local)")
+    p_serve.add_argument("--port", type=int, default=18080)
+    p_serve.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="mudar isso expoe uma API SEM autenticacao na rede",
+    )
+    p_serve.set_defaults(func=cmd_serve)
 
     p_export = sub.add_parser("graph-export", help="exporta o grafo para JSON")
     p_export.add_argument("--out", default="docs/graph.json")

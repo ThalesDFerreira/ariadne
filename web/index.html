@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ariadne — perguntar</title>
+<style>
+  :root {
+    --fundo: #0f1115;
+    --painel: #171a21;
+    --borda: #272c36;
+    --texto: #e6e8ec;
+    --fraco: #939aa8;
+    --destaque: #7aa2f7;
+    --alerta: #e0af68;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--fundo); color: var(--texto);
+    font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+  }
+  main { width: 100%; max-width: 820px; padding: 28px 20px 60px; }
+  header { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 4px; }
+  h1 { font-size: 19px; margin: 0; letter-spacing: .01em; }
+  header a { color: var(--fraco); font-size: 13px; }
+  #corpus { color: var(--fraco); font-size: 13px; margin: 0 0 22px; }
+
+  form { display: flex; gap: 10px; }
+  #pergunta {
+    flex: 1; min-width: 0; background: var(--painel); color: var(--texto);
+    border: 1px solid var(--borda); border-radius: 8px; padding: 12px 14px; font: inherit;
+  }
+  #pergunta:focus { outline: 1px solid var(--destaque); }
+  button {
+    background: var(--destaque); color: #0f1115; border: 0; border-radius: 8px;
+    padding: 12px 20px; font: inherit; font-weight: 600; cursor: pointer;
+  }
+  button:disabled { opacity: .5; cursor: default; }
+
+  #exemplos { margin: 12px 0 0; display: flex; gap: 8px; flex-wrap: wrap; }
+  #exemplos button {
+    background: transparent; color: var(--fraco); border: 1px solid var(--borda);
+    font-weight: 400; font-size: 13px; padding: 5px 11px; border-radius: 999px;
+  }
+  #exemplos button:hover { color: var(--texto); border-color: var(--destaque); }
+
+  #estado { margin-top: 26px; color: var(--fraco); }
+  .erro { color: #f7768e; }
+
+  #resposta { margin-top: 26px; }
+  #texto { white-space: pre-wrap; font-size: 16px; }
+  .rotulo {
+    color: var(--fraco); font-size: 12px; text-transform: uppercase;
+    letter-spacing: .07em; margin: 26px 0 8px;
+  }
+  .aviso {
+    border-left: 3px solid var(--alerta); background: rgba(224,175,104,.08);
+    padding: 10px 14px; margin-top: 18px; color: var(--alerta); font-size: 14px;
+  }
+  ol.fontes { margin: 0; padding-left: 22px; color: var(--fraco); font-size: 14px; }
+  ol.fontes li { margin-bottom: 4px; }
+
+  details {
+    border: 1px solid var(--borda); border-radius: 8px; padding: 10px 14px; margin-top: 10px;
+    background: var(--painel);
+  }
+  summary { cursor: pointer; color: var(--fraco); font-size: 13.5px; }
+  .trecho { border-top: 1px solid var(--borda); padding: 12px 0; }
+  .trecho:first-of-type { border-top: 0; }
+  .cit { color: var(--destaque); font-size: 13px; }
+  .ex { color: var(--fraco); font-size: 13.5px; margin-top: 4px; }
+  .passo { font-size: 13.5px; margin-bottom: 6px; }
+  .rel { color: var(--destaque); font-weight: 600; }
+  code { background: rgba(255,255,255,.06); padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Ariadne</h1>
+    <a href="/grafo/">ver o grafo &rarr;</a>
+  </header>
+  <p id="corpus">conectando ao banco...</p>
+
+  <form id="form">
+    <input id="pergunta" type="text" maxlength="500" autocomplete="off"
+           placeholder="Pergunte alguma coisa sobre o corpus..." autofocus>
+    <button id="enviar" type="submit">Perguntar</button>
+  </form>
+  <div id="exemplos"></div>
+
+  <div id="estado"></div>
+  <div id="resposta" hidden></div>
+</main>
+
+<script>
+const EXEMPLOS = [
+  "De qual subsidiaria a PetroReconcavo comprou os ativos de midstream?",
+  "Quais companhias estao envolvidas na operacao da Geracao Ceu Azul?",
+  "Que percentual do capital votante da MRS a CSN Mineracao passou a deter?",
+];
+
+const form = document.getElementById("form");
+const campo = document.getElementById("pergunta");
+const botao = document.getElementById("enviar");
+const estado = document.getElementById("estado");
+const painel = document.getElementById("resposta");
+
+fetch("/api/stats")
+  .then((r) => r.json())
+  .then((s) => {
+    document.getElementById("corpus").textContent = s.error
+      ? `banco indisponivel: ${s.error}`
+      : `${s.documents} documentos · ${s.chunks} trechos · ${s.nodes} entidades · ${s.edges} relacoes`;
+  })
+  .catch(() => {
+    document.getElementById("corpus").textContent = "banco indisponivel";
+  });
+
+document.getElementById("exemplos").innerHTML = EXEMPLOS.map(
+  (q, i) => `<button type="button" data-i="${i}">${q.slice(0, 52)}...</button>`
+).join("");
+document.getElementById("exemplos").addEventListener("click", (ev) => {
+  const i = ev.target.dataset?.i;
+  if (i === undefined) return;
+  campo.value = EXEMPLOS[i];
+  form.requestSubmit();
+});
+
+// O relogio existe porque a primeira pergunta carrega o cross-encoder e leva
+// dezenas de segundos. Barra de progresso sem numero faz parecer travado.
+let timer = null;
+function aguardando(ligar) {
+  botao.disabled = ligar;
+  campo.disabled = ligar;
+  clearInterval(timer);
+  if (!ligar) return;
+  const inicio = Date.now();
+  const tick = () => {
+    const s = Math.round((Date.now() - inicio) / 1000);
+    estado.className = "";
+    estado.textContent =
+      `buscando... ${s}s` +
+      (s > 20 ? "  (reranking em CPU; a primeira pergunta carrega o modelo)" : "");
+  };
+  tick();
+  timer = setInterval(tick, 1000);
+}
+
+form.addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const pergunta = campo.value.trim();
+  if (!pergunta) return;
+
+  painel.hidden = true;
+  aguardando(true);
+  try {
+    const r = await fetch("/api/ask", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ question: pergunta }),
+    });
+    const dados = await r.json();
+    if (!r.ok) throw new Error(dados.error || `HTTP ${r.status}`);
+    mostrar(dados);
+    estado.textContent = "";
+  } catch (erro) {
+    estado.className = "erro";
+    estado.textContent = `falhou: ${erro.message}`;
+  } finally {
+    aguardando(false);
+    campo.focus();
+  }
+});
+
+function escapar(s) {
+  return String(s ?? "").replace(/[&<>"]/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]
+  );
+}
+
+function mostrar(d) {
+  const partes = [];
+
+  partes.push(`<div id="texto">${escapar(d.answer)}</div>`);
+
+  // O aviso vem do proprio motor: resposta que nao citou fonte valida chega
+  // com grounded=false. Mostrar isso e o ponto -- esconder faria a resposta
+  // parecer verificada justamente onde ela nao esta.
+  if (!d.grounded || d.warning) {
+    partes.push(
+      `<div class="aviso">${escapar(d.warning || "resposta sem citacao de fonte valida")}</div>`
+    );
+  }
+
+  if (d.sources?.length) {
+    partes.push('<div class="rotulo">Fontes</div><ol class="fontes">');
+    for (const f of d.sources) partes.push(`<li>${escapar(f)}</li>`);
+    partes.push("</ol>");
+  }
+
+  if (d.path?.length) {
+    partes.push('<div class="rotulo">Caminho no grafo</div>');
+    for (const p of d.path) {
+      partes.push(
+        `<div class="passo">${escapar(p.source)} <span class="rel">~[${escapar(
+          p.relation
+        )}]~</span> ${escapar(p.target)}` +
+          (p.evidence ? `<div class="ex">${escapar(p.evidence.slice(0, 240))}</div>` : "") +
+          "</div>"
+      );
+    }
+  }
+
+  const e = d.strategy;
+  partes.push(
+    `<details><summary>rota: <code>${escapar(e.kind)}</code> · peso de grafo ${
+      e.graph_weight
+    } · reranking ${e.rerank ? "ligado" : "desligado"} · ${d.seconds}s · ${
+      d.hits.length
+    } trecho(s)</summary>`
+  );
+  if (e.entities?.length) {
+    partes.push(`<div class="ex">entidades na pergunta: ${escapar(e.entities.join(", "))}</div>`);
+  }
+  for (const h of d.hits) {
+    partes.push(
+      `<div class="trecho"><div class="cit">${escapar(h.citation)}</div>` +
+        `<div class="ex">${escapar(h.excerpt)}...</div></div>`
+    );
+  }
+  partes.push("</details>");
+
+  painel.innerHTML = partes.join("");
+  painel.hidden = false;
+}
+</script>
+</body>
+</html>
