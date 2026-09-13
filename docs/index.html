@@ -32,7 +32,9 @@
   }
   #busca:focus { outline: 1px solid var(--destaque); }
   main { flex: 1; display: flex; min-height: 0; }
-  #tela { flex: 1; display: block; cursor: grab; }
+  /* min-width:0 deixa o canvas encolher dentro do flex; sem isso o tamanho
+     intrinseco dele (que o DPR multiplica) vira o piso da largura. */
+  #tela { flex: 1; min-width: 0; display: block; cursor: grab; }
   #tela:active { cursor: grabbing; }
   aside {
     width: 330px; border-left: 1px solid var(--borda); padding: 16px;
@@ -88,8 +90,15 @@ let arrastando = null, panorama = null;
 function dimensionar() {
   const r = tela.getBoundingClientRect();
   const dpr = window.devicePixelRatio || 1;
-  tela.width = r.width * dpr;
-  tela.height = r.height * dpr;
+  // O atributo `width` do canvas e o tamanho INTRINSECO. Multiplicar por dpr
+  // sem fixar o tamanho CSS fazia o elemento crescer a cada redimensionamento:
+  // numa tela com dpr 2 a pagina ganhava rolagem horizontal e empurrava o
+  // painel de evidencias para fora. O tamanho CSS trava o layout; o atributo
+  // so aumenta a resolucao do desenho.
+  tela.style.width = r.width + "px";
+  tela.style.height = r.height + "px";
+  tela.width = Math.round(r.width * dpr);
+  tela.height = Math.round(r.height * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
@@ -131,6 +140,12 @@ function iniciar(dados) {
 
   legenda();
   dimensionar();
+  // Converge ANTES do primeiro desenho. Deixar a simulacao acontecer na tela
+  // parecia bom e nao era: com ~100 nos ela leva varios segundos para assentar,
+  // e quem abre a pagina ve um emaranhado se mexendo. O laco abaixo custa menos
+  // de 100 ms -- 600 passos de O(n^2) com n=109 -- e entrega o grafo pronto.
+  for (let i = 0; i < 600; i++) passo();
+  enquadrar();
   requestAnimationFrame(quadro);
 }
 
@@ -157,7 +172,13 @@ let calor = 1;
 let interagiu = false;
 
 function passo() {
-  const REPULSAO = 4200, MOLA = 0.02, COMPRIMENTO = 88, CENTRO = 0.0028;
+  // Repulsao dividida pelo numero de nos: cada no recebe a soma da repulsao de
+  // todos os outros, entao uma constante calibrada para 84 nos deixa o grafo
+  // quente demais com 109 -- os perifericos sao arremessados para fora e levam
+  // segundos voltando. Com a divisao, o mesmo arquivo serve a corpus de
+  // tamanhos diferentes sem retoque.
+  const REPULSAO = 360000 / nos.length;
+  const MOLA = 0.02, COMPRIMENTO = 88, CENTRO = 0.0028;
 
   for (let i = 0; i < nos.length; i++) {
     const a = nos[i];
@@ -213,11 +234,7 @@ function enquadrar() {
 function raio(n) { return 4 + Math.min(11, Math.sqrt(n.grau) * 2.4); }
 
 function quadro() {
-  // Varias iteracoes por quadro enquanto esta quente: o layout converge em
-  // ~2 s em vez de ~15 s, e quem abre a pagina ve o grafo pronto, nao se
-  // arrastando ate o lugar.
-  const iteracoes = calor > 0.05 ? 4 : 1;
-  for (let i = 0; i < iteracoes; i++) passo();
+  passo();
   if (!interagiu) enquadrar();
   desenhar();
   requestAnimationFrame(quadro);

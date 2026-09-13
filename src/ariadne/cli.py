@@ -214,6 +214,16 @@ def cmd_ask(args: argparse.Namespace) -> int:
 
 
 def cmd_graph_build(args: argparse.Namespace) -> int:
+    if args.rebuild:
+        # Sem isso, reextrair com prompt novo SOMA ao grafo velho: os nos tem o
+        # tipo corrigido pelo SET, mas as arestas antigas ficam, porque a
+        # evidencia mudou e o MERGE cria aresta nova em vez de casar com a
+        # existente. O grafo ficaria com as duas versoes ao mesmo tempo.
+        print("limpando o grafo antes de reconstruir...")
+        with connection() as conn:
+            apply_schema(conn)
+            AgeGraphStore().clear(conn)
+
     print("extraindo entidades e relacoes (uma chamada de LLM por chunk novo)...")
     inicio = time.monotonic()
 
@@ -345,6 +355,11 @@ def main(argv: list[str] | None = None) -> int:
     p_build = sub.add_parser("graph-build", help="extrai o grafo dos chunks indexados")
     p_build.add_argument("--limit", type=int, default=None, help="processa so N chunks")
     p_build.add_argument("--refresh", action="store_true", help="ignora o cache de extracao")
+    p_build.add_argument(
+        "--rebuild",
+        action="store_true",
+        help="apaga o grafo antes de reconstruir (use junto com --refresh)",
+    )
     p_build.set_defaults(func=cmd_graph_build)
 
     p_explore = sub.add_parser("explore", help="vizinhanca de uma entidade")

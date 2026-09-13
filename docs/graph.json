@@ -1,0 +1,2276 @@
+{
+ "nodes": [
+  {
+   "key": "banco btg pactual",
+   "name": "BANCO BTG PACTUAL S/A",
+   "type": "Organizacao",
+   "mentions": 3
+  },
+  {
+   "key": "jgp gestao patrimonial",
+   "name": "JGP Gestão Patrimonial Ltda.",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "julius baer brasil gestao de patrimonio e consultoria de valores mobiliarios",
+   "name": "Julius Baer Brasil Gestão de Patrimônio e Consultoria de Valores Mobiliários Ltda.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "banco do nordeste do brasil",
+   "name": "Banco do Nordeste do Brasil S.A.",
+   "type": "Organizacao",
+   "mentions": 4
+  },
+  {
+   "key": "b3 brasil bolsa balcao",
+   "name": "B3 S.A. – Brasil, Bolsa, Balcão",
+   "type": "Organizacao",
+   "mentions": 17
+  },
+  {
+   "key": "finor",
+   "name": "FINOR",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "comissao de valores mobiliarios",
+   "name": "CVM",
+   "type": "Organizacao",
+   "mentions": 35
+  },
+  {
+   "key": "corretora de titulos e valores mobiliarios",
+   "name": "Corretora de Títulos e Valores Mobiliários",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "sobre o banco publicacoes fatos comunicados e avisos comunicado ao mercado",
+   "name": "Sobre o Banco/ Publicações/ Fatos, Comunicados e Avisos/ Comunicado ao Mercado",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "www bnb gov br",
+   "name": "www.bnb.gov.br",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "www b3 com br",
+   "name": "www.b3.com.br",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "fortaleza ce",
+   "name": "Fortaleza (CE)",
+   "type": "Lugar",
+   "mentions": 1
+  },
+  {
+   "key": "valdiane martins pessoa",
+   "name": "Valdiane Martins Pessoa",
+   "type": "Pessoa",
+   "mentions": 1
+  },
+  {
+   "key": "silvia kelly soares bezerra",
+   "name": "Sílvia Kelly Soares Bezerra",
+   "type": "Pessoa",
+   "mentions": 1
+  },
+  {
+   "key": "ana maria nunes macedo pereira",
+   "name": "Ana Maria Nunes Macedo Pereira",
+   "type": "Pessoa",
+   "mentions": 1
+  },
+  {
+   "key": "plinio sergio leite gomes",
+   "name": "Plínio Sergio Leite Gomes",
+   "type": "Pessoa",
+   "mentions": 1
+  },
+  {
+   "key": "camed microcredito e servicos",
+   "name": "CAMED MICROCREDITO E SERVICOS LTDA",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "wanger antonio de alencar rocha",
+   "name": "WANGER ANTONIO DE ALENCAR ROCHA",
+   "type": "Pessoa",
+   "mentions": 1
+  },
+  {
+   "key": "fortaleza",
+   "name": "Fortaleza",
+   "type": "Lugar",
+   "mentions": 1
+  },
+  {
+   "key": "ce",
+   "name": "CE",
+   "type": "Lugar",
+   "mentions": 1
+  },
+  {
+   "key": "banco mercantil do brasil",
+   "name": "Banco Mercantil do Brasil S.A.",
+   "type": "Organizacao",
+   "mentions": 6
+  },
+  {
+   "key": "mercantil financeira credito financiamento e investimento",
+   "name": "Mercantil Financeira S.A. – CRÉDITO, FINANCIAMENTO E INVESTIMENTO",
+   "type": "Organizacao",
+   "mentions": 4
+  },
+  {
+   "key": "banco mercantil brasil",
+   "name": "Banco Mercantil Brasil S.A.",
+   "type": "Organizacao",
+   "mentions": 6
+  },
+  {
+   "key": "companhia",
+   "name": "Companhia",
+   "type": "Organizacao",
+   "mentions": 17
+  },
+  {
+   "key": "mercantil financeira",
+   "name": "Mercantil Financeira",
+   "type": "Organizacao",
+   "mentions": 6
+  },
+  {
+   "key": "b3",
+   "name": "B3",
+   "type": "Organizacao",
+   "mentions": 7
+  },
+  {
+   "key": "grant thornton corporate consultores de negocios",
+   "name": "Grant Thornton Corporate Consultores de Negócios Ltda.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "paulino ramos rodrigues",
+   "name": "Paulino Ramos Rodrigues",
+   "type": "Pessoa",
+   "mentions": 4
+  },
+  {
+   "key": "b3 clearing and settlement house",
+   "name": "B3 Clearing and Settlement House",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "grant thorton coporate consultores de negocios",
+   "name": "Grant Thorton Coporate Consultores de Negócios Ltda.",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "grant thorton corporate consultores de negocios",
+   "name": "Grant Thorton Corporate Consultores de Negócios Ltda.",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "banco santander brasil",
+   "name": "Banco Santander (Brasil) S.A.",
+   "type": "Organizacao",
+   "mentions": 10
+  },
+  {
+   "key": "return capital gestao de ativos e participacoes",
+   "name": "Return Capital Gestão de Ativos e Participações",
+   "type": "Organizacao",
+   "mentions": 5
+  },
+  {
+   "key": "santander leasing arrendamento mercantil",
+   "name": "Santander Leasing S.A. Arrendamento Mercantil",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "return",
+   "name": "Return",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "santander leasing",
+   "name": "Santander Leasing S.A.",
+   "type": "Organizacao",
+   "mentions": 7
+  },
+  {
+   "key": "cindida",
+   "name": "Cindida",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "return capital gestao de ativos e participacoes s",
+   "name": "Return Capital Gestão de Ativos e Participações S.",
+   "type": "Organizacao",
+   "mentions": 3
+  },
+  {
+   "key": "bacen",
+   "name": "BACEN",
+   "type": "Organizacao",
+   "mentions": 5
+  },
+  {
+   "key": "brava energia",
+   "name": "Brava Energia S.A.",
+   "type": "Organizacao",
+   "mentions": 21
+  },
+  {
+   "key": "petroreconcavo",
+   "name": "PetroReconcavo S.A.",
+   "type": "Organizacao",
+   "mentions": 18
+  },
+  {
+   "key": "rio grande do norte",
+   "name": "Rio Grande do Norte",
+   "type": "Lugar",
+   "mentions": 19
+  },
+  {
+   "key": "bacia potiguar",
+   "name": "Bacia Potiguar",
+   "type": "Lugar",
+   "mentions": 4
+  },
+  {
+   "key": "potiguar basin",
+   "name": "Potiguar Basin",
+   "type": "Lugar",
+   "mentions": 4
+  },
+  {
+   "key": "industrial asset of guamare",
+   "name": "Industrial Asset of Guamaré",
+   "type": "Lugar",
+   "mentions": 1
+  },
+  {
+   "key": "azevedo e travassos petroleo",
+   "name": "Azevedo e Travassos Petróleo S. A.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "petro victory energy",
+   "name": "Petro-Victory Energy Corp.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "brf",
+   "name": "BRF S.A.",
+   "type": "Organizacao",
+   "mentions": 5
+  },
+  {
+   "key": "marfrig global foods",
+   "name": "MARFRIG GLOBAL FOODS S.A.",
+   "type": "Organizacao",
+   "mentions": 20
+  },
+  {
+   "key": "sao paulo",
+   "name": "Sao Paulo",
+   "type": "Lugar",
+   "mentions": 9
+  },
+  {
+   "key": "companhia brasileira de distribuicao",
+   "name": "COMPANHIA BRASILEIRA DE DISTRIBUIÇÃO",
+   "type": "Organizacao",
+   "mentions": 9
+  },
+  {
+   "key": "gpa malls properties gestao de ativos e servicos imobiliarios",
+   "name": "GPA Malls & Properties Gestão de Ativos e Serviços Imobiliários Ltda.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "gpa",
+   "name": "GPA",
+   "type": "Organizacao",
+   "mentions": 5
+  },
+  {
+   "key": "gpa malls",
+   "name": "GPA Malls",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "place 2b servicos imobiliarios",
+   "name": "Place 2B Serviços Imobiliários Ltda.",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "rafael sirotsky russowsky",
+   "name": "Rafael Sirotsky Russowsky",
+   "type": "Pessoa",
+   "mentions": 1
+  },
+  {
+   "key": "financeira itau cbd credito financiamento e investimento",
+   "name": "Financeira Itaú CBD S.A. – Crédito, Financiamento e Investimento",
+   "type": "Organizacao",
+   "mentions": 4
+  },
+  {
+   "key": "fic",
+   "name": "FIC",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "itau unibanco holding",
+   "name": "Itaú Unibanco Holding S.A.",
+   "type": "Organizacao",
+   "mentions": 5
+  },
+  {
+   "key": "itau",
+   "name": "Itaú",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "itau unibanco",
+   "name": "Itaú Unibanco S.A.",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "financeira itau cbd credito financiamento e investimento fic",
+   "name": "Financeira Itaú CBD S.A. – Crédito, Financiamento e Investimento (FIC)",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "itau unibanco itau",
+   "name": "Itaú Unibanco S.A. (Itaú)",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "rafael russowsky",
+   "name": "Rafael Russowsky",
+   "type": "Pessoa",
+   "mentions": 1
+  },
+  {
+   "key": "copel",
+   "name": "COPEL",
+   "type": "Organizacao",
+   "mentions": 3
+  },
+  {
+   "key": "copel geracao e transmissao",
+   "name": "Copel Geração e Transmissão S.A.",
+   "type": "Organizacao",
+   "mentions": 7
+  },
+  {
+   "key": "neoenergia",
+   "name": "Neoenergia S.A.",
+   "type": "Organizacao",
+   "mentions": 16
+  },
+  {
+   "key": "geracao ceu azul",
+   "name": "Geração Céu Azul S.A.",
+   "type": "Organizacao",
+   "mentions": 6
+  },
+  {
+   "key": "energo pro participacoes",
+   "name": "ENERGO-PRO PARTICIPAÇÕES S.A.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "dk holding investments s r o",
+   "name": "DK Holding Investments, S.R.O.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "parana",
+   "name": "Paraná",
+   "type": "Lugar",
+   "mentions": 3
+  },
+  {
+   "key": "uhe baixo iguacu",
+   "name": "UHE Baixo Iguaçu",
+   "type": "Produto",
+   "mentions": 1
+  },
+  {
+   "key": "conpel companhia nordestina de papel",
+   "name": "Conpel Companhia Nordestina de Papel",
+   "type": "Organizacao",
+   "mentions": 4
+  },
+  {
+   "key": "e k n embalagens kraft do nordeste",
+   "name": "E. K. N. Embalagens Kraft do Nordeste S.A.",
+   "type": "Organizacao",
+   "mentions": 3
+  },
+  {
+   "key": "acionistas elegiveis",
+   "name": "Acionistas Elegíveis",
+   "type": "Pessoa",
+   "mentions": 1
+  },
+  {
+   "key": "conpel nordestina de papel",
+   "name": "Conpel CIA. Nordestina de Papel",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "luiz antonio giacomassi cavet",
+   "name": "Luiz Antonio Giacomassi Cavet",
+   "type": "Pessoa",
+   "mentions": 2
+  },
+  {
+   "key": "conpel nordestina de papel em recuperacao judicial",
+   "name": "CONPEL - CIA. NORDESTINA DE PAPEL - EM RECUPERAÇÃO JUDICIAL",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "ekn",
+   "name": "EKN",
+   "type": "Organizacao",
+   "mentions": 7
+  },
+  {
+   "key": "conpel",
+   "name": "Conpel",
+   "type": "Organizacao",
+   "mentions": 8
+  },
+  {
+   "key": "e k",
+   "name": "E.K.",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "uhy bendoraytes auditores independentes",
+   "name": "UHY Bendoraytes & Cia Auditores Independentes",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "recuperacao judicial",
+   "name": "Recuperação Judicial",
+   "type": "Evento",
+   "mentions": 1
+  },
+  {
+   "key": "alpha auditores independentes",
+   "name": "Alpha Auditores Independentes",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "conde",
+   "name": "Conde",
+   "type": "Lugar",
+   "mentions": 1
+  },
+  {
+   "key": "companhia paranaense de energia",
+   "name": "Companhia Paranaense de Energia",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "curitiba",
+   "name": "Curitiba",
+   "type": "Lugar",
+   "mentions": 3
+  },
+  {
+   "key": "csn mineracao",
+   "name": "CSN MINERAÇÃO S.A.",
+   "type": "Organizacao",
+   "mentions": 6
+  },
+  {
+   "key": "cmin",
+   "name": "CMIN",
+   "type": "Organizacao",
+   "mentions": 3
+  },
+  {
+   "key": "mrs logistica",
+   "name": "MRS Logística S.A.",
+   "type": "Organizacao",
+   "mentions": 5
+  },
+  {
+   "key": "companhia siderurgica nacional",
+   "name": "Companhia Siderúrgica Nacional",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "compahia siderurgica nacional",
+   "name": "Compahia Siderúrgica Nacional",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "mbr investimentos",
+   "name": "MBR Investimentos Ltda.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "gelprime industria e comercio de produtos alimenticios",
+   "name": "Gelprime Indústria e Comércio de Produtos Alimentícios S.A.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "gelprime",
+   "name": "Gelprime",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "mbrf",
+   "name": "MBRF",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "jose ignacio scoseria rey",
+   "name": "Jose Ignacio Scoseria Rey",
+   "type": "Pessoa",
+   "mentions": 1
+  },
+  {
+   "key": "ibipora pr",
+   "name": "Ibiporã-PR",
+   "type": "Lugar",
+   "mentions": 2
+  },
+  {
+   "key": "bolsonaro",
+   "name": "Bolsonaro",
+   "type": "Pessoa",
+   "mentions": 1
+  },
+  {
+   "key": "brasil",
+   "name": "Brasil",
+   "type": "Lugar",
+   "mentions": 1
+  },
+  {
+   "key": "cnpj mf no 03 853 896 0001 40",
+   "name": "CNPJ/MF nº 03.853.896/0001-40",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "cnpj mf no 01 838 723 0001 27",
+   "name": "CNPJ/MF nº 01.838.723/0001-27",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "nire 35 300 341 031",
+   "name": "NIRE 35.300.341.031",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "nire 42 300 034 240",
+   "name": "NIRE 42.300.034.240",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "mbr",
+   "name": "MBR",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "2019",
+   "name": "2019",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "2025",
+   "name": "2025",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "2024",
+   "name": "2024",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "mfg agropecuaria",
+   "name": "MFG Agropecuária Ltda.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "tang david",
+   "name": "Tang David",
+   "type": "Pessoa",
+   "mentions": 2
+  },
+  {
+   "key": "conselho de administracao",
+   "name": "Conselho de Administração",
+   "type": "Organizacao",
+   "mentions": 3
+  },
+  {
+   "key": "montana montana",
+   "name": "Montana Montana",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "credit suisse brasil corretora de titulos e valores mobiliarios",
+   "name": "Credit Suisse (Brasil) S.A. Corretora de Títulos e Valores Mobiliários",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "j p morgan ccvm",
+   "name": "J.P. Morgan CCVM S.A.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "safra distribuidora de titulos e valores mobiliarios",
+   "name": "Safra Distribuidora de Títulos e Valores Mobiliários Ltda.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "santander ccvm",
+   "name": "Santander CCVM S.A.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "cvm resolution 80 22",
+   "name": "CVM Resolution 80/22",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "cvm resolution 77 22",
+   "name": "CVM Resolution 77/22",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "marfrig",
+   "name": "Marfrig",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "avenida paulista 2100 sao paulo sp",
+   "name": "Avenida Paulista, 2100, São Paulo, SP",
+   "type": "Lugar",
+   "mentions": 1
+  },
+  {
+   "key": "minerva",
+   "name": "Minerva S.A.",
+   "type": "Organizacao",
+   "mentions": 4
+  },
+  {
+   "key": "irapuru ii energia",
+   "name": "Irapuru II Energia S.A.",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "elera energia",
+   "name": "Elera Energia S.A.",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "minerva foods",
+   "name": "Minerva Foods",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "minerva energia",
+   "name": "Minerva Energia",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "janauba",
+   "name": "Janaúba",
+   "type": "Lugar",
+   "mentions": 1
+  },
+  {
+   "key": "minas gerais",
+   "name": "Minas Gerais",
+   "type": "Lugar",
+   "mentions": 1
+  },
+  {
+   "key": "mercado livre",
+   "name": "Mercado Livre",
+   "type": "Produto",
+   "mentions": 1
+  },
+  {
+   "key": "i recs",
+   "name": "I-RECs",
+   "type": "Produto",
+   "mentions": 1
+  },
+  {
+   "key": "saneamento",
+   "name": "saneamento",
+   "type": "Setor",
+   "mentions": 1
+  },
+  {
+   "key": "siderurgia",
+   "name": "siderurgia",
+   "type": "Setor",
+   "mentions": 1
+  },
+  {
+   "key": "edison ticle de andrade melo e souza filho",
+   "name": "Edison Ticle de Andrade Melo e Souza Filho",
+   "type": "Pessoa",
+   "mentions": 2
+  },
+  {
+   "key": "mrs",
+   "name": "MRS",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "csn",
+   "name": "CSN",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "rio de janeiro",
+   "name": "Rio de Janeiro",
+   "type": "Lugar",
+   "mentions": 9
+  },
+  {
+   "key": "consorcio empreendedor baixo iguacu cebi",
+   "name": "Consórcio Empreendedor Baixo Iguaçu (CEBI)",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "neoenergia transmissao",
+   "name": "Neoenergia Transmissão S.A.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "unique power fundo de investimento em participacoes multiestrategia responsabilidade limitada",
+   "name": "Unique Power Fundo de Investimento em Participações Multiestratégia Responsabilidade Limitada",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "warrington investment pte ltd",
+   "name": "Warrington Investment Pte. Ltd.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "neoenergia itabapoana",
+   "name": "Neoenergia Itabapoana",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "warrington",
+   "name": "Warrington",
+   "type": "Organizacao",
+   "mentions": 3
+  },
+  {
+   "key": "unique power",
+   "name": "Unique Power",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "weg",
+   "name": "WEG",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "katt",
+   "name": "Katt",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "lt itabapoana",
+   "name": "LT Itabapoana",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "itabapoana",
+   "name": "Itabapoana",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "leonardo pimenta gadelha",
+   "name": "Leonardo Pimenta Gadelha",
+   "type": "Pessoa",
+   "mentions": 2
+  },
+  {
+   "key": "edf brasil holding",
+   "name": "EDF Brasil Holding S.A.",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "stoa",
+   "name": "STOA S.A.",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "consorcio empreendedor baixo iguacu",
+   "name": "Consórcio Empreendedor Baixo Iguaçu",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "usina hidreletrica baixo iguacu",
+   "name": "Usina Hidrelétrica Baixo Iguaçu",
+   "type": "Produto",
+   "mentions": 1
+  },
+  {
+   "key": "conselho administrativo de defesa economica cade",
+   "name": "Conselho Administrativo de Defesa Econômica (CADE)",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "agencia nacional de energia eletrica aneel",
+   "name": "Agência Nacional de Energia Elétrica (Aneel)",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "edf brasil holding edf",
+   "name": "EDF Brasil Holding S.A. (EDF)",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "stoa stoa",
+   "name": "STOA S.A. (STOA)",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "geracao ceu azul gca",
+   "name": "Geração Céu Azul S.A. (GCA)",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "baixo iguacu hydroelectric power plant",
+   "name": "Baixo Iguaçu Hydroelectric Power Plant",
+   "type": "Produto",
+   "mentions": 1
+  },
+  {
+   "key": "administrative council for economic defense cade",
+   "name": "Administrative Council for Economic Defense (CADE)",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "national electric energy agency aneel",
+   "name": "National Electric Energy Agency (Aneel)",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "norte energia",
+   "name": "Norte Energia S.A.",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "trf1",
+   "name": "TRF1",
+   "type": "Lugar",
+   "mentions": 1
+  },
+  {
+   "key": "cvm n 44 2021",
+   "name": "CVM n° 44/2021",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "ons",
+   "name": "ONS",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "caixa economica federal",
+   "name": "Caixa Economica Federal",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "3r potiguar",
+   "name": "3R Potiguar S.A.",
+   "type": "Organizacao",
+   "mentions": 5
+  },
+  {
+   "key": "comissao de valores mobiliarios cvm",
+   "name": "Comissão de Valores Mobiliários - CVM",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "natural gas midstream assets",
+   "name": "natural gas midstream assets",
+   "type": "Produto",
+   "mentions": 1
+  },
+  {
+   "key": "b3 recv3",
+   "name": "B3: RECV3",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "receita",
+   "name": "Receita",
+   "type": "Produto",
+   "mentions": 2
+  },
+  {
+   "key": "brent",
+   "name": "Brent",
+   "type": "Produto",
+   "mentions": 1
+  },
+  {
+   "key": "aviation kerosene qav",
+   "name": "aviation kerosene (QAV)",
+   "type": "Produto",
+   "mentions": 1
+  },
+  {
+   "key": "diesel for vessels mgo",
+   "name": "diesel for vessels (MGO)",
+   "type": "Produto",
+   "mentions": 1
+  },
+  {
+   "key": "porto seguro",
+   "name": "PORTO SEGURO S.A.",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "porto servico",
+   "name": "Porto Serviço S.A.",
+   "type": "Organizacao",
+   "mentions": 7
+  },
+  {
+   "key": "cdf assistencia e suporte digital",
+   "name": "CDF Assistência e Suporte Digital S.A.",
+   "type": "Organizacao",
+   "mentions": 4
+  },
+  {
+   "key": "porto assistencia participacoes",
+   "name": "Porto Assistência Participações S.A.",
+   "type": "Organizacao",
+   "mentions": 4
+  },
+  {
+   "key": "btg pactual economia real fundo de investimento em participacoes multiestrategia responsabilidade limitada",
+   "name": "BTG Pactual Economia Real Fundo de Investimento em Participações Multiestratégia Responsabilidade Limitada",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "porto assistencia",
+   "name": "Porto Assistência",
+   "type": "Organizacao",
+   "mentions": 4
+  },
+  {
+   "key": "cdf",
+   "name": "CDF",
+   "type": "Organizacao",
+   "mentions": 4
+  },
+  {
+   "key": "rumo",
+   "name": "Rumo S.A.",
+   "type": "Organizacao",
+   "mentions": 7
+  },
+  {
+   "key": "rumo malha norte",
+   "name": "Rumo Malha Norte S.A.",
+   "type": "Organizacao",
+   "mentions": 5
+  },
+  {
+   "key": "b3 brasil bolsa e balcao",
+   "name": "B3 S.A. – Brasil, Bolsa e Balcão",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "comites especiais independentes",
+   "name": "Comitês Especiais Independentes",
+   "type": "Outro",
+   "mentions": 2
+  },
+  {
+   "key": "guilherme lelis bernardo machado",
+   "name": "Guilherme Lelis Bernardo Machado",
+   "type": "Pessoa",
+   "mentions": 4
+  },
+  {
+   "key": "malha norte",
+   "name": "Malha Norte",
+   "type": "Organizacao",
+   "mentions": 5
+  },
+  {
+   "key": "novo mercado",
+   "name": "Novo Mercado",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "independent special committees",
+   "name": "Independent Special Committees",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "independent committees",
+   "name": "Independent Committees",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "conselhos de administracao",
+   "name": "Conselhos de Administração",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "cvm guidance opinion no 35",
+   "name": "CVM Guidance Opinion No. 35",
+   "type": "Outro",
+   "mentions": 1
+  },
+  {
+   "key": "sendas distribuidora",
+   "name": "SENDAS DISTRIBUIDORA S.A.",
+   "type": "Organizacao",
+   "mentions": 4
+  },
+  {
+   "key": "grupo casas bahia",
+   "name": "Grupo Casas Bahia S.A.",
+   "type": "Organizacao",
+   "mentions": 3
+  },
+  {
+   "key": "banco central do brasil bacen",
+   "name": "Banco Central do Brasil – BACEN",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "assai atacadista",
+   "name": "ASSAI ATACADISTA",
+   "type": "Organizacao",
+   "mentions": 2
+  },
+  {
+   "key": "cade",
+   "name": "CADE",
+   "type": "Organizacao",
+   "mentions": 4
+  },
+  {
+   "key": "belmiro de figueiredo gomes",
+   "name": "Belmiro de Figueiredo Gomes",
+   "type": "Pessoa",
+   "mentions": 2
+  },
+  {
+   "key": "companhia brasileira de distribuicao fic",
+   "name": "Companhia Brasileira de Distribuição (FIC)",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "senior sistemas",
+   "name": "Senior Sistemas S.A.",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "btg pactual",
+   "name": "BTG Pactual S.A.",
+   "type": "Organizacao",
+   "mentions": 1
+  },
+  {
+   "key": "blumenau",
+   "name": "Blumenau",
+   "type": "Lugar",
+   "mentions": 1
+  },
+  {
+   "key": "senior capital",
+   "name": "Senior Capital",
+   "type": "Organizacao",
+   "mentions": 1
+  }
+ ],
+ "edges": [
+  {
+   "source": "banco btg pactual",
+   "target": "jgp gestao patrimonial",
+   "type": "ADQUIRIU",
+   "evidence": "assinou os documentos definitivos referentes à aquisição de 100% (cem por cento) do capital social da JGP Gestão Patrimonial Ltda.",
+   "count": 1
+  },
+  {
+   "source": "banco btg pactual",
+   "target": "julius baer brasil gestao de patrimonio e consultoria de valores mobiliarios",
+   "type": "ADQUIRIU",
+   "evidence": "O BANCO BTG PACTUAL S.A. vem comunicar aos acionistas e ao mercado em geral que assinou os documentos definitivos referentes à aquisição de 100% (cem por cento) do capital social da Julius Baer Brasil Gestão de Patrimônio e Consultoria de Valores Mobiliários Ltda., uma das líderes no segmento de Wealth Management, com R$ 61 bilhões em ativos sob gestão, pelo preço de aquisição de R$ 615 milhões.",
+   "count": 2
+  },
+  {
+   "source": "banco do nordeste do brasil",
+   "target": "b3 brasil bolsa balcao",
+   "type": "LOCALIZADA_EM",
+   "evidence": "será realizado na B3 S/A – Brasil, Bolsa, Balcão o 2º Leilão de oferta de compra, pelo referido Fundo, das cotas escriturais de sua emissão, custodiadas na citada Bolsa",
+   "count": 2
+  },
+  {
+   "source": "banco do nordeste do brasil",
+   "target": "finor",
+   "type": "CONTROLA",
+   "evidence": "O Banco do Nordeste do Brasil S/A, na qualidade de Banco Operador do Fundo de Investimentos do Nordeste – FINOR",
+   "count": 1
+  },
+  {
+   "source": "finor",
+   "target": "b3 brasil bolsa balcao",
+   "type": "LOCALIZADA_EM",
+   "evidence": "será realizado na B3 S/A – Brasil, Bolsa, Balcão o 2º Leilão de oferta de compra, pelo referido Fundo, das cotas escriturais de sua emissão, custodiadas na citada Bolsa",
+   "count": 1
+  },
+  {
+   "source": "comissao de valores mobiliarios",
+   "target": "banco do nordeste do brasil",
+   "type": "PARTICIPOU_DE",
+   "evidence": "nas seguintes condições: Instrução da Comissão de Valores Mobiliários nº 168, de 23/12/1991",
+   "count": 1
+  },
+  {
+   "source": "banco do nordeste do brasil",
+   "target": "www bnb gov br",
+   "type": "LOCALIZADA_EM",
+   "evidence": "no site do Banco do Nordeste (www.bnb.gov.br)",
+   "count": 1
+  },
+  {
+   "source": "banco do nordeste do brasil",
+   "target": "www b3 com br",
+   "type": "LOCALIZADA_EM",
+   "evidence": "no site da B3 S/A – Brasil, Bolsa, Balcão (www.b3.com.br)",
+   "count": 1
+  },
+  {
+   "source": "banco do nordeste do brasil",
+   "target": "camed microcredito e servicos",
+   "type": "ADQUIRIU",
+   "evidence": "O Banco do Nordeste do Brasil S.A. (BNBR3) comunica a assinatura do 3º Aditivo de prorrogação ao Acordo de Operacionalização do Programa de Microcrédito Crediamigo, firmado com a CAMED MICROCREDITO E SERVICOS LTDA, por 12 (doze) meses, de 01/06/2025 a 31/05/2026, assegurando a continuidade das atividades do Programa em face de sua relevância e impacto social.",
+   "count": 1
+  },
+  {
+   "source": "banco mercantil do brasil",
+   "target": "mercantil financeira credito financiamento e investimento",
+   "type": "CONTROLA",
+   "evidence": "seu Conselho de Administração aprovou a realização de uma oferta pública para aquisição de ações ordinárias e preferenciais de emissão de sua controlada, a **MERCANTIL FINANCEIRA S.A.**",
+   "count": 3
+  },
+  {
+   "source": "companhia",
+   "target": "b3 brasil bolsa balcao",
+   "type": "LOCALIZADA_EM",
+   "evidence": "na CVM e, consequentemente, a sua saída do segmento básico de listagem da B3 S.A. – Brasil, Bolsa, Balcão",
+   "count": 1
+  },
+  {
+   "source": "companhia",
+   "target": "comissao de valores mobiliarios",
+   "type": "RELACIONADA_A",
+   "evidence": "na CVM",
+   "count": 1
+  },
+  {
+   "source": "companhia",
+   "target": "mercantil financeira",
+   "type": "CONTROLA",
+   "evidence": "a Companhia é titular de 23.630.703 ações ordinárias de emissão da Mercantil Financeira, equivalentes a aproximadamente 98,13% do total de suas ações ordinárias, e de 15.440.166 ações preferenciais da Mercantil Financeira, equivalentes a aproximadamente 91,28% do total de suas ações preferenciais, representando, em conjunto, 39.070.869 ações, equivalente a aproximadamente 95,30% do total de ações de emissão da Mercantil Financeira.",
+   "count": 1
+  },
+  {
+   "source": "banco mercantil do brasil",
+   "target": "mercantil financeira",
+   "type": "ADQUIRIU",
+   "evidence": "A OPA será destinada à aquisição de até a totalidade das ações ordinárias e preferenciais de emissão da Mercantil Financeira, com exceção de...",
+   "count": 1
+  },
+  {
+   "source": "banco mercantil brasil",
+   "target": "comissao de valores mobiliarios",
+   "type": "PARTICIPOU_DE",
+   "evidence": "o qual terá a minuta preliminar disponibilizada no site da CVM",
+   "count": 4
+  },
+  {
+   "source": "banco mercantil brasil",
+   "target": "b3",
+   "type": "PARTICIPOU_DE",
+   "evidence": "nas páginas eletrônicas da B3",
+   "count": 2
+  },
+  {
+   "source": "banco mercantil brasil",
+   "target": "mercantil financeira",
+   "type": "ADQUIRIU",
+   "evidence": "ações (inclusive para manter em tesouraria) e/ou alterações no número de ações ordinárias ou preferenciais de emissão da Mercantil Financeira",
+   "count": 1
+  },
+  {
+   "source": "banco mercantil brasil",
+   "target": "mercantil financeira",
+   "type": "CONTROLA",
+   "evidence": "As of today, Company holds 23,630,703 common shares issued by Mercantil Financeira, equivalent to approximately 98.13% of its total common shares, and 15,440,166 preferred shares of Mercantil Financeira, equivalent to approximately 91.28% of its total preferred shares, representing, together, 39,070,869 shares, equivalent to approximately 95.30% of the total shares issued by Mercantil Financeira.",
+   "count": 1
+  },
+  {
+   "source": "comissao de valores mobiliarios",
+   "target": "b3 brasil bolsa balcao",
+   "type": "CONTROLA",
+   "evidence": "Aprovação de Oferta Pública de Aquisição de Ações de companhia controlada",
+   "count": 1
+  },
+  {
+   "source": "banco mercantil do brasil",
+   "target": "mercantil financeira",
+   "type": "CONTROLA",
+   "evidence": "except for those shares issued by it that are: (i) owned by Company and persons related to it; (ii) owned by its managers; and (iiii) held in treasury (“Outstanding Shares”)",
+   "count": 1
+  },
+  {
+   "source": "comissao de valores mobiliarios",
+   "target": "banco mercantil do brasil",
+   "type": "PARTICIPOU_DE",
+   "evidence": "the notice (edital) of the public tender offer to be filed with the CVM in due course",
+   "count": 1
+  },
+  {
+   "source": "b3 clearing and settlement house",
+   "target": "banco mercantil do brasil",
+   "type": "LOCALIZADA_EM",
+   "evidence": "in accordance with the procedures set forth in the rules of the B3 Clearing and Settlement House (“B3 Clearing House”) ",
+   "count": 1
+  },
+  {
+   "source": "banco mercantil brasil",
+   "target": "grant thorton coporate consultores de negocios",
+   "type": "PARTICIPOU_DE",
+   "evidence": "The appraisal report, prepared by Grant Thorton Coporate Consultores de Negócios Ltda.,",
+   "count": 1
+  },
+  {
+   "source": "banco mercantil brasil",
+   "target": "paulino ramos rodrigues",
+   "type": "TRABALHA_EM",
+   "evidence": "Chief Financial and Investor Relations Officer",
+   "count": 1
+  },
+  {
+   "source": "banco mercantil brasil",
+   "target": "mercantil financeira credito financiamento e investimento",
+   "type": "CONTROLA",
+   "evidence": "for the acquisition of common and preferred shares issued by its subsidiary, Mercantil Financeira S.A. CRÉDITO, FINANCIAMENTO E INVESTIMENTO",
+   "count": 1
+  },
+  {
+   "source": "banco mercantil brasil",
+   "target": "b3 brasil bolsa balcao",
+   "type": "PARTICIPOU_DE",
+   "evidence": "delisting from the basic listing segment of the Brazilian Stock Exchange (B3 S.A. – Brasil, Bolsa, Balcão)",
+   "count": 1
+  },
+  {
+   "source": "banco santander brasil",
+   "target": "return capital gestao de ativos e participacoes",
+   "type": "CONTROLA",
+   "evidence": "incorporação pela Companhia, da parcela cindida da Return Capital Gestão de Ativos e Participações S.A. (“Return”), sua subsidiária integral",
+   "count": 1
+  },
+  {
+   "source": "banco santander brasil",
+   "target": "santander leasing arrendamento mercantil",
+   "type": "CONTROLA",
+   "evidence": "incorporação pela Companhia, da Santander Leasing S.A. Arrendamento Mercantil (“Santander Leasing”), sua subsidiária integral",
+   "count": 2
+  },
+  {
+   "source": "banco santander brasil",
+   "target": "return",
+   "type": "PARTICIPOU_DE",
+   "evidence": "A Companhia descreve os principais termos e condições das operações a seguir:",
+   "count": 1
+  },
+  {
+   "source": "banco santander brasil",
+   "target": "return capital gestao de ativos e participacoes",
+   "type": "ADQUIRIU",
+   "evidence": "A operação está sendo proposta com o objetivo de centralizar certas atividades desenvolvidas pela Return, otimizar a estrutura de capital do Grupo Santander, bem como a simplificação da estrutura societária, com a consequente redução de custos administrativos, especialmente aqueles relacionados às obrigações legais e contábeis.",
+   "count": 1
+  },
+  {
+   "source": "companhia",
+   "target": "return capital gestao de ativos e participacoes s",
+   "type": "CONTROLA",
+   "evidence": "Considerando que a Return é uma subsidiária integral da Companhia",
+   "count": 1
+  },
+  {
+   "source": "companhia",
+   "target": "santander leasing",
+   "type": "CONTROLA",
+   "evidence": "A realização da Incorporação da Santander Leasing S.A. Arrendamento Mercantil||Incorporação de parcela Cindida da Return Capital Gestão de Ativos e Participações S.",
+   "count": 3
+  },
+  {
+   "source": "banco santander brasil",
+   "target": "santander leasing",
+   "type": "CONTROLA",
+   "evidence": "Conforme indicado no item 2.2. acima, a operação trará benefícios de ordem administrativa, econômica e financeira às partes, em especial, a integração de processos administrativos, operacionais e tecnológicos, promovendo ganhos de escala e eficiência na gestão de recursos e atividades. Estima-se que os custos e despesas totais para realização e efetivação da Incorporação da Santander Leasing, estão concentrados em despesas de honorários de auditores e de outros profissionais contratados pela Com",
+   "count": 1
+  },
+  {
+   "source": "brava energia",
+   "target": "petroreconcavo",
+   "type": "FORNECE_PARA",
+   "evidence": "A BRAVA ENERGIA S.A. assinou, em 24 de fevereiro de 2025, aditivos aos contratos para compra do petróleo cru produzido pela PetroReconcavo S.A. na Bacia Potiguar.",
+   "count": 4
+  },
+  {
+   "source": "brava energia",
+   "target": "petroreconcavo",
+   "type": "ADQUIRIU",
+   "evidence": "A BRAVA ENERGIA S.A. (“BRAVA” ou “Companhia”) (B3: BRAV3) , nos termos da Resolução CVM Nº 44, comunica aos seus investidores e ao mercado em geral que assinou, nesta data, Contrato de Compra e Venda de Ativos (“Contrato”) junto à PETRORECONCAVO S.A. (“PetroReconcavo”).",
+   "count": 3
+  },
+  {
+   "source": "brava energia",
+   "target": "rio grande do norte",
+   "type": "LOCALIZADA_EM",
+   "evidence": "ativos que compõem a infraestrutura de escoamento e processamento de gás natural localizada no Ativo Industrial de Guamaré, na Bacia Potiguar, no estado do Rio Grande do Norte.",
+   "count": 4
+  },
+  {
+   "source": "brava energia",
+   "target": "bacia potiguar",
+   "type": "LOCALIZADA_EM",
+   "evidence": "ativos que compõem a infraestrutura de escoamento e processamento de gás natural localizada no Ativo Industrial de Guamaré, na Bacia Potiguar, no estado do Rio Grande do Norte.",
+   "count": 2
+  },
+  {
+   "source": "brava energia",
+   "target": "rio grande do norte",
+   "type": "ATUA_EM",
+   "evidence": "BRAVA ENERGIA S.A. (“BRAVA” or the “Company”) (B3: BRAV3) , pursuant to CVM Resolution No. 44, hereby informs its investors and the market in general that, on this date, it has entered into an Asset Purchase and Sale Agreement (the “Agreement”) with PETRORECONCAVO S.A. (“PetroReconcavo”), regarding the sale of 50% of (i) the Natural Gas Processing Units II and III, the Livramento/Guamaré gas pipeline and (iii) the Liquefied Natural Gas (LNG) storage spheres, which together comprise the natural g",
+   "count": 1
+  },
+  {
+   "source": "brava energia",
+   "target": "potiguar basin",
+   "type": "ATUA_EM",
+   "evidence": "BRAVA ENERGIA S.A. (“BRAVA” or the “Company”) (B3: BRAV3) , pursuant to CVM Resolution No. 44, hereby informs its investors and the market in general that, on this date, it has entered into an Asset Purchase and Sale Agreement (the “Agreement”) with PETRORECONCAVO S.A. (“PetroReconcavo”), regarding the sale of 50% of (i) the Natural Gas Processing Units II and III, the Livramento/Guamaré gas pipeline and (iii) the Liquefied Natural Gas (LNG) storage spheres, which together comprise the natural g",
+   "count": 1
+  },
+  {
+   "source": "brava energia",
+   "target": "azevedo e travassos petroleo",
+   "type": "ADQUIRIU",
+   "evidence": "A BRAVA ENERGIA S.A. (“BRAVA” ou “Companhia”) (B3: BRAV3) , nos termos da Resolução CVM Nº 44, em sequência ao Comunicado ao Mercado divulgado em 17 de dezembro de 2024, comunica aos seus investidores e ao mercado em geral que assinou, em 07 de fevereiro de 2025, junto ao consórcio formado por Azevedo e Travassos Petróleo S. A. (“A&T”) e Petro-Victory Energy Corp. (“PVE”), contrato para venda de 11 concessões de óleo e gás onshore localizadas na Bacia Potiguar, no estado do Rio Grande do Norte.",
+   "count": 2
+  },
+  {
+   "source": "brava energia",
+   "target": "petro victory energy",
+   "type": "ADQUIRIU",
+   "evidence": "A BRAVA ENERGIA S.A. (“BRAVA” ou “Companhia”) (B3: BRAV3) , nos termos da Resolução CVM Nº 44, em sequência ao Comunicado ao Mercado divulgado em 17 de dezembro de 2024, comunica aos seus investidores e ao mercado em geral que assinou, em 07 de fevereiro de 2025, junto ao consórcio formado por Azevedo e Travassos Petróleo S. A. (“A&T”) e Petro-Victory Energy Corp. (“PVE”), contrato para venda de 11 concessões de óleo e gás onshore localizadas na Bacia Potiguar, no estado do Rio Grande do Norte.",
+   "count": 2
+  },
+  {
+   "source": "brava energia",
+   "target": "potiguar basin",
+   "type": "LOCALIZADA_EM",
+   "evidence": "11 onshore oil and gas concessions located in the state of Rio Grande do Norte.",
+   "count": 1
+  },
+  {
+   "source": "brf",
+   "target": "marfrig global foods",
+   "type": "ADQUIRIU",
+   "evidence": "a operação de incorporação de ações de emissão da BRF pela Marfrig Global Foods S.A.",
+   "count": 1
+  },
+  {
+   "source": "marfrig global foods",
+   "target": "brf",
+   "type": "ADQUIRIU",
+   "evidence": "the merger of BRF shares by Marfrig Global Foods S.A. (“Marfrig”)",
+   "count": 1
+  },
+  {
+   "source": "companhia brasileira de distribuicao",
+   "target": "gpa malls properties gestao de ativos e servicos imobiliarios",
+   "type": "ADQUIRIU",
+   "evidence": "A Companhia Brasileira de Distribuição (“GPA” ou “Companhia”) vem informar aos seus acionistas e ao mercado em geral que seu Conselho de Administração, em reunião realizada nesta data, aprovou os termos do “Protocolo e Justificação de Incorporação da GPA Malls & Properties Gestão de Ativos e Serviços Imobiliários Ltda. pela Companhia Brasileira de Distribuição” (“Protocolo”), celebrado pelas administrações do GPA e da GPA Malls & Properties Gestão de Ativos e Serviços Imobiliários Ltda. (“GPA Ma",
+   "count": 1
+  },
+  {
+   "source": "companhia brasileira de distribuicao",
+   "target": "gpa",
+   "type": "ADQUIRIU",
+   "evidence": "A Companhia Brasileira de Distribuição (''GPA'' or the ''Company'') informs its shareholders and the market in general that its Board of Directors, at a meeting held on this date, approved the terms of the ''Merger Protocol with Justification of GPA Malls & Properties Gestão de Ativos e Serviços Imobiliários Ltda. by Companhia Brasileira de Distribuição'' (the ''Protocol''), entered into by the management members of GPA and GPA Malls & Properties Gestão de Ativos e Serviços Imobiliários Ltda. (“",
+   "count": 1
+  },
+  {
+   "source": "gpa",
+   "target": "companhia brasileira de distribuicao",
+   "type": "CONTROLA",
+   "evidence": "GPA Malls, whose capital stock is wholly owned by GPA",
+   "count": 1
+  },
+  {
+   "source": "gpa",
+   "target": "gpa malls",
+   "type": "CONTROLA",
+   "evidence": "GPA Malls, whose capital stock is wholly owned by GPA",
+   "count": 1
+  },
+  {
+   "source": "gpa malls",
+   "target": "place 2b servicos imobiliarios",
+   "type": "CONTROLA",
+   "evidence": "currently has as its only remaining activity the holding of the direct equity interest in the investee company Place 2B Serviços Imobiliários Ltda.",
+   "count": 1
+  },
+  {
+   "source": "gpa",
+   "target": "fic",
+   "type": "ADQUIRIU",
+   "evidence": "A Companhia Brasileira de Distribuição (“GPA” ou “Companhia”), em cumprimento ao disposto na Resolução CVM 44, vem informar aos seus acionistas e ao mercado em geral que, em 05 de dezembro de 2025, foi celebrado o Contrato de Compra e Venda de Ações e Outras Avenças tendo por objeto a alienação das participações detidas, direta ou indiretamente, por GPA e demais acionistas, no capital social da Financeira Itaú CBD S.A. – Crédito, Financiamento e Investimento (“FIC”) para o Itaú Unibanco Holding ",
+   "count": 1
+  },
+  {
+   "source": "itau",
+   "target": "fic",
+   "type": "CONTROLA",
+   "evidence": "A Companhia Brasileira de Distribuição (“GPA” ou “Companhia”), em cumprimento ao disposto na Resolução CVM 44, vem informar aos seus acionistas e ao mercado em geral que, em 05 de dezembro de 2025, foi celebrado o Contrato de Compra e Venda de Ações e Outras Avenças tendo por objeto a alienação das participações detidas, direta ou indiretamente, por GPA e demais acionistas, no capital social da Financeira Itaú CBD S.A. – Crédito, Financiamento e Investimento (“FIC”) para o Itaú Unibanco Holding ",
+   "count": 1
+  },
+  {
+   "source": "companhia brasileira de distribuicao",
+   "target": "gpa",
+   "type": "LOCALIZADA_EM",
+   "evidence": "COMPANHIA BRASILEIRA DE DISTRIBUIÇÃO\\n\\nPublicly Held Company with Authorized Capital CNPJ/MF Nº 47.508.411/0001-56 NIRE: 35.300.089.901",
+   "count": 1
+  },
+  {
+   "source": "gpa",
+   "target": "financeira itau cbd credito financiamento e investimento",
+   "type": "CONTROLA",
+   "evidence": "Companhia Brasileira de Distribuição (“Company” or “GPA”), pursuant to CVM Resolution No. 44/21, hereby informs its shareholders and the market in general that, on December 5<sup>th</sup>, 2025, the Agreement of Share Purchase and Sale and Other Provisions was executed, which sets forth the sale of the shareholding held, directly and indirectly, by GPA and other shareholders, in the share capital of Financeira Itaú CBD S.A. – Crédito, Financiamento e Investimento (“FIC”) to Itaú Unibanco S.A. (“",
+   "count": 1
+  },
+  {
+   "source": "financeira itau cbd credito financiamento e investimento",
+   "target": "itau unibanco",
+   "type": "ADQUIRIU",
+   "evidence": "Companhia Brasileira de Distribuição (“Company” or “GPA”), pursuant to CVM Resolution No. 44/21, hereby informs its shareholders and the market in general that, on December 5<sup>th</sup>, 2025, the Agreement of Share Purchase and Sale and Other Provisions was executed, which sets forth the sale of the shareholding held, directly and indirectly, by GPA and other shareholders, in the share capital of Financeira Itaú CBD S.A. – Crédito, Financiamento e Investimento (“FIC”) to Itaú Unibanco S.A. (“",
+   "count": 1
+  },
+  {
+   "source": "gpa",
+   "target": "financeira itau cbd credito financiamento e investimento fic",
+   "type": "ADQUIRIU",
+   "evidence": "by GPA and other shareholders, in the share capital of Financeira Itaú CBD S.A. – Crédito, Financiamento e Investimento (“FIC”) to Itaú Unibanco S.A. (“Itaú”) (“FIC Transaction”).",
+   "count": 1
+  },
+  {
+   "source": "itau unibanco itau",
+   "target": "financeira itau cbd credito financiamento e investimento fic",
+   "type": "CONTROLA",
+   "evidence": "by GPA and other shareholders, in the share capital of Financeira Itaú CBD S.A. – Crédito, Financiamento e Investimento (“FIC”) to Itaú Unibanco S.A. (“Itaú”) (“FIC Transaction”).",
+   "count": 1
+  },
+  {
+   "source": "copel geracao e transmissao",
+   "target": "neoenergia",
+   "type": "ADQUIRIU",
+   "evidence": "a Copel GeT, da totalidade das ações do capital social da Geração Céu Azul S.A., detentora de uma participação de 70% no Consórcio Empreendedor Baixo Iguaçu (“CEBI”), pelo valor de R$ 1.050 milhões, ajustado desde a data base de junho de 2024",
+   "count": 2
+  },
+  {
+   "source": "energo pro participacoes",
+   "target": "dk holding investments s r o",
+   "type": "CONTROLA",
+   "evidence": "ENERGO-PRO PARTICIPAÇÕES S.A. (“CCVA 2” e “Compradora”, respectivamente), sucessora da DK Holding Investments, S.R.O.",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "copel",
+   "type": "ADQUIRIU",
+   "evidence": "Conclusão da Aquisição da Participação da Neoenergia S.A.",
+   "count": 1
+  },
+  {
+   "source": "e k n embalagens kraft do nordeste",
+   "target": "conpel companhia nordestina de papel",
+   "type": "ADQUIRIU",
+   "evidence": "a incorporação de ações de emissão da Companhia pela E. K. N. EMBALAGENS KRAFT DO NORDESTE S.A.",
+   "count": 1
+  },
+  {
+   "source": "conpel nordestina de papel",
+   "target": "companhia",
+   "type": "PARTICIPOU_DE",
+   "evidence": "O reembolso do valor das ações somente será assegurado em relação às ações de que o Acionista Elegível seja ininterrupta e comprovadamente titular desde a data da primeira publicação do edital de convocação da assembleia até a data do exercício do Direito de Retirada, sendo certo que as ações adquiridas após essa data não conferirão a seus titulares o Direito de Retirada, nos termos do §1º do art. 137 da Lei das Sociedades por Ações.",
+   "count": 1
+  },
+  {
+   "source": "e k n embalagens kraft do nordeste",
+   "target": "conpel nordestina de papel em recuperacao judicial",
+   "type": "ADQUIRIU",
+   "evidence": "celebraram na presente data o “Protocolo e Justificação de Incorporação das Ações da CONPEL - Cia. Nordestina de Papel – Em Recuperação Judicial pela E.K.N. Embalagens Kraft do Nordeste S.A.”",
+   "count": 1
+  },
+  {
+   "source": "conpel nordestina de papel em recuperacao judicial",
+   "target": "ekn",
+   "type": "CONTROLA",
+   "evidence": "Em decorrência da Incorporação de Ações, a Conpel se tornará uma subsidiária integral da EKN",
+   "count": 1
+  },
+  {
+   "source": "ekn",
+   "target": "conpel",
+   "type": "CONTROLA",
+   "evidence": "A EKN, na qualidade de controladora da Conpel, é uma sociedade cujo objeto social é a fabricação de embalagens de papel e possui como único ativo a propriedade de ações de emissão da Conpel.",
+   "count": 1
+  },
+  {
+   "source": "conpel",
+   "target": "ekn",
+   "type": "PARTICIPOU_DE",
+   "evidence": "Nos termos do Protocolo de Incorporação e tendo em vista que as ações da Conpel representam 100,00% (cem por cento) do ativo da EKN",
+   "count": 2
+  },
+  {
+   "source": "uhy bendoraytes auditores independentes",
+   "target": "conpel",
+   "type": "PARTICIPOU_DE",
+   "evidence": "foi escolhida a empresa especializada UHY Bendoraytes & Cia Auditores Independentes, inscrita no CNPJ sob o n.º 42.170.852/0001-77, com sede na Cidade do Rio de Janeiro, Estado do Rio de Janeiro, na Avenida João Cabral de Mello Neto, 850, bloco 3, sala 1301 a 1305, CEP 22.775-057 (“Empresa Avaliadora”), para proceder à avaliação das ações de emissão da Conpel.",
+   "count": 1
+  },
+  {
+   "source": "copel geracao e transmissao",
+   "target": "copel",
+   "type": "CONTROLA",
+   "evidence": "",
+   "count": 1
+  },
+  {
+   "source": "copel geracao e transmissao",
+   "target": "geracao ceu azul",
+   "type": "ADQUIRIU",
+   "evidence": "",
+   "count": 1
+  },
+  {
+   "source": "copel geracao e transmissao",
+   "target": "energo pro participacoes",
+   "type": "ADQUIRIU",
+   "evidence": "",
+   "count": 1
+  },
+  {
+   "source": "csn mineracao",
+   "target": "mrs logistica",
+   "type": "ADQUIRIU",
+   "evidence": "A CSN Mineração S.A. (\\\"Companhia\\\" ou \\\"CMIN\\\") (B3: CMIN3), em continuidade ao Comunicado ao Mercado divulgado em 18 de novembro de 2025 e ao Fato Relevante divulgado em 18 de dezembro de 2025, comunica aos seus acionistas e ao mercado em geral que, nesta data, foi concluída a aquisição adicional, pela Companhia, de 6.759.540 ações preferenciais classe B de emissão da concessionária de serviço de transporte ferroviário MRS Logística S.A. (\\\"MRS\\\") de titularidade da Companhia Siderúrgica Nacional (\\\"",
+   "count": 4
+  },
+  {
+   "source": "compahia siderurgica nacional",
+   "target": "mrs logistica",
+   "type": "ADQUIRIU",
+   "evidence": "Compahia Siderúrgica Nacional (“CSN”), representing 2% of the capital stock of MRS",
+   "count": 1
+  },
+  {
+   "source": "cmin",
+   "target": "mrs logistica",
+   "type": "ADQUIRIU",
+   "evidence": "CMIN became holder of 26,777,723 common shares, representing 14.30% of MRS's voting capital stock, as well as 74,301,916 preferred shares, representing 49.28% of all preferred shares issued by MRS.",
+   "count": 1
+  },
+  {
+   "source": "mbr investimentos",
+   "target": "gelprime industria e comercio de produtos alimenticios",
+   "type": "ADQUIRIU",
+   "evidence": "ocorreu o fechamento da operação de aquisição, pela MBR Investimentos Ltda. (“MBR”), subsidiária integral da BRF, de participação equivalente a 50% (cinquenta por cento) do capital social da Gelprime Indústria e Comércio de Produtos Alimentícios S.A. (“Gelprime” e “Aquisição”, respectivamente).",
+   "count": 2
+  },
+  {
+   "source": "marfrig global foods",
+   "target": "mbrf",
+   "type": "ADQUIRIU",
+   "evidence": "Aquisição da Gelprime pela MBR",
+   "count": 1
+  },
+  {
+   "source": "gelprime",
+   "target": "marfrig global foods",
+   "type": "FORNECE_PARA",
+   "evidence": "A Gelprime, criada em 2019, com fábrica em Ibiporã-PR, é uma sociedade que produz, comercializa e distribui gelatina e colágeno através do processamento de matéria prima de origem animal, contando com uma rede de fornecedores próprios e certificados de matérias-primas, assegurando a procedência, rastreabilidade e disponibilidade de entrega aos seus clientes.",
+   "count": 1
+  },
+  {
+   "source": "mbr",
+   "target": "gelprime",
+   "type": "ADQUIRIU",
+   "evidence": "The remaining balance will be paid on November 1, 2025. The total amount of the Acquisition may still be subject to adjustments, upwards or downwards, depending on Gelprime’s working capital and net debt.",
+   "count": 1
+  },
+  {
+   "source": "marfrig global foods",
+   "target": "mfg agropecuaria",
+   "type": "ADQUIRIU",
+   "evidence": "concluiu a aquisição de determinadas unidades de confinamento de gado e produção agrícola, parte delas anteriormente pertencentes à própria Companhia, atualmente operacionalizadas pela sociedade MFG Agropecuária Ltda.",
+   "count": 2
+  },
+  {
+   "source": "csn mineracao",
+   "target": "mrs",
+   "type": "CONTROLA",
+   "evidence": "a CSN é controladora da CMIN, ambas já são acionistas da Companhia",
+   "count": 1
+  },
+  {
+   "source": "csn",
+   "target": "mrs",
+   "type": "CONTROLA",
+   "evidence": "a CSN é controladora da CMIN, ambas já são acionistas da Companhia",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "copel geracao e transmissao",
+   "type": "ADQUIRIU",
+   "evidence": "Neoenergia e a Copel Geração e Transmissão S.A. cumpriram todas as suas condições precedentes e, nesta data, concluíram a operação, mediante alienação pela Companhia da totalidade das ações do capital social da Geração Céu Azul S.A., detentora de uma participação de 70% no Consórcio Empreendedor Baixo Iguaçu (“CEBI”), pelo valor de R$ 1.050.376.245,00 (um bilhão, cinquenta milhões, trezentos e setenta e seis mil, duzentos e quarenta e cinco reais), não detendo mais, assim, a partir desta data, q",
+   "count": 2
+  },
+  {
+   "source": "porto servico",
+   "target": "porto assistencia participacoes",
+   "type": "FORNECE_PARA",
+   "evidence": "This pertains to the merger, by the Company, of CDF Assistência e Suporte Digital S.A., a company enrolled with the CNPJ under No. 08.769.874/0001-10 (",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "geracao ceu azul",
+   "type": "ADQUIRIU",
+   "evidence": "Neoenergia e a Copel Geração e Transmissão S.A. cumpriram todas as suas condições precedentes e, nesta data, concluíram a operação, mediante alienação pela Companhia da totalidade das ações do capital social da Geração Céu Azul S.A., detentora de uma participação de 70% no Consórcio Empreendedor Baixo Iguaçu (“CEBI”), pelo valor de R$ 1.050.376.245,00 (um bilhão, cinquenta milhões, trezentos e setenta e seis mil, duzentos e quarenta e cinco reais), não detendo mais, assim, a partir desta data, q",
+   "count": 4
+  },
+  {
+   "source": "neoenergia",
+   "target": "consorcio empreendedor baixo iguacu",
+   "type": "ADQUIRIU",
+   "evidence": "Neoenergia e a Copel Geração e Transmissão S.A. cumpriram todas as suas condições precedentes e, nesta data, concluíram a operação, mediante alienação pela Companhia da totalidade das ações do capital social da Geração Céu Azul S.A., detentora de uma participação de 70% no Consórcio Empreendedor Baixo Iguaçu (“CEBI”), pelo valor de R$ 1.050.376.245,00 (um bilhão, cinquenta milhões, trezentos e setenta e seis mil, duzentos e quarenta e cinco reais), não detendo mais, assim, a partir desta data, q",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "consorcio empreendedor baixo iguacu cebi",
+   "type": "ADQUIRIU",
+   "evidence": "Neoenergia and Copel Geração e Transmissão S.A. complied with all the conditions precedent and today concluded the transaction, through the sale of all the shares of the capital stock of Geração Céu Azul S.A., holder of a 70% stake in the Consórcio Empreendedor Baixo Iguaçu (“CEBI”), for the amount of R$ 1,050,376,245.00 (one billion, fifty million, three hundred and seventy-six thousand, two hundred and forty-five reais ), thus no longer holding any stake in CEBI.",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "rio de janeiro",
+   "type": "LOCALIZADA_EM",
+   "evidence": "Rio de Janeiro, June 30, 2025",
+   "count": 4
+  },
+  {
+   "source": "neoenergia",
+   "target": "neoenergia transmissao",
+   "type": "ADQUIRIU",
+   "evidence": "Neoenergia S.A. nos termos do disposto na Lei nº. 6.404, de 15 de dezembro de 1976, conforme alterada, e na Resolução da Comissão de Valores Mobiliários nº 44, de 23 de agosto de 2021, em referência ao Fato Relevante publicado no dia 22 de abril de 2025, informa aos seus acionistas e ao mercado em geral que, nesta data foi concluída alienação de 50% das novas ações emitidas pela Neoenergia Transmissão S.A. em razão do aporte pela Companhia na Neoenergia Transmissão da totalidade de sua participa",
+   "count": 1
+  },
+  {
+   "source": "unique power fundo de investimento em participacoes multiestrategia responsabilidade limitada",
+   "target": "warrington investment pte ltd",
+   "type": "CONTROLA",
+   "evidence": "Unique Power Fundo de Investimento em Participações Multiestratégia Responsabilidade Limitada (Unique Power), fundo de investimentos integralmente detido pela Warrington Investment Pte. Ltd. (Warrington)",
+   "count": 2
+  },
+  {
+   "source": "neoenergia",
+   "target": "lt itabapoana",
+   "type": "ADQUIRIU",
+   "evidence": "A Transação, que faz parte da estratégia de rotação de ativos da Neoenergia, reafirma o compromisso com nossos acionistas, com a otimização da estrutura de capital e geração de valor.",
+   "count": 1
+  },
+  {
+   "source": "warrington",
+   "target": "lt itabapoana",
+   "type": "ADQUIRIU",
+   "evidence": "resultando, até o momento, na aquisição pela Warrington de 50% de 9 lotes de Transmissão já construídos pela Neoenergia.",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "neoenergia transmissao",
+   "type": "CONTROLA",
+   "evidence": "due to the contribution by the Company of its entire stake in Itabapoana to Neoenergia Transmissão",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "itabapoana",
+   "type": "CONTROLA",
+   "evidence": "due to the contribution by the Company of its entire stake in Itabapoana to Neoenergia Transmissão",
+   "count": 1
+  },
+  {
+   "source": "warrington",
+   "target": "itabapoana",
+   "type": "ADQUIRIU",
+   "evidence": "Warrington’s acquisition of 50% of 9 transmission assets already built by Neoenergia.",
+   "count": 1
+  },
+  {
+   "source": "conselho de administracao",
+   "target": "neoenergia",
+   "type": "PARTICIPOU_DE",
+   "evidence": "o Conselho de Administração da Companhia aprovou no dia 17 de fevereiro de 2025 a aquisição complementar de 248.397 ações (duzentas e quarenta e oito mil, trezentas e noventa e sete ações) de emissão da Companhia",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "comissao de valores mobiliarios",
+   "type": "RELACIONADA_A",
+   "evidence": "informa aos seus acionistas e ao mercado em geral que o Conselho de Administração da Companhia aprovou no dia 17 de fevereiro de 2025 a aquisição complementar de 248.397 ações (duzentas e quarenta e oito mil, trezentas e noventa e sete ações) de emissão da Companhia para fins de atendimento de obrigações de entrega de ações a executivos, assumidas no âmbito de seu Programa de Incentivo de Longo Prazo, aprovado na Assembleia Geral Extraordinária realizada em 20 de abril de 2020.",
+   "count": 1
+  },
+  {
+   "source": "leonardo pimenta gadelha",
+   "target": "neoenergia",
+   "type": "TRABALHA_EM",
+   "evidence": "Leonardo Pimenta Gadelha\\nDiretor Executivo de Finanças e de Relações com Investidores",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "comissao de valores mobiliarios",
+   "type": "PARTICIPOU_DE",
+   "evidence": "in compliance with Federal Law No. 6,404, of December 15th, 1976, as amended, and CVM Resolution No. 44, of August 23rd, 2021",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "edf brasil holding",
+   "type": "ADQUIRIU",
+   "evidence": "a Companhia, a EDF Brasil Holding S.A. (“EDF”) e STOA S.A. (“STOA”) celebraram, nesta data, o Contrato de Compra e Venda de Ações e outras Avenças (“Contrato de Compra e Venda”)",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "stoa",
+   "type": "ADQUIRIU",
+   "evidence": "a Companhia, a EDF Brasil Holding S.A. (“EDF”) e STOA S.A. (“STOA”) celebraram, nesta data, o Contrato de Compra e Venda de Ações e outras Avenças (“Contrato de Compra e Venda”)",
+   "count": 1
+  },
+  {
+   "source": "geracao ceu azul",
+   "target": "consorcio empreendedor baixo iguacu",
+   "type": "CONTROLA",
+   "evidence": "que, por sua vez, detém uma participação de 70% (setenta por cento) no Consórcio Empreendedor Baixo Iguaçu (“CEBI”).",
+   "count": 1
+  },
+  {
+   "source": "consorcio empreendedor baixo iguacu",
+   "target": "usina hidreletrica baixo iguacu",
+   "type": "CONTROLA",
+   "evidence": "O CEBI opera a Usina Hidrelétrica Baixo Iguaçu, situada no Paraná, com capacidade instalada de 350 MW e 172 MWm de garantia física (245 MW e 120 MWm para 70%, respectivamente).",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "parana",
+   "type": "LOCALIZADA_EM",
+   "evidence": "situada no Paraná",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "conselho administrativo de defesa economica cade",
+   "type": "PARTICIPOU_DE",
+   "evidence": "A conclusão da operação está sujeita a determinadas condições precedentes usuais a este tipo de transação, incluindo a aprovação pelo Conselho Administrativo de Defesa Econômica (CADE)",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "agencia nacional de energia eletrica aneel",
+   "type": "PARTICIPOU_DE",
+   "evidence": "A conclusão da operação está sujeita a determinadas condições precedentes usuais a este tipo de transação, incluindo a aprovação pelo Conselho Administrativo de Defesa Econômica (CADE), autoridades de defesa concorrencial com jurisdição sobre as partes, pela Agência Nacional de Energia Elétrica (“Aneel”) e pelos agentes financiadores da GCA.",
+   "count": 1
+  },
+  {
+   "source": "neoenergia",
+   "target": "copel geracao e transmissao",
+   "type": "PARTICIPOU_DE",
+   "evidence": "A operação também está sujeita ao eventual exercício do direito de preferência por parte da Copel Geração e Transmissão S.A., que detém a participação remanescente no CEBI.",
+   "count": 1
+  },
+  {
+   "source": "geracao ceu azul gca",
+   "target": "consorcio empreendedor baixo iguacu cebi",
+   "type": "CONTROLA",
+   "evidence": "which holds a 70% (seventy percent) stake in the Consórcio Empreendedor Baixo Iguaçu (",
+   "count": 1
+  },
+  {
+   "source": "consorcio empreendedor baixo iguacu cebi",
+   "target": "baixo iguacu hydroelectric power plant",
+   "type": "PRODUZ",
+   "evidence": "CEBI operates the Baixo Iguaçu Hydroelectric Power Plant, located in Paraná, with an installed capacity of 350 MW and 172 MWm of assured energy (245 MW and 120 MWm for 70%, respectively).",
+   "count": 1
+  },
+  {
+   "source": "parana",
+   "target": "baixo iguacu hydroelectric power plant",
+   "type": "LOCALIZADA_EM",
+   "evidence": "CEBI operates the Baixo Iguaçu Hydroelectric Power Plant, located in Paraná, with an installed capacity of 350 MW and 172 MWm of assured energy (245 MW and 120 MWm for 70%, respectively).",
+   "count": 1
+  },
+  {
+   "source": "copel geracao e transmissao",
+   "target": "consorcio empreendedor baixo iguacu cebi",
+   "type": "CONCORRE_COM",
+   "evidence": "the transaction is also subject to the potential exercise of the right of first refusal by Copel Geração e Transmissão S.A., which holds the remaining stake in CEBI.",
+   "count": 1
+  },
+  {
+   "source": "petroreconcavo",
+   "target": "brava energia",
+   "type": "ADQUIRIU",
+   "evidence": "a PetroReconcavo S.A. ou “Companhia”, em atendimento às disposições da Resolução da Comissão de Valores Mobiliários - CVM - nº 44, de 23 de agosto de 2021, vem informar que assinou, nesta data, um Contrato de Compra e Venda com a 3R Potiguar S.A., subsidiária da Brava Energia S.A. (“Brava”), referente à aquisição pela Companhia de 50% de ativos de _midstream_ de gás natural localizados no Estado do Rio Grande do Norte.",
+   "count": 5
+  },
+  {
+   "source": "brava energia",
+   "target": "3r potiguar",
+   "type": "CONTROLA",
+   "evidence": "a 3R Potiguar S.A., subsidiária da Brava Energia S.A. (“Brava”)",
+   "count": 3
+  },
+  {
+   "source": "petroreconcavo",
+   "target": "rio grande do norte",
+   "type": "ATUA_EM",
+   "evidence": "PETRORECÔNCAVO S.A. - Aquisição de Participação em Ativos de Midstream de Gás Natural da Brava Energia no Rio Grande no Norte",
+   "count": 3
+  },
+  {
+   "source": "petroreconcavo",
+   "target": "brava energia",
+   "type": "FORNECE_PARA",
+   "evidence": "The parties signed a natural gas purchase and sale agreement in which PetroReconcavo will supply rich gas to Brava, for a period of 6 years.",
+   "count": 5
+  },
+  {
+   "source": "petroreconcavo",
+   "target": "3r potiguar",
+   "type": "ADQUIRIU",
+   "evidence": "a Companhia realizou nesta data o pagamento à Brava de R$ 168,8 milhões, equivalentes a 50% do valor total da transação, após os ajustes de preço.",
+   "count": 3
+  },
+  {
+   "source": "petroreconcavo",
+   "target": "brava energia",
+   "type": "CONTROLA",
+   "evidence": "As of the present date, the operation of these midstream assets will be regulated by a Joint Operating Agreement (JOA), and Brava will continue to act as the operator of the assets and the Parties will constitute an Operations Committee, composed of their respective representatives, responsible for defining the budgetary, cost and efficiency guidelines for the operations.",
+   "count": 1
+  },
+  {
+   "source": "porto seguro",
+   "target": "porto servico",
+   "type": "CONTROLA",
+   "evidence": "Porto Serviço S.A., sociedade controlada pela Companhia",
+   "count": 1
+  },
+  {
+   "source": "porto seguro",
+   "target": "cdf assistencia e suporte digital",
+   "type": "CONTROLA",
+   "evidence": "incorporação, pela Porto Serviço S.A., sociedade controlada pela Companhia, inscrita no CNPJ sob o nº 51.430.503/0001-38 (“Porto Serviço”), da CDF Assistência e Suporte Digital S.A., sociedade inscrita no CNPJ sob o nº 08.769.874/0001-10 (“CDF”), e da Porto Assistência Participações S.A.",
+   "count": 1
+  },
+  {
+   "source": "porto seguro",
+   "target": "porto assistencia participacoes",
+   "type": "CONTROLA",
+   "evidence": "incorporação, pela Porto Serviço S.A., sociedade controlada pela Companhia, inscrita no CNPJ sob o nº 51.430.503/0001-38 (“Porto Serviço”), da CDF Assistência e Suporte Digital S.A., sociedade inscrita no CNPJ sob o nº 08.769.874/0001-10 (“CDF”), e da Porto Assistência Participações S.A.",
+   "count": 1
+  },
+  {
+   "source": "porto servico",
+   "target": "btg pactual economia real fundo de investimento em participacoes multiestrategia responsabilidade limitada",
+   "type": "ADQUIRIU",
+   "evidence": "houve a migração da base acionária da Porto Assistência para a Porto Serviço, incluindo o BTG Pactual Economia Real Fundo de Investimento em Participações Multiestratégia Responsabilidade Limitada (CNPJ nº 35.640.811/0001-31), com o qual a Companhia celebrou um acordo de acionistas nesta data, regulando direitos e obrigações na qualidade de acionistas da Porto Serviço.",
+   "count": 1
+  },
+  {
+   "source": "porto servico",
+   "target": "porto seguro",
+   "type": "CONTROLA",
+   "evidence": "Porto Serviço SA, a subsidiary of the Company",
+   "count": 1
+  },
+  {
+   "source": "porto assistencia participacoes",
+   "target": "porto servico",
+   "type": "CONTROLA",
+   "evidence": "Porto Serviço SA, a subsidiary of the Company",
+   "count": 1
+  },
+  {
+   "source": "porto seguro",
+   "target": "btg pactual economia real fundo de investimento em participacoes multiestrategia responsabilidade limitada",
+   "type": "PARTICIPOU_DE",
+   "evidence": "with which the Company entered into a shareholders' agreement on this date, regulating rights and obligations as shareholders of Porto Serviço",
+   "count": 1
+  },
+  {
+   "source": "porto servico",
+   "target": "cdf assistencia e suporte digital",
+   "type": "ADQUIRIU",
+   "evidence": "incorporação da CDF Assistência e Suporte Digital S.A.",
+   "count": 1
+  },
+  {
+   "source": "porto servico",
+   "target": "porto assistencia participacoes",
+   "type": "ADQUIRIU",
+   "evidence": "incorporação da Porto Assistência Participações S.A.",
+   "count": 1
+  },
+  {
+   "source": "cdf",
+   "target": "porto assistencia",
+   "type": "CONTROLA",
+   "evidence": "A CDF era uma subsidiária integral da Porto Assistência, que também foi incorporada pela Companhia e extinta na Incorporação.",
+   "count": 2
+  },
+  {
+   "source": "porto assistencia",
+   "target": "companhia",
+   "type": "CONTROLA",
+   "evidence": "A CDF era uma subsidiária integral da Porto Assistência, que também foi incorporada pela Companhia e extinta na Incorporação.",
+   "count": 1
+  },
+  {
+   "source": "porto servico",
+   "target": "cdf assistencia e suporte digital",
+   "type": "FORNECE_PARA",
+   "evidence": "This pertains to the merger, by the Company, of CDF Assistência e Suporte Digital S.A., a company enrolled with the CNPJ under No. 08.769.874/0001-10 (",
+   "count": 1
+  },
+  {
+   "source": "porto servico",
+   "target": "cdf",
+   "type": "CONTROLA",
+   "evidence": "The merged companies are controlled, directly or indirectly, by the Company and are engaged in the assistance services market.",
+   "count": 1
+  },
+  {
+   "source": "porto servico",
+   "target": "porto assistencia",
+   "type": "CONTROLA",
+   "evidence": "The merged companies are controlled, directly or indirectly, by the Company and are engaged in the assistance services market.",
+   "count": 1
+  },
+  {
+   "source": "porto assistencia",
+   "target": "porto servico",
+   "type": "ADQUIRIU",
+   "evidence": "CDF was a wholly-owned subsidiary of Porto Assistência, which was also merged into the Company and extinguished in the Merger;",
+   "count": 2
+  },
+  {
+   "source": "porto assistencia",
+   "target": "porto servico",
+   "type": "CONTROLA",
+   "evidence": "CDF was a wholly-owned subsidiary of Porto Assistência, which was also merged into the Company and extinguished in the Merger;",
+   "count": 1
+  },
+  {
+   "source": "rumo",
+   "target": "rumo malha norte",
+   "type": "CONTROLA",
+   "evidence": "A operação proposta contempla a incorporação, pela Rumo, da totalidade das ações da Malha Norte, o que, se implementada, resultará na conversão da Malha Norte em subsidiária integral da Rumo.",
+   "count": 3
+  },
+  {
+   "source": "rumo malha norte",
+   "target": "rumo",
+   "type": "CONTROLA",
+   "evidence": "eberão ações ordinárias da Rumo negociadas no segmento do Novo Mercado da B3 S.A. – Brasil, Bolsa e Balcão (“B3”), proporcionalmente às suas respectivas participações no capital social da Malha Norte.",
+   "count": 1
+  },
+  {
+   "source": "comissao de valores mobiliarios",
+   "target": "comites especiais independentes",
+   "type": "PARTICIPOU_DE",
+   "evidence": "Comitês Especiais Independentes, constituídos para os fins do Parecer de Orientação CVM nº 35, de 1 de setembro de 2008 (“Comitês Independentes”), informaram aos Conselhos de Administração das Companhias que, após (i) discutirem e analisarem, cada qual individualmente, a proposta de Incorporação de Ações em conjunto com seus assessores jurídicos e financeiros, contratados para esse fim, e, posteriormente, (ii) negociarem entre si, recomendaram a relação de troca de 0,668 ação da Rumo para cada a",
+   "count": 1
+  },
+  {
+   "source": "rumo",
+   "target": "b3 brasil bolsa balcao",
+   "type": "LOCALIZADA_EM",
+   "evidence": "traded on the Novo Mercado segment of B3 S.A. – Brasil, Bolsa, Balcão (“B3”)}",
+   "count": 1
+  },
+  {
+   "source": "rumo malha norte",
+   "target": "malha norte",
+   "type": "ADQUIRIU",
+   "evidence": "al and financial advisors retained for this purpose and (ii) negotiating with each other, they have recommended an exchange ratio of 0.668 Rumo share for each Malha Norte share (the “Exchange Ratio”).",
+   "count": 1
+  },
+  {
+   "source": "rumo",
+   "target": "malha norte",
+   "type": "CONTROLA",
+   "evidence": "A operação proposta contempla a incorporação, pela Rumo, da totalidade das ações da Malha Norte, o que, se implementada, resultará na conversão da Malha Norte em subsidiária integral da Rumo.",
+   "count": 2
+  },
+  {
+   "source": "rumo",
+   "target": "malha norte",
+   "type": "ADQUIRIU",
+   "evidence": "al and financial advisors retained for this purpose and (ii) negotiating with each other, they have recommended an exchange ratio of 0.668 Rumo share for each Malha Norte share (the “Exchange Ratio”)",
+   "count": 1
+  },
+  {
+   "source": "itau unibanco holding",
+   "target": "sendas distribuidora",
+   "type": "ADQUIRIU",
+   "evidence": "celebrou documentos definitivos e vinculantes com o Itaú Unibanco Holding S.A. (“Itaú”), na qualidade de comprador, e a Companhia, o Grupo Casas Bahia S.A. (“GCB”) e a Companhia Brasileira de Distribuição (“CBD” e, em conjunto com a Companhia, GCB e CBD, as “Varejistas”), na qualidade de vendedoras, referente às participações societárias direta ou indiretamente detidas pelas Varejistas na Financeira Itaú CBD S.A. – Crédito, Financiamento e Investimento (“FIC” e “Transação”).",
+   "count": 1
+  },
+  {
+   "source": "companhia",
+   "target": "financeira itau cbd credito financiamento e investimento",
+   "type": "PRODUZ",
+   "evidence": "celebrou documentos definitivos e vinculantes com o Itaú Unibanco Holding S.A. (“Itaú”), na qualidade de comprador, e a Companhia, o Grupo Casas Bahia S.A. (“GCB”) e a Companhia Brasileira de Distribuição (“CBD” e, em conjunto com a Companhia, GCB e CBD, as “Varejistas”), na qualidade de vendedoras, referente às participações societárias direta ou indiretamente detidas pelas Varejistas na Financeira Itaú CBD S.A. – Crédito, Financiamento e Investimento (“FIC” e “Transação”).",
+   "count": 1
+  },
+  {
+   "source": "assai atacadista",
+   "target": "sendas distribuidora",
+   "type": "PARTICIPOU_DE",
+   "evidence": "A Companhia manterá seus acionistas e o mercado em geral devidamente informados, nos termos da legislação e da regulamentação aplicável, acerca de qualquer ato ou fato relevante envolvendo a Companhia e/ou sobre o desenvolvimento do presente tema.",
+   "count": 1
+  },
+  {
+   "source": "sendas distribuidora",
+   "target": "financeira itau cbd credito financiamento e investimento",
+   "type": "ADQUIRIU",
+   "evidence": "The first phase will comprise the sale of GCB’s and CBD’s direct or indirect interests in FIC, while the second phase, to occur within two years after the closing of the first, will comprise the sale of the Company’s indirect interest in FIC.",
+   "count": 1
+  },
+  {
+   "source": "itau unibanco holding",
+   "target": "financeira itau cbd credito financiamento e investimento",
+   "type": "CONTROLA",
+   "evidence": "Upon completion of both phases, Itaú will become the sole direct or indirect shareholder of FIC.",
+   "count": 1
+  },
+  {
+   "source": "itau unibanco holding",
+   "target": "companhia",
+   "type": "ADQUIRIU",
+   "evidence": "Itaú, na qualidade de comprador, e a Companhia",
+   "count": 1
+  },
+  {
+   "source": "sendas distribuidora",
+   "target": "companhia brasileira de distribuicao fic",
+   "type": "FORNECE_PARA",
+   "evidence": "the existing commercial partnership between the Company and FIC will remain effective for another 2 (two) year period, during which FIC will retain its current exclusivity for the distribution of the existing financial products and services, which are already offered to the Company’s client base",
+   "count": 1
+  },
+  {
+   "source": "assai atacadista",
+   "target": "rio de janeiro",
+   "type": "LOCALIZADA_EM",
+   "evidence": "Rio de Janeiro, December 8th, 2025",
+   "count": 1
+  },
+  {
+   "source": "belmiro de figueiredo gomes",
+   "target": "assai atacadista",
+   "type": "TRABALHA_EM",
+   "evidence": "Belmiro de Figueiredo Gomes\\nChief Executive Officer and Investor Relations Officer",
+   "count": 1
+  },
+  {
+   "source": "senior sistemas",
+   "target": "senior capital",
+   "type": "PRODUZ",
+   "evidence": "A Senior Capital tem o potencial de transformar a experiência financeira das organizações, colocando tecnologia e ciência de dados a serviço do crescimento dos negócios.",
+   "count": 1
+  },
+  {
+   "source": "senior sistemas",
+   "target": "senior capital",
+   "type": "PARTICIPOU_DE",
+   "evidence": "Com o fechamento da Operação, aprovada pelo Conselho Administrativo de Defesa Econômica – CADE em outubro de 2023 e pelo Banco Central do Brasil – BACEN em janeiro de 2025, as empresas detêm, cada uma, 50% de participação na Joint Venture.",
+   "count": 1
+  },
+  {
+   "source": "btg pactual",
+   "target": "senior capital",
+   "type": "PRODUZ",
+   "evidence": "A Senior Capital tem o potencial de transformar a experiência financeira das organizações, colocando tecnologia e ciência de dados a serviço do crescimento dos negócios.",
+   "count": 1
+  },
+  {
+   "source": "btg pactual",
+   "target": "senior capital",
+   "type": "PARTICIPOU_DE",
+   "evidence": "Com o fechamento da Operação, aprovada pelo Conselho Administrativo de Defesa Econômica – CADE em outubro de 2023 e pelo Banco Central do Brasil – BACEN em janeiro de 2025, as empresas detêm, cada uma, 50% de participação na Joint Venture.",
+   "count": 1
+  },
+  {
+   "source": "senior sistemas",
+   "target": "senior capital",
+   "type": "CONTROLA",
+   "evidence": "Com o fechamento da Operação, aprovada pelo Conselho Administrativo de Defesa Econômica – CADE em outubro de 2023 e pelo Banco Central do Brasil – BACEN em janeiro de 2025, as empresas detêm, cada uma, 50% de participação na Joint Venture.",
+   "count": 1
+  },
+  {
+   "source": "btg pactual",
+   "target": "senior capital",
+   "type": "CONTROLA",
+   "evidence": "Com o fechamento da Operação, aprovada pelo Conselho Administrativo de Defesa Econômica – CADE em outubro de 2023 e pelo Banco Central do Brasil – BACEN em janeiro de 2025, as empresas detêm, cada uma, 50% de participação na Joint Venture.",
+   "count": 1
+  }
+ ]
+}

@@ -20,6 +20,24 @@ from ariadne.domain.graph import Extraction
 
 _PROMPT = """Voce extrai entidades e relacoes de textos em portugues sobre empresas brasileiras.
 
+TIPOS DE ENTIDADE:
+
+- Organizacao: QUALQUER pessoa juridica -- empresa, banco, fundo, subsidiaria,
+  orgao regulador, bolsa. "Banco Santander (Brasil) S.A.", "Copel", "CVM", "B3".
+- Pessoa: individuo, gente com nome proprio.
+- Lugar: pais, estado, cidade, regiao ou instalacao geografica.
+  "Rio Grande do Norte", "Parana", "Bacia Potiguar".
+- Produto: bem ou servico negociado. "minerio de ferro", "gas natural".
+- Setor: RAMO DE ATIVIDADE, nunca uma empresa. "siderurgia", "setor eletrico",
+  "midstream", "saneamento".
+- Evento: acontecimento datado. "assembleia geral extraordinaria",
+  "oferta publica de aquisicao".
+- Outro: so quando nao couber em nenhum acima.
+
+Regra que resolve a confusao mais comum: nome que traz "S.A.", "S/A", "Ltda.",
+"Banco", "Companhia", "Cia." ou "Participacoes" e **Organizacao**, nunca Setor.
+Setor e o ramo em que ela atua, nao ela.
+
 TIPOS DE RELACAO (preste atencao na DIRECAO -- origem primeiro, destino depois):
 
 - CONTROLA: origem e dona/acionista da destino.
@@ -72,7 +90,7 @@ def chunk_fingerprint(text: str, model: str, prompt_version: str) -> str:
 class OllamaExtractor:
     """Extrator via Ollama, com schema estrito."""
 
-    PROMPT_VERSION = "v2"
+    PROMPT_VERSION = "v3"
 
     def __init__(
         self,
