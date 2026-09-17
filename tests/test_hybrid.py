@@ -57,12 +57,12 @@ def motor():
 # --- busca lexical ----------------------------------------------------------
 
 
-def test_lexical_encontra_por_termo_exato(db):
+def test_lexical_encontra_por_termo_exato(db, _require_corpus):
     hits = LexicalSearch().search(db, TERMO, limit=5)
     assert hits, f"busca lexical nao devolveu nada para {TERMO!r}"
 
 
-def test_lexical_nao_exige_todos_os_termos(db):
+def test_lexical_nao_exige_todos_os_termos(db, _require_corpus):
     """O bug que quase passou: com AND, pergunta natural devolvia zero.
 
     Uma pergunta inteira so casaria com um trecho que contivesse TODOS os seus

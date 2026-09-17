@@ -80,12 +80,12 @@ def parse_file(path: Path) -> ParsedDocument:
 def _parse_pdf(path: Path) -> ParsedDocument:
     try:
         import pymupdf
-        import pymupdf4llm  # type: ignore[import-untyped]
+        import pymupdf4llm
     except ImportError as exc:  # pragma: no cover
         msg = "instale o extra 'docs' para ler PDF: uv sync --extra docs"
         raise ParserUnavailableError(msg) from exc
 
-    documento: Any = pymupdf.open(path)  # type: ignore[no-untyped-call]
+    documento: Any = pymupdf.open(path)
     try:
         paginas = int(documento.page_count)
     finally:
@@ -146,7 +146,7 @@ def _parse_docx(path: Path) -> ParsedDocument:
 
 def _parse_sheet(path: Path) -> ParsedDocument:
     try:
-        import openpyxl  # type: ignore[import-untyped]
+        import openpyxl
     except ImportError as exc:  # pragma: no cover
         msg = "instale o extra 'docs' para ler planilhas: uv sync --extra docs"
         raise ParserUnavailableError(msg) from exc
@@ -214,9 +214,7 @@ def _parse_image(path: Path) -> ParsedDocument:
 
 def _ocr_engine() -> Any:
     try:
-        from rapidocr_onnxruntime import (  # type: ignore[import-untyped]
-            RapidOCR,
-        )
+        from rapidocr_onnxruntime import RapidOCR
     except ImportError as exc:  # pragma: no cover
         msg = "instale o extra 'ocr' para ler imagens: uv sync --extra ocr"
         raise ParserUnavailableError(msg) from exc
@@ -244,7 +242,7 @@ def _ocr_pdf(path: Path) -> str:
         return ""
 
     partes: list[str] = []
-    documento: Any = pymupdf.open(path)  # type: ignore[no-untyped-call]
+    documento: Any = pymupdf.open(path)
     try:
         for pagina in documento:
             # 200 dpi: abaixo disso o OCR erra muito, acima fica lento sem

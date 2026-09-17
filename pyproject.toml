@@ -66,6 +66,32 @@ strict = true
 files = ["src", "tests"]
 mypy_path = "src"
 
+# Os parsers e o reranker sao EXTRAS opcionais: `uv sync` sem eles instala um
+# projeto que funciona, so sem PDF/OCR/reranking. Sem estes overrides o mypy
+# passava na maquina de quem instalou os extras e falhava em quem nao instalou
+# -- e foi exatamente isso que o primeiro push do projeto revelou, com o CI
+# vermelho num codigo que estava verde aqui. Nenhuma destas bibliotecas publica
+# stubs de tipo.
+[[tool.mypy.overrides]]
+module = [
+    "pymupdf.*",
+    "pymupdf4llm.*",
+    "docx.*",
+    "openpyxl.*",
+    "rapidocr_onnxruntime.*",
+    "sentence_transformers.*",
+]
+ignore_missing_imports = true
+
+# Fronteira com bibliotecas sem tipos. Com os extras instalados, `pymupdf.open`
+# e uma funcao untyped e o mypy reclama de `no-untyped-call`; sem eles, o import
+# nem resolve. Relaxar a regra NESTE arquivo -- e so nele -- e o que faz o mesmo
+# comando dar o mesmo resultado nos dois ambientes. O retorno ja e amarrado em
+# `ParsedDocument`, entao o tipo volta a valer na saida da funcao.
+[[tool.mypy.overrides]]
+module = "ariadne.ingestion.parsers"
+disallow_untyped_calls = false
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [

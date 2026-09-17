@@ -13,6 +13,7 @@ import pytest
 
 from ariadne.config import Settings, get_settings
 from ariadne.storage import database
+from ariadne.storage.schema import apply_schema
 
 
 @pytest.fixture(scope="session")
@@ -23,11 +24,37 @@ def settings() -> Settings:
 
 @pytest.fixture(scope="session")
 def _require_database(settings: Settings) -> None:
+    """Exige o banco de pe E o schema aplicado.
+
+    Aplicar o schema aqui nao e comodidade: um banco recem-subido nao tem
+    tabela nenhuma, e sem isso os testes quebravam com
+    `relation "chunks" does not exist`. Passava despercebido na maquina de
+    quem ja tinha ingerido corpus, e quebrava no CI, que sobe o container
+    zerado a cada execucao. Foi assim que o primeiro push do projeto descobriu.
+    """
     try:
         with psycopg.connect(settings.pg_dsn, connect_timeout=3) as conn:
             conn.execute("SELECT 1")
     except psycopg.Error as exc:
         pytest.skip(f"Postgres indisponivel em {settings.pg_host}:{settings.pg_port} ({exc})")
+
+    with database.connection() as conn:
+        apply_schema(conn)
+
+
+@pytest.fixture(scope="session")
+def _require_corpus(_require_database: None) -> None:
+    """Pula quando o indice esta vazio.
+
+    Teste que mede recuperacao precisa de algo para recuperar. Sem corpus ele
+    nao falha por defeito do codigo -- falha por falta de dado, e um vermelho
+    desses ensina a ignorar o vermelho.
+    """
+    with database.connection() as conn, conn.cursor() as cur:
+        cur.execute("SELECT count(*) FROM chunks")
+        linha = cur.fetchone()
+    if not linha or not linha[0]:
+        pytest.skip("indice vazio -- rode `ariadne ingest-dir data/cvm`")
 
 
 TEST_GRAPH = "ariadne_test"
