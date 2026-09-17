@@ -9,6 +9,8 @@ seguinte.
 Cada teste aqui e um vetor de exfiltracao fechado.
 """
 
+import importlib.util
+
 import pytest
 
 from ariadne.config import Settings
@@ -73,12 +75,21 @@ def test_extensao_nao_suportada_e_recusada(raiz):
         resolve_source("programa.exe", cfg(raiz))
 
 
+@pytest.mark.skipif(
+    importlib.util.find_spec("pymupdf") is None,
+    reason="precisa do extra 'docs' para exercitar o parser de PDF de verdade",
+)
 def test_arquivo_corrompido_vira_recusa_e_nao_traceback(raiz):
     """Extensao certa, conteudo quebrado.
 
     A biblioteca de parsing estoura sua propria excecao (FileDataError,
     BadZipFile...). Deixar vazar entregaria um traceback ao LLM no lugar de uma
     instrucao sobre o que fazer.
+
+    O `skipif` existe porque sem o extra `docs` o sistema recusa o arquivo por
+    OUTRO motivo -- "instale o extra" --, que tambem e uma recusa legivel e
+    tambem esta certa. Sem a marca, o teste falhava em qualquer instalacao
+    minima e dizia que o codigo estava errado quando era o ambiente.
     """
     with pytest.raises(SourceRejectedError, match="nao foi possivel ler"):
         resolve_source("corrompido.pdf", cfg(raiz))
